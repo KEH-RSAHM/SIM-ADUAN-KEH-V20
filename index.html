@@ -473,14 +473,49 @@
 </div>
 
 <!-- MODALS -->
-<div class="modal-overlay" id="modalAduan"><div class="modal modal-lg"><div class="modal-header"><h3 id="modalAduanTitle"><i class="fas fa-bullhorn"></i> Tambah Aduan</h3><button class="modal-close" onclick="closeModal('modalAduan')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="formAduan"><input type="hidden" id="aduanId"><div class="form-row"><div class="form-group"><label>Email <span class="required">*</span></label><input type="email" class="form-control" id="aduanEmail" required></div><div class="form-group"><label>Nama Pelapor <span class="required">*</span></label><input type="text" class="form-control" id="aduanNama" required></div></div><div class="form-row"><div class="form-group"><label>No. HP/WA <span class="required">*</span></label><input type="text" class="form-control" id="aduanHP" required></div><div class="form-group"><label>Tgl Kejadian <span class="required">*</span></label><input type="date" class="form-control" id="aduanTglKejadian" required></div></div><div class="form-group"><label>Deskripsi <span class="required">*</span></label><textarea class="form-control" id="aduanDeskripsi" rows="3" required></textarea></div><div class="form-row"><div class="form-group"><label>Nama Dilaporkan <span class="required">*</span></label><input type="text" class="form-control" id="aduanNamaDilaporkan" required></div><div class="form-group"><label>Jabatan</label><input type="text" class="form-control" id="aduanJabatan"></div></div><div class="form-group"><label>Unit Kerja / Lokasi <span class="required">*</span></label><input type="text" class="form-control" id="aduanUnitKerja" required></div><div class="form-group"><div class="form-group">
-    <label>Bukti Laporan <span style="font-weight:normal; color:#64748b; font-size:10px;">(jpeg, png, pdf, doc, xlsx, mp4, audio/* atau link)</span></label>
-    <div style="display: flex; flex-direction: column; gap: 8px;">
-        <input type="file" id="buktiFile" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xlsx,.mp4,.mpeg,audio/*" class="form-control form-control-sm">
-        <div style="text-align: center; font-size: 10px; font-weight: bold; color: #94a3b8;">ATAU</div>
-        <input type="url" id="buktiLink" placeholder="Tempel link Dropbox / Google Drive di sini" class="form-control form-control-sm">
+<div class="modal-overlay" id="modalAduan">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3 id="modalAduanTitle"><i class="fas fa-bullhorn"></i> Tambah Aduan</h3>
+            <button type="button" class="modal-close" onclick="closeModal('modalAduan')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="formAduan">
+                <input type="hidden" id="aduanId">
+                <div class="form-row">
+                    <div class="form-group"><label>Email <span class="required">*</span></label><input type="email" class="form-control" id="aduanEmail" required></div>
+                    <div class="form-group"><label>Nama Pelapor <span class="required">*</span></label><input type="text" class="form-control" id="aduanNama" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>No. HP/WA <span class="required">*</span></label><input type="text" class="form-control" id="aduanHP" required></div>
+                    <div class="form-group"><label>Tgl Kejadian <span class="required">*</span></label><input type="date" class="form-control" id="aduanTglKejadian" required></div>
+                </div>
+                <div class="form-group">
+                    <label>Deskripsi <span class="required">*</span></label><textarea class="form-control" id="aduanDeskripsi" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Nama Dilaporkan <span class="required">*</span></label><input type="text" class="form-control" id="aduanNamaDilaporkan" required></div>
+                    <div class="form-group"><label>Jabatan</label><input type="text" class="form-control" id="aduanJabatan"></div>
+                </div>
+                <div class="form-group">
+                    <label>Unit Kerja / Lokasi <span class="required">*</span></label><input type="text" class="form-control" id="aduanUnitKerja" required>
+                </div>
+                <div class="form-group">
+                    <label>Bukti Laporan <span style="font-weight:normal; color:#64748b; font-size:10px;">(jpeg, png, pdf, doc, xlsx, mp4, audio/* atau link)</span></label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <input type="file" id="buktiFile" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xlsx,.mp4,.mpeg,audio/*" class="form-control form-control-sm">
+                        <div style="text-align: center; font-size: 10px; font-weight: bold; color: #94a3b8;">ATAU</div>
+                        <input type="url" id="buktiLink" placeholder="Tempel link Dropbox / Google Drive di sini" class="form-control form-control-sm">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('modalAduan')">Batal</button>
+            <button type="button" class="btn btn-primary" onclick="saveAduan()"><i class="fas fa-save"></i> Simpan</button>
+        </div>
     </div>
-</div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalAduan')">Batal</button><button class="btn btn-primary" onclick="saveAduan()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
+</div>
 <div class="modal-overlay" id="modalPenanganan"><div class="modal modal-lg"><div class="modal-header"><h3 id="modalPenangananTitle"><i class="fas fa-tasks"></i> Tambah Penanganan</h3><button class="modal-close" onclick="closeModal('modalPenanganan')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="formPenanganan"><input type="hidden" id="penangananId"><div class="form-row"><div class="form-group"><label>Pilih Aduan <span class="required">*</span></label><select class="form-control" id="penangananAduanId" required></select></div><div class="form-group"><label>Diverifikasi Tgl <span class="required">*</span></label><input type="date" class="form-control" id="penangananTglVerif" required></div></div><div class="form-row-3"><div class="form-group"><label>Kategori <span class="required">*</span></label><select class="form-control" id="penangananKategori" onchange="loadSubKategori()" required><option value="">Pilih</option><option value="Etik">Etik</option><option value="Hukum">Hukum</option></select></div><div class="form-group"><label>Sub Kategori</label><select class="form-control" id="penangananSubKategori"><option value="">Pilih</option></select></div><div class="form-group"><label>Urgensi <span class="required">*</span></label><select class="form-control" id="penangananUrgensi" required><option value="">Pilih</option><option value="Ringan">Ringan</option><option value="Sedang">Sedang</option><option value="Berat">Berat</option></select></div></div><div class="form-row-3"><div class="form-group"><label>Status <span class="required">*</span></label><select class="form-control" id="penangananStatus" required></select></div><div class="form-group"><label>PIC <span class="required">*</span></label><select class="form-control" id="penangananPIC" required><option value="">Pilih PIC</option></select></div><div class="form-group"><label>Eskalasi</label><select class="form-control" id="penangananEskalasi"><option value="">Pilih Eskalasi</option></select></div></div><div class="form-row"><div class="form-group"><label>Estimasi</label><select class="form-control" id="penangananEstimasi"><option value="3 Hari">3 Hari</option><option value="7 Hari">7 Hari</option><option value="14 Hari">14 Hari</option><option value=">14 Hari">>14 Hari</option></select></div><div class="form-group"><label>Tgl Mulai</label><input type="date" class="form-control" id="penangananTglMulai"></div></div><div class="form-group"><label>Tanggapan Komite</label><textarea class="form-control" id="penangananTanggapan" rows="2"></textarea></div><div class="form-group"><label>No. SK Keputusan</label><input type="text" class="form-control" id="penangananKeputusan" readonly></div><div class="form-group"><label>Hal Keputusan</label><textarea class="form-control" id="penangananHalKeputusan" rows="2" readonly></textarea></div><div class="form-group"><label>Bukti Dokumentasi (URL)</label><input type="text" class="form-control" id="penangananBukti"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalPenanganan')">Batal</button><button class="btn btn-primary" onclick="savePenanganan()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
 <div class="modal-overlay" id="modalMasterGeneric"><div class="modal modal-sm"><div class="modal-header"><h3 id="modalMasterGenericTitle"><i class="fas fa-tag"></i> Tambah</h3><button class="modal-close" onclick="closeModal('modalMasterGeneric')"><i class="fas fa-times"></i></button></div><div class="modal-body" id="modalMasterGenericBody"></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalMasterGeneric')">Batal</button><button class="btn btn-primary" onclick="saveMasterGeneric()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
 <div class="modal-overlay" id="modalUploadSK"><div class="modal modal-sm"><div class="modal-header"><h3><i class="fas fa-file-upload"></i> Upload Surat Penetapan</h3><button class="modal-close" onclick="closeModal('modalUploadSK')"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="uploadSKPenangananId"><div class="form-group"><label>No. SK</label><input type="text" class="form-control" id="uploadSKNomor" readonly></div><div class="form-group"><label>Upload PDF (Max 5MB)</label><div class="upload-area" id="uploadSKArea" onclick="document.getElementById('uploadSKFile').click()"><i class="fas fa-cloud-upload-alt"></i><p>Klik pilih file PDF</p><div class="file-name" id="uploadSKFileName"></div></div><input type="file" id="uploadSKFile" accept=".pdf" style="display:none" onchange="handleSKFileSelect(event)"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalUploadSK')">Batal</button><button class="btn btn-primary" onclick="saveSKUpload()"><i class="fas fa-save"></i> Upload</button></div></div></div>
@@ -605,8 +640,66 @@ function createDoughnutChart(){const p=getDB('penanganan');const allStatuses=get
 
 function renderAduanTable(){const d=getDB('aduan');let h='';d.forEach((a,i)=>{h+=`<tr><td>${i+1}</td><td style="font-size:10px;white-space:nowrap">${a.timestamp}</td><td>${a.email}</td><td class="sticky-col"><strong>${a.nama}</strong></td><td>${a.hp}</td><td>${a.tglKejadian}</td><td><div class="text-truncate" title="${a.deskripsi}">${a.deskripsi}</div></td><td>${a.namaDilaporkan}</td><td>${a.jabatan||'-'}</td><td>${a.unitKerja}</td><td>${a.lampiran?'<a href="'+a.lampiran+'" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-paperclip"></i></a>':'-'}</td><td class="sticky-col-right"><div class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editAduan('${a.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('aduan','${a.id}')"><i class="fas fa-trash"></i></button></div></td></tr>`;});document.getElementById('aduanTableBody').innerHTML=h||'<tr><td colspan="12" style="text-align:center;color:var(--gray);padding:32px">Belum ada data</td></tr>';document.getElementById('aduanInfo').textContent=`${d.length} data`;}
 function showModalAduan(e){document.getElementById('modalAduanTitle').innerHTML=`<i class="fas fa-bullhorn"></i> ${e?'Edit':'Tambah'} Aduan`;if(!e){document.getElementById('formAduan').reset();document.getElementById('aduanId').value='';}document.getElementById('modalAduan').classList.add('active');}
-function editAduan(id){const d=getDB('aduan').find(a=>a.id===id);if(!d)return;document.getElementById('aduanId').value=id;document.getElementById('aduanEmail').value=d.email;document.getElementById('aduanNama').value=d.nama;document.getElementById('aduanHP').value=d.hp;document.getElementById('aduanTglKejadian').value=d.tglKejadian;document.getElementById('aduanDeskripsi').value=d.deskripsi;document.getElementById('aduanNamaDilaporkan').value=d.namaDilaporkan;document.getElementById('aduanJabatan').value=d.jabatan;document.getElementById('aduanUnitKerja').value=d.unitKerja;document.getElementById('aduanLampiran').value=d.lampiran;showModalAduan(true);}
-function saveAduan(){const id=document.getElementById('aduanId').value;const o={email:document.getElementById('aduanEmail').value,nama:document.getElementById('aduanNama').value,hp:document.getElementById('aduanHP').value,tglKejadian:document.getElementById('aduanTglKejadian').value,deskripsi:document.getElementById('aduanDeskripsi').value,namaDilaporkan:document.getElementById('aduanNamaDilaporkan').value,jabatan:document.getElementById('aduanJabatan').value,unitKerja:document.getElementById('aduanUnitKerja').value,lampiran:document.getElementById('aduanLampiran').value};if(!o.email||!o.nama||!o.deskripsi){showToast('error','Isi field wajib!');return;}let d=getDB('aduan');if(id){d=d.map(a=>a.id===id?{...a,...o}:a);addLog('info',`Aduan ${o.nama} diperbarui`);}else{o.id=genId();o.timestamp=now();d.push(o);addLog('success',`Aduan baru: ${o.nama}`);}setDB('aduan',d);closeModal('modalAduan');renderAduanTable();showToast('success','Aduan disimpan!');}
+function editAduan(id) {
+    const d = getDB('aduan').find(a => a.id === id);
+    if (!d) return;
+    document.getElementById('aduanId').value = id;
+    document.getElementById('aduanEmail').value = d.email;
+    document.getElementById('aduanNama').value = d.nama;
+    document.getElementById('aduanHP').value = d.hp;
+    document.getElementById('aduanTglKejadian').value = d.tglKejadian;
+    document.getElementById('aduanDeskripsi').value = d.deskripsi;
+    document.getElementById('aduanNamaDilaporkan').value = d.namaDilaporkan;
+    document.getElementById('aduanJabatan').value = d.jabatan;
+    document.getElementById('aduanUnitKerja').value = d.unitKerja;
+    document.getElementById('buktiLink').value = d.lampiran || '';
+    document.getElementById('buktiFile').value = ''; 
+    showModalAduan(true);
+}
+
+function saveAduan() {
+    const id = document.getElementById('aduanId').value;
+    const fileInput = document.getElementById('buktiFile');
+    let lampiranVal = document.getElementById('buktiLink').value;
+    
+    // Jika ada file yang dipilih, simpan nama filenya
+    if (fileInput.files.length > 0) {
+        lampiranVal = "File: " + fileInput.files[0].name; 
+    }
+
+    const o = {
+        email: document.getElementById('aduanEmail').value,
+        nama: document.getElementById('aduanNama').value,
+        hp: document.getElementById('aduanHP').value,
+        tglKejadian: document.getElementById('aduanTglKejadian').value,
+        deskripsi: document.getElementById('aduanDeskripsi').value,
+        namaDilaporkan: document.getElementById('aduanNamaDilaporkan').value,
+        jabatan: document.getElementById('aduanJabatan').value,
+        unitKerja: document.getElementById('aduanUnitKerja').value,
+        lampiran: lampiranVal
+    };
+
+    if (!o.email || !o.nama || !o.deskripsi) {
+        showToast('error', 'Isi field wajib!');
+        return;
+    }
+
+    let d = getDB('aduan');
+    if (id) {
+        d = d.map(a => a.id === id ? { ...a, ...o } : a);
+        addLog('info', `Aduan ${o.nama} diperbarui`);
+    } else {
+        o.id = genId();
+        o.timestamp = now();
+        d.push(o);
+        addLog('success', `Aduan baru: ${o.nama}`);
+    }
+
+    setDB('aduan', d);
+    closeModal('modalAduan');
+    renderAduanTable();
+    showToast('success', 'Aduan disimpan!');
+}
 
 function renderPenangananTable(){
     const data=getDB('penanganan'),aduan=getDB('aduan');
