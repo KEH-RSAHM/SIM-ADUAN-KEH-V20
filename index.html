@@ -10,6 +10,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         :root {
             --primary: #4f46e5; --primary-light: #818cf8; --primary-dark: #3730a3;
@@ -244,7 +247,6 @@
         .profile-menu a i { width: 16px; color: var(--gray); font-size: 13px; }
         .profile-menu hr { border: none; border-top: 1px solid #f1f5f9; margin: 3px 0; }
         
-        /* Text Wrap Full */
         .text-wrap-full { white-space: pre-wrap !important; word-break: break-word; min-width: 220px; display: block; line-height: 1.5; }
         .text-truncate { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
         .text-truncate-sm { max-width: 110px; }
@@ -301,7 +303,10 @@
     </style>
 </head>
 <body>
-<div class="loader-overlay" id="loader"><div class="spinner"></div><p style="color: var(--gray); font-size: 13px; font-weight: 500;">Memuat sistem...</p></div>
+<div class="loader-overlay" id="loader">
+    <div class="spinner"></div>
+    <p style="color: var(--gray); font-size: 13px; font-weight: 500;" id="loaderText">Memuat sistem dari Cloud...</p>
+</div>
 <div class="toast-container" id="toastContainer"></div>
 
 <div class="landing-page" id="landingPage">
@@ -313,7 +318,7 @@
     <div class="landing-hero"><div class="hero-content"><div class="hero-badge"><i class="fas fa-sparkles"></i> Platform Terpercaya & Aman</div><h1>Laporkan Masalah <span>Etik & Hukum</span> dengan Mudah</h1><p>Sistem pelaporan aduan terintegrasi yang memastikan setiap laporan ditangani secara profesional, transparan, dan akuntabel.</p><div class="hero-buttons"><a href="#" class="btn-hero btn-hero-primary" onclick="showAuth('register')"><i class="fas fa-paper-plane"></i> Buat Laporan</a><a href="#info" class="btn-hero btn-hero-outline"><i class="fas fa-info-circle"></i> Selengkapnya</a></div></div></div>
     <div class="landing-features" id="features"><div class="info-section-title"><h2>Fitur Unggulan</h2><p>Dirancang untuk kemudahan dan keamanan</p></div><div class="features-grid"><div class="feature-card"><div class="feature-icon" style="background:var(--gradient-1)"><i class="fas fa-lock"></i></div><h3>Kerahasiaan Terjamin</h3><p>Data pelapor dienkripsi dan aman.</p></div><div class="feature-card"><div class="feature-icon" style="background:var(--gradient-3)"><i class="fas fa-chart-line"></i></div><h3>Tracking Real-time</h3><p>Pantau progres secara real-time.</p></div><div class="feature-card"><div class="feature-icon" style="background:var(--gradient-4)"><i class="fas fa-clock"></i></div><h3>Penanganan Cepat</h3><p>SLA terukur dengan estimasi jelas.</p></div><div class="feature-card"><div class="feature-icon" style="background:var(--gradient-5)"><i class="fas fa-file-pdf"></i></div><h3>Multi Format Bukti</h3><p>Foto, dokumen, video, audio, cloud.</p></div><div class="feature-card"><div class="feature-icon" style="background:var(--gradient-2)"><i class="fas fa-gavel"></i></div><h3>Multi Kategori</h3><p>Etik dan hukum komprehensif.</p></div><div class="feature-card"><div class="feature-icon" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb)"><i class="fas fa-users-cog"></i></div><h3>Multi Role</h3><p>Kontrol akses berlapis.</p></div></div></div>
     <div class="landing-info" id="info">
-        <div class="info-section-title"><h2>Informasi & Panduan</h2><p>Download brosur, panduan, dan video (Max 5MB)</p></div>
+        <div class="info-section-title"><h2>Informasi & Panduan</h2><p>Download brosur, panduan, dan video</p></div>
         <div class="info-cards">
             <div class="info-card"><div class="info-card-img" style="background:var(--gradient-1)">📋</div><div class="info-card-body"><h3>Panduan Pelaporan</h3><p>Langkah membuat laporan aduan.</p><button class="btn-download" onclick="downloadLandingContent('panduan', 'pdf')"><i class="fas fa-download"></i> Download PDF</button></div></div>
             <div class="info-card"><div class="info-card-img" style="background:var(--gradient-3)">⚖️</div><div class="info-card-body"><h3>Kode Etik & Info</h3><p>Dokumen kode etik dan peraturan.</p><button class="btn-download" onclick="downloadLandingContent('info', 'pdf')"><i class="fas fa-download"></i> Download PDF</button></div></div>
@@ -533,7 +538,8 @@
                 </div>
             </div>
 
-<div class="page" id="pageNotifikasi"><div class="card"><div class="card-header"><h3><i class="fas fa-bell"></i> Notifikasi Proses</h3><div class="card-actions"><button class="btn btn-secondary btn-sm" onclick="markAllRead()"><i class="fas fa-check-double"></i> Semua Dibaca</button><button class="btn btn-danger btn-sm" id="btnHapusNotifSA" onclick="clearNotifikasi()" style="display:none;"><i class="fas fa-trash"></i> Hapus Semua</button></div></div><div class="card-body p-0"><div class="table-wrapper"><table class="data-table"><thead><tr><th>No</th><th>Waktu</th><th>Dari</th><th>Pesan</th><th>Tipe</th><th>Target</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="notifTableBody"></tbody></table></div></div></div></div>            <div class="page" id="pageLogActivity"><div class="card"><div class="card-header"><h3><i class="fas fa-history"></i> Log Aktivitas</h3><button class="btn btn-danger btn-sm" onclick="clearLogs()"><i class="fas fa-trash"></i> Hapus Log</button></div><div class="card-body"><div class="log-container" id="logContainer"></div></div></div></div>
+            <div class="page" id="pageNotifikasi"><div class="card"><div class="card-header"><h3><i class="fas fa-bell"></i> Notifikasi Proses</h3><div class="card-actions"><button class="btn btn-secondary btn-sm" onclick="markAllRead()"><i class="fas fa-check-double"></i> Semua Dibaca</button><button class="btn btn-danger btn-sm" id="btnHapusNotifSA" onclick="clearNotifikasi()" style="display:none;"><i class="fas fa-trash"></i> Hapus Semua</button></div></div><div class="card-body p-0"><div class="table-wrapper"><table class="data-table"><thead><tr><th>No</th><th>Waktu</th><th>Dari</th><th>Pesan</th><th>Tipe</th><th>Target</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="notifTableBody"></tbody></table></div></div></div></div>
+            <div class="page" id="pageLogActivity"><div class="card"><div class="card-header"><h3><i class="fas fa-history"></i> Log Aktivitas</h3><button class="btn btn-danger btn-sm" onclick="clearLogs()"><i class="fas fa-trash"></i> Hapus Log</button></div><div class="card-body"><div class="log-container" id="logContainer"></div></div></div></div>
             <div class="page" id="pageMasterPIC"><div class="card"><div class="card-header"><h3><i class="fas fa-user-tie"></i> Master PIC</h3><div class="card-actions"><button class="btn btn-primary btn-sm" onclick="showModalMasterGeneric('masterPIC')"><i class="fas fa-plus"></i> Tambah</button><button class="btn btn-success btn-sm" onclick="exportTable('masterPIC','xlsx')"><i class="fas fa-file-excel"></i> Export</button><button class="btn btn-info btn-sm" onclick="importXLSX('masterPIC')"><i class="fas fa-file-import"></i> Import</button><input type="file" id="importMasterPIC" accept=".xlsx" style="display:none" onchange="processImport(event,'masterPIC')"></div></div><div class="card-body p-0"><div class="table-wrapper"><table class="data-table"><thead><tr><th>No</th><th>Kode</th><th>Nama PIC</th><th>Jabatan</th><th>Deskripsi</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="masterPICBody"></tbody></table></div></div></div></div>
             <div class="page" id="pageMasterEskalasi"><div class="card"><div class="card-header"><h3><i class="fas fa-layer-group"></i> Master Eskalasi</h3><div class="card-actions"><button class="btn btn-primary btn-sm" onclick="showModalMasterGeneric('masterEskalasi')"><i class="fas fa-plus"></i> Tambah</button><button class="btn btn-success btn-sm" onclick="exportTable('masterEskalasi','xlsx')"><i class="fas fa-file-excel"></i> Export</button><button class="btn btn-info btn-sm" onclick="importXLSX('masterEskalasi')"><i class="fas fa-file-import"></i> Import</button><input type="file" id="importMasterEskalasi" accept=".xlsx" style="display:none" onchange="processImport(event,'masterEskalasi')"></div></div><div class="card-body p-0"><div class="table-wrapper"><table class="data-table"><thead><tr><th>No</th><th>Kode</th><th>Level Eskalasi</th><th>Deskripsi</th><th>Waktu (Hari)</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="masterEskalasiBody"></tbody></table></div></div></div></div>
             <div class="page" id="pageMasterEtik"><div class="card"><div class="card-header"><h3><i class="fas fa-balance-scale"></i> Master Masalah Etik</h3><div class="card-actions"><button class="btn btn-primary btn-sm" onclick="showModalMaster('etik')"><i class="fas fa-plus"></i> Tambah</button><button class="btn btn-success btn-sm" onclick="exportTable('masterEtik','xlsx')"><i class="fas fa-file-excel"></i> Export</button><button class="btn btn-info btn-sm" onclick="importXLSX('masterEtik')"><i class="fas fa-file-import"></i> Import</button><input type="file" id="importMasterEtik" accept=".xlsx" style="display:none" onchange="processImport(event,'masterEtik')"></div></div><div class="card-body p-0"><div class="table-wrapper"><table class="data-table"><thead><tr><th>No</th><th>Kode</th><th>Nama Kategori</th><th>Deskripsi</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="masterEtikBody"></tbody></table></div></div></div></div>
@@ -696,8 +702,6 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="modalVerifikasi" style="display:none;"></div>
-
 <div class="modal-overlay" id="modalPenanganan">
     <div class="modal modal-lg">
         <div class="modal-header">
@@ -794,12 +798,57 @@
 <div class="modal-overlay" id="modalSuperAdmin"><div class="modal modal-sm"><div class="modal-header"><h3><i class="fas fa-crown"></i> SuperAdmin</h3><button class="modal-close" onclick="closeModal('modalSuperAdmin')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="formSuperAdmin"><input type="hidden" id="saId"><div class="form-group"><label>Username <span class="required">*</span></label><input type="text" class="form-control" id="saUsername" required></div><div class="form-group"><label>Nama <span class="required">*</span></label><input type="text" class="form-control" id="saNama" required></div><div class="form-group"><label>Email</label><input type="email" class="form-control" id="saEmail"></div><div class="form-group"><label>Password</label><input type="password" class="form-control" id="saPassword" placeholder="Default: 123//"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalSuperAdmin')">Batal</button><button class="btn btn-primary" onclick="saveSuperAdmin()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
 
 <script>
+// ==========================================
+// KONFIGURASI SUPABASE (GANTI DENGAN KODE ANDA)
+// ==========================================
+const SUPABASE_URL = 'https://eigywrzqdxalvmrsvrtr.supabase.co'; 
+const SUPABASE_ANON_KEY = 'sb_publishable_zGxgCOBJLoYLOxo41pCMbQ_lhEuI1KI'; 
+
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+// ==========================================
+// ADAPTER DATABASE (Local Storage <-> Supabase)
+// ==========================================
 const DB_KEYS={aduan:'sigap_aduan',penanganan:'sigap_penanganan',masterEtik:'sigap_master_etik',masterHukum:'sigap_master_hukum',masterPIC:'sigap_master_pic',masterEskalasi:'sigap_master_eskalasi',masterStatusPenanganan:'sigap_master_status',users:'sigap_users',superadmins:'sigap_superadmins',settings:'sigap_settings',roles:'sigap_roles',notifications:'sigap_notifications',logs:'sigap_logs'};
 const EXCLUDE_FROM_EXPORT=['users','superadmins'];
+
+// FUNGSI TARIK DATA DARI SUPABASE SAAT AWAL LOAD
+async function fetchFromSupabase() {
+    if (!supabase || SUPABASE_URL.includes('XXXXXX')) return; 
+    document.getElementById('loader').classList.remove('hide');
+    document.getElementById('loaderText').textContent = 'Sinkronisasi dari Cloud...';
+    try {
+        const { data, error } = await supabase.from('sigap_storage').select('*');
+        if (error) throw error;
+        if (data && data.length > 0) {
+            data.forEach(row => {
+                localStorage.setItem(row.key, JSON.stringify(row.data));
+            });
+        }
+    } catch (err) {
+        console.error("Gagal sinkron dari Supabase:", err);
+    }
+}
+
+// BACA LOKAL UNTUK KECEPATAN UI (SYNC)
 function getDB(k){try{return JSON.parse(localStorage.getItem(DB_KEYS[k]))||[];}catch{return[];}}
-function setDB(k,d){localStorage.setItem(DB_KEYS[k],JSON.stringify(d));}
+
+// SIMPAN LOKAL & UPSERT KE SUPABASE DI BACKGROUND
+function setDB(k,d){
+    localStorage.setItem(DB_KEYS[k],JSON.stringify(d));
+    if (supabase && !SUPABASE_URL.includes('XXXXXX')) {
+        supabase.from('sigap_storage').upsert({ key: DB_KEYS[k], data: d })
+        .then(({error}) => { if (error) console.error("Supabase Sync Error:", error); });
+    }
+}
+
+// SAMA SEPERTI DI ATAS UNTUK SETTINGS & ROLES
 function getSettings(){try{return JSON.parse(localStorage.getItem(DB_KEYS.settings))||{};}catch{return{};}}
-function setSettings(d){localStorage.setItem(DB_KEYS.settings,JSON.stringify(d));}
+function setSettings(d){
+    localStorage.setItem(DB_KEYS.settings,JSON.stringify(d));
+    if (supabase && !SUPABASE_URL.includes('XXXXXX')) supabase.from('sigap_storage').upsert({ key: DB_KEYS.settings, data: d });
+}
+
 function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 function now(){return new Date().toLocaleString('id-ID');}
 function today(){return new Date().toISOString().split('T')[0];}
@@ -885,6 +934,16 @@ function markAllRead(){let n=getDB('notifications');n=n.map(x=>{
     return x;
 });setDB('notifications',n);renderNotifications();updateNotifBadge();showToast('success','Semua dibaca');}
 
+// FUNGSI HAPUS NOTIFIKASI KHUSUS SUPERADMIN
+function clearNotifikasi() {
+    if(!confirm('PERINGATAN: Anda yakin ingin menghapus SELURUH data notifikasi dari sistem?')) return;
+    setDB('notifications', []);
+    renderNotifications();
+    updateNotifBadge();
+    showToast('success', 'Semua data notifikasi berhasil dihapus!');
+    addLog('danger', 'SuperAdmin menghapus seluruh data notifikasi');
+}
+
 function updateStatusAduan(aduanId, newStatus) {
     let a = getDB('aduan');
     a = a.map(x => x.id === aduanId ? {...x, statusAduan: newStatus} : x);
@@ -954,7 +1013,7 @@ function initApp(){
     if(!getSettings().appName) setSettings({appName:'SIGAP',instName:'Sistem Informasi Pengelolaan Aduan dan Pelaporan',instLogo:'',appLogo:'',toastURL:''});
     
     if(!localStorage.getItem(DB_KEYS.roles)) {
-        localStorage.setItem(DB_KEYS.roles,JSON.stringify({
+        let defaultRoles = {
             'Admin':{dashboard:true,aduan:true,verifikasi:true,penanganan:true,otorisasi:true,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:true,masterEskalasi:true,masterEtik:true,masterHukum:true,masterStatusPenanganan:true,users:true,roles:false,settings:true,exportImport:true},
             'Operator':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
             'Komite Etik':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:false,masterEskalasi:false,masterEtik:true,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
@@ -962,7 +1021,9 @@ function initApp(){
             'PIC':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
             'Otorisator':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:true,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:true,masterEskalasi:true,masterEtik:true,masterHukum:true,masterStatusPenanganan:true,users:true,roles:true,settings:true,exportImport:false},
             'Pelapor':{dashboard:false,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false}
-        }));
+        };
+        localStorage.setItem(DB_KEYS.roles,JSON.stringify(defaultRoles));
+        if(supabase) supabase.from('sigap_storage').upsert({ key: DB_KEYS.roles, data: defaultRoles });
     }
     
     applySettings();
@@ -1035,19 +1096,19 @@ function enterApp(showWelcome = true){
 function applyPermissions(){
     const cpMenu = document.getElementById('cpMenu');
     const cpItem = document.getElementById('cpMenuItem');
-    const btnHapusNotifSA = document.getElementById('btnHapusNotifSA'); // Tombol hapus notif
+    const btnHapusNotifSA = document.getElementById('btnHapusNotifSA');
     
     if(currentUser.role === 'SuperAdmin') {
         document.querySelectorAll('.menu-item[data-page]').forEach(item => item.style.display = '');
         if(cpMenu) cpMenu.style.display = '';
         if(cpItem) cpItem.style.display = '';
-        if(btnHapusNotifSA) btnHapusNotifSA.style.display = 'inline-flex'; // Tampilkan untuk SuperAdmin
+        if(btnHapusNotifSA) btnHapusNotifSA.style.display = 'inline-flex';
         return;
     }
     
     if(cpMenu) cpMenu.style.display = 'none';
     if(cpItem) cpItem.style.display = 'none';
-    if(btnHapusNotifSA) btnHapusNotifSA.style.display = 'none'; // Sembunyikan untuk role lain
+    if(btnHapusNotifSA) btnHapusNotifSA.style.display = 'none';
     
     const perms=JSON.parse(localStorage.getItem(DB_KEYS.roles))||{};
     const rp=perms[currentUser.role]||{};
@@ -1361,7 +1422,6 @@ function renderPenangananTable(){
                 }
             }
         } else {
-            // Admin receives exception to edit Selesai explicitly for SK based on prompt
             if (role === 'Admin' || isSA) canEdit = true;
         }
         
@@ -1514,7 +1574,6 @@ function savePenanganan() {
                 updated.skUploaded = true;
             }
 
-            // Role specific status changes
             if (role === 'Komite Etik' && updated.pic && updated.status === 'Verifikasi') {
                 updated.status = 'di Eskalasi';
                 triggerEskalasi = true;
@@ -1646,7 +1705,6 @@ function saveOtorisasi() {
     addLog('success', `Keputusan untuk ID ${id.substring(0,8)} diotorisasi`);
 }
 
-
 function renderMasterTable(t){const k=t==='etik'?'masterEtik':'masterHukum',b=t==='etik'?'masterEtikBody':'masterHukumBody';const d=getDB(k);let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${m.kode}</strong></td><td>${m.nama}</td><td><div class="text-truncate">${m.desc||'-'}</div></td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMaster('${t}','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('${k}','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById(b).innerHTML=h||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
 function showModalMaster(t){document.getElementById('masterType').value=t;document.getElementById('masterId').value='';document.getElementById('formMaster').reset();document.getElementById('modalMasterTitle').innerHTML=`<i class="fas fa-tag"></i> Tambah ${t==='etik'?'Etik':'Hukum'}`;document.getElementById('modalMaster').classList.add('active');}
 function editMaster(t,id){const k=t==='etik'?'masterEtik':'masterHukum',d=getDB(k).find(m=>m.id===id);if(!d)return;document.getElementById('masterId').value=id;document.getElementById('masterType').value=t;document.getElementById('masterKode').value=d.kode;document.getElementById('masterNama').value=d.nama;document.getElementById('masterDesc').value=d.desc;document.getElementById('masterStatus').value=d.status;document.getElementById('modalMaster').classList.add('active');}
@@ -1692,6 +1750,7 @@ function togglePerm(r,m,v){
     if(!perms[r]) perms[r]={};
     perms[r][m]=v;
     localStorage.setItem(DB_KEYS.roles,JSON.stringify(perms));
+    if(supabase && !SUPABASE_URL.includes('XXXXXX')) supabase.from('sigap_storage').upsert({ key: DB_KEYS.roles, data: perms });
     const label=m==='exportImport'?'Ekspor/Impor':m;
     showToast('success',`${r} → ${label}: ${v?'ON':'OFF'}`);
     
@@ -1701,11 +1760,23 @@ function togglePerm(r,m,v){
         if(!v && m!=='exportImport') navigateTo('dashboard', document.querySelector('[data-page="dashboard"]'));
     }
 }
+
 function renderControlPanel(){const sas=getDB('superadmins');let h='';sas.forEach((sa,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${sa.username}</strong></td><td>${sa.nama}</td><td>${sa.email}</td><td><span class="badge badge-success">${sa.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editSuperAdmin('${sa.id}')"><i class="fas fa-edit"></i></button>${sas.length>1?`<button class="btn btn-danger btn-xs" onclick="deleteItem('superadmins','${sa.id}')"><i class="fas fa-trash"></i></button>`:''}</td></tr>`;});document.getElementById('superAdminBody').innerHTML=h;}
 function showModalSuperAdmin(){document.getElementById('formSuperAdmin').reset();document.getElementById('saId').value='';document.getElementById('modalSuperAdmin').classList.add('active');}
 function editSuperAdmin(id){const d=getDB('superadmins').find(s=>s.id===id);if(!d)return;document.getElementById('saId').value=id;document.getElementById('saUsername').value=d.username;document.getElementById('saNama').value=d.nama;document.getElementById('saEmail').value=d.email;document.getElementById('saPassword').value='';document.getElementById('modalSuperAdmin').classList.add('active');}
 function saveSuperAdmin(){const id=document.getElementById('saId').value;const o={username:document.getElementById('saUsername').value,nama:document.getElementById('saNama').value,email:document.getElementById('saEmail').value};const pass=document.getElementById('saPassword').value;if(!o.username||!o.nama){showToast('error','Wajib!');return;}let d=getDB('superadmins');if(id)d=d.map(s=>{if(s.id===id){const up={...s,...o};if(pass)up.password=pass;return up;}return s;});else{o.id=genId();o.password=pass||'123//';o.status='Aktif';d.push(o);}setDB('superadmins',d);closeModal('modalSuperAdmin');renderControlPanel();showToast('success','SuperAdmin disimpan!');}
-function resetAllData(){if(!confirm('PERINGATAN: Reset semua data?'))return;if(!confirm('Yakin?'))return;Object.keys(DB_KEYS).forEach(k=>{if(k!=='superadmins'&&k!=='settings')localStorage.removeItem(DB_KEYS[k]);});showToast('success','Reset!');navigateTo('dashboard',document.querySelector('[data-page="dashboard"]'));}
+async function resetAllData(){
+    if(!confirm('PERINGATAN: Reset semua data?'))return;
+    if(!confirm('Yakin?'))return;
+    Object.keys(DB_KEYS).forEach(k=>{if(k!=='superadmins'&&k!=='settings')localStorage.removeItem(DB_KEYS[k]);});
+    if(supabase && !SUPABASE_URL.includes('XXXXXX')) {
+        for (const k of Object.keys(DB_KEYS)) {
+            if(k!=='superadmins'&&k!=='settings'&&k!=='roles') await supabase.from('sigap_storage').delete().eq('key', DB_KEYS[k]);
+        }
+    }
+    showToast('success','Reset!');
+    navigateTo('dashboard',document.querySelector('[data-page="dashboard"]'));
+}
 
 function showChangePasswordModal(){document.getElementById('profileMenu').classList.remove('show');document.getElementById('modalChangePass').classList.add('active');}
 function changePassword(){const oP=document.getElementById('oldPassword').value,nP=document.getElementById('newPassword').value,cP=document.getElementById('confirmPassword').value;if(oP!==currentUser.password){showToast('error','Password lama salah!');return;}if(nP!==cP){showToast('error','Tidak cocok!');return;}if(nP.length<3){showToast('error','Min 3!');return;}if(currentUser.role==='SuperAdmin'){let d=getDB('superadmins');d=d.map(s=>s.id===currentUser.id?{...s,password:nP}:s);setDB('superadmins',d);}else{let d=getDB('users');d=d.map(u=>u.id===currentUser.id?{...u,password:nP}:u);setDB('users',d);}currentUser.password=nP;closeModal('modalChangePass');showToast('success','Password diubah!');}
@@ -1714,7 +1785,7 @@ function deleteItem(k,id){
     if(!confirm('Hapus data ini?'))return;
     let d=getDB(k);
     d=d.filter(x=>x.id!==id);
-    setDB(k,d);
+    setDB(k,d); 
     
     if(k === 'aduan') {
         let pen = getDB('penanganan');
@@ -1742,7 +1813,6 @@ function uploadAllDB(e){const f=e.target.files[0];if(!f||!confirm('Restore DB?')
 
 window.addEventListener('scroll',()=>{const n=document.getElementById('landingNav');if(n)n.classList.toggle('scrolled',window.scrollY>50);});
 document.addEventListener('click',e=>{const pm=document.getElementById('profileMenu');const av=document.getElementById('headerAvatarText');if(pm&&!pm.contains(e.target)&&e.target!==av)pm.classList.remove('show');});
-window.addEventListener('load',initApp);
 window.addEventListener('resize',()=>{if(window.innerWidth>768){document.getElementById('sidebar').classList.remove('mobile-open');document.getElementById('sidebarOverlay').classList.remove('active');}});
 
 function checkSettingsAccess() {
@@ -1907,7 +1977,7 @@ function uploadLandingFile(input, key, type) {
             showToast('success', 'File berhasil diunggah dan disimpan!');
             addLog('success', `Konten Landing Page (${key}) diperbarui.`);
         } catch (error) {
-            showToast('error', 'Penyimpanan penuh (Quota Exceeded)! Ukuran file terlalu besar untuk LocalStorage.');
+            showToast('error', 'Penyimpanan penuh! File terlalu besar.');
             input.value = '';
         }
     };
@@ -1949,7 +2019,7 @@ async function syncToCloud() {
 
     if (!confirm('Kirim data sistem ke Spreadsheet di Cloud? (User & SuperAdmin dikecualikan)')) return;
 
-    showToast('info', 'Memulai sinkronisasi ke Cloud...');
+    showToast('info', 'Memulai sinkronisasi ke Webhook...');
 
     const allData = {};
     Object.keys(DB_KEYS).forEach(k => {
@@ -1969,26 +2039,20 @@ async function syncToCloud() {
         showToast('success', 'Sinkronisasi berhasil dikirim ke Spreadsheet!');
         addLog('success', 'Database disinkronisasi ke Google Drive/Spreadsheet.');
     } catch (error) {
-        showToast('error', 'Gagal menyinkronkan data. Pastikan perangkat online dan URL Webhook valid.');
+        showToast('error', 'Gagal menyinkronkan data.');
         console.error("Sync Error:", error);
     }
 }
 
 document.addEventListener('contextmenu', event => event.preventDefault());
-function clearNotifikasi() {
-    if(!confirm('PERINGATAN: Anda yakin ingin menghapus SELURUH data notifikasi dari sistem?')) return;
-    
-    // Kosongkan database notifikasi
-    setDB('notifications', []);
-    
-    // Render ulang tabel notifikasi dan badge
-    renderNotifications();
-    updateNotifBadge();
-    
-    // Tampilkan pesan sukses dan catat di log aktivitas
-    showToast('success', 'Semua data notifikasi berhasil dihapus!');
-    addLog('danger', 'SuperAdmin menghapus seluruh data notifikasi');
-}
+
+// MULA KETIKA WINDOW LOADED
+window.addEventListener('load', async () => {
+    // Sinkronkan data dari Supabase terlebih dahulu
+    await fetchFromSupabase();
+    // Lalu jalankan inisiasi lokal
+    initApp();
+});
 </script>
 </body>
 </html>
