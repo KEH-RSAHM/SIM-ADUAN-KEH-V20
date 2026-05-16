@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGAP - Poertal Aduan Terpadu</title>
+    <title>SIGAP - Sistem Informasi Pengelolaan Aduan dan Pelaporan</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -243,8 +243,12 @@
         .profile-menu a:hover { background: #f8fafc; }
         .profile-menu a i { width: 16px; color: var(--gray); font-size: 13px; }
         .profile-menu hr { border: none; border-top: 1px solid #f1f5f9; margin: 3px 0; }
+        
+        /* Text Wrap Full */
+        .text-wrap-full { white-space: pre-wrap !important; word-break: break-word; min-width: 220px; display: block; line-height: 1.5; }
         .text-truncate { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
         .text-truncate-sm { max-width: 110px; }
+        
         .log-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--gray-light); border-radius: 8px; padding: 12px; background: #fafbfc; font-family: 'Courier New', monospace; font-size: 11px; }
         .log-entry { padding: 4px 0; border-bottom: 1px solid #f1f5f9; display: flex; gap: 8px; align-items: flex-start; }
         .log-entry:last-child { border-bottom: none; }
@@ -268,6 +272,7 @@
         .mini-stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
         .mini-stat h4 { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
         .mini-stat p { font-size: 10px; color: var(--gray); font-weight: 500; }
+        .readonly-box { background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 12px; border: 1px solid #e2e8f0; line-height: 1.6; }
         @media (max-width: 1400px) { .stats-grid-6 { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .charts-grid { grid-template-columns: 1fr; } .stats-grid-6 { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 768px) {
@@ -331,7 +336,11 @@
             <div class="menu-category">Menu Utama</div>
             <a class="menu-item active" data-page="dashboard" onclick="navigateTo('dashboard',this)"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
             <a class="menu-item" data-page="aduan" onclick="navigateTo('aduan',this)"><i class="fas fa-bullhorn"></i><span>Pelaporan Aduan</span><div class="menu-badge" id="aduanBadge">0</div></a>
+            <a class="menu-item" data-page="verifikasi" onclick="navigateTo('verifikasi',this)" style="display:none;"><i class="fas fa-check-circle"></i><span>Verifikasi Aduan</span></a>
             <a class="menu-item" data-page="penanganan" onclick="navigateTo('penanganan',this)"><i class="fas fa-tasks"></i><span>Penanganan Aduan</span></a>
+            
+            <a class="menu-item" data-page="otorisasi" onclick="navigateTo('otorisasi',this)"><i class="fas fa-stamp"></i><span>Otorisasi Penanganan</span></a>
+            
             <a class="menu-item" data-page="notifikasi" onclick="navigateTo('notifikasi',this)"><i class="fas fa-bell"></i><span>Notifikasi</span><div class="menu-badge" id="notifBadge">0</div></a>
             <a class="menu-item" data-page="logActivity" onclick="navigateTo('logActivity',this)"><i class="fas fa-history"></i><span>Log Aktivitas</span></a>
             
@@ -403,8 +412,37 @@
                         </div>
                     </div>
                     <div class="card-body" style="padding-bottom:8px"><div class="filter-bar"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Cari aduan..." oninput="filterTable('aduanTableBody',this.value)"></div></div></div>
-                    <div class="card-body p-0"><div class="table-wrapper" style="max-height:65vh"><table class="data-table"><thead><tr><th style="min-width:40px">No</th><th style="min-width:140px">Timestamp</th><th style="min-width:150px">Email</th><th class="sticky-col" style="min-width:140px">Nama Pelapor</th><th style="min-width:120px">No. HP/WA</th><th style="min-width:110px">Tgl Kejadian</th><th style="min-width:200px">Deskripsi</th><th style="min-width:140px">Nama Dilaporkan</th><th style="min-width:120px">Jabatan</th><th style="min-width:150px">Unit Kerja</th><th style="min-width:80px">Lampiran</th><th style="min-width:90px">Status</th><th class="sticky-col-right" style="min-width:90px">Aksi</th></tr></thead><tbody id="aduanTableBody"></tbody></table></div></div>
+                    <div class="card-body p-0"><div class="table-wrapper" style="max-height:65vh"><table class="data-table"><thead><tr><th style="min-width:40px">No</th><th style="min-width:140px">Timestamp</th><th style="min-width:150px">Email</th><th class="sticky-col" style="min-width:140px">Nama Pelapor</th><th style="min-width:120px">No. HP/WA</th><th style="min-width:110px">Tgl Kejadian</th><th style="min-width:200px">Deskripsi</th><th style="min-width:140px">Nama Dilaporkan</th><th style="min-width:120px">Jabatan</th><th style="min-width:150px">Unit Kerja</th><th style="min-width:80px">Lampiran</th><th style="min-width:90px">Status</th><th class="sticky-col-right" style="min-width:130px">Aksi</th></tr></thead><tbody id="aduanTableBody"></tbody></table></div></div>
                     <div class="table-footer"><div class="table-info" id="aduanInfo">0 data</div></div>
+                </div>
+            </div>
+
+            <div class="page" id="pageVerifikasi">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-check-circle"></i> Tabel Verifikasi Aduan</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>ID Aduan</th>
+                                        <th>Pelapor</th>
+                                        <th>Diverifikasi Tgl</th>
+                                        <th>Kategori</th>
+                                        <th>Sub Kategori</th>
+                                        <th>Urgensi</th>
+                                        <th>Status Aduan</th>
+                                        <th>PIC</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="verifikasiTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -413,7 +451,6 @@
                     <div class="card-header">
                         <h3><i class="fas fa-tasks"></i> Tabel Penanganan Aduan</h3>
                         <div class="card-actions">
-                            <button id="btnTambahPenanganan" class="btn btn-primary btn-sm" onclick="showModalPenanganan()"><i class="fas fa-plus"></i> Tambah</button>
                             <button id="btnExportXlsxPenanganan" class="btn btn-success btn-sm" onclick="exportTable('penanganan','xlsx')"><i class="fas fa-file-excel"></i> XLSX</button>
                             <button id="btnExportPdfPenanganan" class="btn btn-danger btn-sm" onclick="exportTable('penanganan','pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
                             <button id="btnImportPenanganan" class="btn btn-info btn-sm" onclick="importXLSX('penanganan')"><i class="fas fa-file-import"></i> Import</button>
@@ -421,8 +458,35 @@
                         </div>
                     </div>
                     <div class="card-body" style="padding-bottom:8px"><div class="filter-bar"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Cari..." oninput="filterTable('penangananTableBody',this.value)"></div><select class="form-control form-control-sm" style="width:auto;min-width:130px" onchange="filterByStatus('penangananTableBody',this.value)" id="filterStatusPenanganan"><option value="">Semua Status</option></select></div></div>
-                    <div class="card-body p-0"><div class="table-wrapper" style="max-height:65vh"><table class="data-table"><thead><tr><th style="min-width:40px">No</th><th style="min-width:80px">ID Aduan</th><th class="sticky-col" style="min-width:120px">Pelapor</th><th style="min-width:110px">Diverifikasi</th><th style="min-width:80px">Kategori</th><th style="min-width:150px">Sub Kategori</th><th style="min-width:80px">Urgensi</th><th style="min-width:90px">Status</th><th style="min-width:110px">PIC</th><th style="min-width:110px">Eskalasi</th><th style="min-width:80px">Estimasi</th><th style="min-width:100px">Tgl Mulai</th><th style="min-width:160px">Tanggapan</th><th style="min-width:100px">Tgl Selesai</th><th style="min-width:180px">No. SK</th><th style="min-width:240px">Hal Keputusan</th><th style="min-width:80px">Bukti</th><th style="min-width:100px">Upload SK</th><th style="min-width:90px">Req Surat</th><th class="sticky-col-right" style="min-width:130px">Aksi</th></tr></thead><tbody id="penangananTableBody"></tbody></table></div></div>
+                    <div class="card-body p-0"><div class="table-wrapper" style="max-height:65vh"><table class="data-table"><thead><tr><th style="min-width:40px">No</th><th style="min-width:80px">ID Aduan</th><th class="sticky-col" style="min-width:120px">Pelapor</th><th style="min-width:110px">Diverifikasi</th><th style="min-width:80px">Kategori</th><th style="min-width:150px">Sub Kategori</th><th style="min-width:80px">Urgensi</th><th style="min-width:90px">Status</th><th style="min-width:110px">PIC</th><th style="min-width:110px">Eskalasi</th><th style="min-width:80px">Estimasi</th><th style="min-width:100px">Tgl Mulai</th><th style="min-width:240px">Tanggapan (Proses & Akhir)</th><th style="min-width:100px">Tgl Selesai</th><th style="min-width:180px">No. SK</th><th style="min-width:240px">Hal Keputusan</th><th style="min-width:80px">Dokumentasi</th><th style="min-width:100px">Upload SK</th><th class="sticky-col-right" style="min-width:140px">Aksi</th></tr></thead><tbody id="penangananTableBody"></tbody></table></div></div>
                     <div class="table-footer"><div class="table-info" id="penangananInfo">0 data</div></div>
+                </div>
+            </div>
+
+            <div class="page" id="pageOtorisasi">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-stamp"></i> Tabel Otorisasi Penanganan</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>ID Aduan</th>
+                                        <th>Pelapor</th>
+                                        <th>Kategori</th>
+                                        <th>Urgensi</th>
+                                        <th>Tanggapan (Proses & Akhir)</th>
+                                        <th>Status Saat Ini</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="otorisasiTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -447,9 +511,10 @@
                                 <label>Status Penanganan</label>
                                 <select id="lapStatus" class="form-control">
                                     <option value="">Semua Status</option>
-                                    <option value="Proses">Proses</option>
+                                    <option value="di Proses">di Proses</option>
                                     <option value="Selesai">Selesai</option>
-                                    <option value="Diotorisasi">Diotorisasi</option>
+                                    <option value="di Eskalasi">di Eskalasi</option>
+                                    <option value="Penetapan">Penetapan</option>
                                     <option value="Ditunda">Ditunda</option>
                                     <option value="Dibatalkan">Dibatalkan</option>
                                 </select>
@@ -540,7 +605,29 @@
                     </div>
                 </div>
             </div>
-            <div class="page" id="pageSettings"><div class="card"><div class="card-header"><h3><i class="fas fa-cog"></i> Pengaturan Sistem & API</h3></div><div class="card-body"><div class="form-row"><div class="form-group"><label>Nama Instansi</label><input type="text" class="form-control" id="settInstName"></div><div class="form-group"><label>Nama Aplikasi</label><input type="text" class="form-control" id="settAppName"></div></div><div class="form-row"><div class="form-group"><label>Logo Instansi (URL)</label><input type="text" class="form-control" id="settInstLogo"></div><div class="form-group"><label>Logo Aplikasi (URL)</label><input type="text" class="form-control" id="settAppLogo"></div></div><div class="form-group"><label>URL Webhook / Google Apps Script (Untuk Sinkronisasi ke Spreadsheet)</label><input type="url" class="form-control" id="settToastURL" placeholder="https://script.google.com/macros/s/.../exec"></div><button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Simpan Pengaturan</button></div></div></div>
+            <div class="page" id="pageSettings">
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-cog"></i> Pengaturan Sistem & API</h3></div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group"><label>Nama Instansi</label><input type="text" class="form-control" id="settInstName"></div>
+                            <div class="form-group"><label>Nama Aplikasi</label><input type="text" class="form-control" id="settAppName"></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Logo Instansi (URL)</label><input type="text" class="form-control" id="settInstLogo"></div>
+                            <div class="form-group"><label>Logo Aplikasi (URL)</label><input type="text" class="form-control" id="settAppLogo"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>URL Webhook / Google Apps Script (Untuk Sinkronisasi ke Spreadsheet)</label>
+                            <input type="url" class="form-control" id="settToastURL" placeholder="https://script.google.com/macros/s/.../exec">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Simpan Pengaturan</button>
+                            <button class="btn btn-info" onclick="syncToCloud()"><i class="fas fa-sync"></i> Test Sinkronisasi Cloud</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="page" id="pageControlPanel">
                 <div class="card">
@@ -609,39 +696,99 @@
         </div>
     </div>
 </div>
-<div class="modal-overlay" id="modalPenanganan"><div class="modal modal-lg"><div class="modal-header"><h3 id="modalPenangananTitle"><i class="fas fa-tasks"></i> Tambah Penanganan</h3><button class="modal-close" onclick="closeModal('modalPenanganan')"><i class="fas fa-times"></i></button></div><div class="modal-body">
-    <form id="formPenanganan">
-                <input type="hidden" id="penangananId">
-                <div class="form-row">
-                    <div class="form-group"><label>Pilih Aduan <span class="required">*</span></label><select class="form-control" id="penangananAduanId" required></select></div>
-                    <div class="form-group"><label>Diverifikasi Tgl <span class="required">*</span></label><input type="date" class="form-control" id="penangananTglVerif" required></div>
-                </div>
+
+<div class="modal-overlay" id="modalVerifikasi" style="display:none;"></div>
+
+<div class="modal-overlay" id="modalPenanganan">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3><i class="fas fa-tasks"></i> Form Penanganan</h3>
+            <button class="modal-close" onclick="closeModal('modalPenanganan')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="readonly-box" id="penangananInfoPanel"></div>
+            <form id="formPenanganan">
+                <input type="hidden" id="penPenangananId">
+                
                 <div class="form-row-3">
-                    <div class="form-group"><label>Kategori <span class="required">*</span></label><select class="form-control" id="penangananKategori" onchange="loadSubKategori()" required><option value="">Pilih</option><option value="Etik">Etik</option><option value="Hukum">Hukum</option></select></div>
-                    <div class="form-group"><label>Sub Kategori</label><select class="form-control" id="penangananSubKategori"><option value="">Pilih</option></select></div>
-                    <div class="form-group"><label>Urgensi <span class="required">*</span></label><select class="form-control" id="penangananUrgensi" required><option value="">Pilih</option><option value="Ringan">Ringan</option><option value="Sedang">Sedang</option><option value="Berat">Berat</option></select></div>
+                    <div class="form-group"><label>Kategori</label><select class="form-control" id="penKategori" onchange="loadPenSubKategori()"><option value="">Pilih Kategori</option><option value="Etik">Etik</option><option value="Hukum">Hukum</option></select></div>
+                    <div class="form-group"><label>Sub Kategori</label><select class="form-control" id="penSubKategori"><option value="">Pilih Sub Kategori</option></select></div>
+                    <div class="form-group"><label>Urgensi</label><select class="form-control" id="penUrgensi"><option value="">Pilih Urgensi</option><option value="Ringan">Ringan</option><option value="Sedang">Sedang</option><option value="Berat">Berat</option></select></div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Status <span class="required">*</span></label><select class="form-control" id="penangananStatus" required></select></div>
-                    <div class="form-group"><label>PIC <span class="required">*</span></label><select class="form-control" id="penangananPIC" onchange="togglePenangananLanjutan()" required><option value="">Pilih PIC</option></select></div>
+
+                <div class="form-row-3">
+                    <div class="form-group"><label>PIC Tujuan</label><select class="form-control" id="penPIC"></select></div>
+                    <div class="form-group"><label>Eskalasi</label><select class="form-control" id="penEskalasi"><option value="">Pilih Eskalasi</option></select></div>
+                    <div class="form-group"><label>Estimasi Waktu</label><select class="form-control" id="penEstimasi"><option value="3 Hari">3 Hari</option><option value="7 Hari">7 Hari</option><option value="14 Hari">14 Hari</option><option value=">14 Hari">>14 Hari</option></select></div>
                 </div>
                 
-                <div id="penangananLanjutan" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--gray-light);">
-                    <div class="form-row-3">
-                        <div class="form-group"><label>Eskalasi</label><select class="form-control" id="penangananEskalasi"><option value="">Pilih Eskalasi</option></select></div>
-                        <div class="form-group"><label>Estimasi</label><select class="form-control" id="penangananEstimasi"><option value="3 Hari">3 Hari</option><option value="7 Hari">7 Hari</option><option value="14 Hari">14 Hari</option><option value=">14 Hari">>14 Hari</option></select></div>
-                        <div class="form-group"><label>Tgl Mulai</label><input type="date" class="form-control" id="penangananTglMulai"></div>
-                    </div>
-                    <div class="form-group"><label>Tanggapan Komite</label><textarea class="form-control" id="penangananTanggapan" rows="2"></textarea></div>
-                    <div class="form-row">
-                        <div class="form-group"><label>No. SK Keputusan</label><input type="text" class="form-control" id="penangananKeputusan" readonly></div>
-                        <div class="form-group"><label>Bukti Dokumentasi (URL)</label><input type="text" class="form-control" id="penangananBukti"></div>
-                    </div>
-                    <div class="form-group"><label>Hal Keputusan</label><textarea class="form-control" id="penangananHalKeputusan" rows="2" readonly></textarea></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Tgl Mulai Penanganan</label><input type="date" class="form-control" id="penTglMulai"></div>
+                    <div class="form-group"><label>Tgl Akhir Penanganan</label><input type="date" class="form-control" id="penTglSelesai"></div>
                 </div>
-            </form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalPenanganan')">Batal</button><button class="btn btn-primary" onclick="savePenanganan()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
+
+                <div class="form-row">
+                    <div class="form-group"><label>Tanggapan Proses</label><textarea class="form-control" id="penTanggapanProses" rows="3"></textarea></div>
+                    <div class="form-group"><label>Tanggapan Akhir</label><textarea class="form-control" id="penTanggapanAkhir" rows="3"></textarea></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Upload Dokumentasi Bukti (PDF)</label>
+                        <input type="file" class="form-control" id="penBuktiFile" accept=".pdf" onchange="handleBuktiUpload(event)">
+                        <input type="hidden" id="penBukti">
+                        <small id="penBuktiName" style="font-size:10px; color:var(--success); font-weight:600;"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Status Penanganan Saat Ini</label>
+                        <select class="form-control" id="penStatus" disabled></select>
+                    </div>
+                </div>
+
+                <div class="form-row" style="border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 14px;">
+                    <div class="form-group"><label>No. SK (Keputusan)</label><input type="text" class="form-control" id="penNoSK" placeholder="Masukkan No. Surat Keputusan"></div>
+                    <div class="form-group">
+                        <label>Upload SK (PDF Max 5MB)</label>
+                        <input type="file" class="form-control" id="penFileSK" accept=".pdf" onchange="handleSKUploadForm(event)">
+                        <input type="hidden" id="penSKData">
+                        <small id="penSKName" style="font-size:10px; color:var(--success); font-weight:600;"></small>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modalPenanganan')">Batal</button>
+            <button class="btn btn-primary" id="btnSavePenanganan" onclick="savePenanganan()"><i class="fas fa-save"></i> Simpan Penanganan</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalOtorisasi">
+    <div class="modal modal-lg">
+        <div class="modal-header">
+            <h3><i class="fas fa-stamp"></i> Form Otorisasi Surat Keputusan</h3>
+            <button class="modal-close" onclick="closeModal('modalOtorisasi')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="readonly-box" id="otorisasiInfoPanel"></div>
+            <form id="formOtorisasi">
+                <input type="hidden" id="otoPenangananId">
+                <div class="form-row">
+                    <div class="form-group"><label>No. SK Keputusan <span class="required">*</span></label><input type="text" class="form-control" id="otoNoSK" required></div>
+                    <div class="form-group"><label>Tgl Otorisasi</label><input type="date" class="form-control" id="otoTgl" readonly></div>
+                </div>
+                <div class="form-group"><label>Hal Keputusan <span class="required">*</span></label><textarea class="form-control" id="otoHal" rows="3" required></textarea></div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modalOtorisasi')">Batal</button>
+            <button class="btn btn-success" id="btnSaveOtorisasi" onclick="saveOtorisasi()"><i class="fas fa-stamp"></i> Otorisasi & Terbitkan</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="modalMasterGeneric"><div class="modal modal-sm"><div class="modal-header"><h3 id="modalMasterGenericTitle"><i class="fas fa-tag"></i> Tambah</h3><button class="modal-close" onclick="closeModal('modalMasterGeneric')"><i class="fas fa-times"></i></button></div><div class="modal-body" id="modalMasterGenericBody"></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalMasterGeneric')">Batal</button><button class="btn btn-primary" onclick="saveMasterGeneric()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
-<div class="modal-overlay" id="modalUploadSK"><div class="modal modal-sm"><div class="modal-header"><h3><i class="fas fa-file-upload"></i> Upload Surat Penetapan</h3><button class="modal-close" onclick="closeModal('modalUploadSK')"><i class="fas fa-times"></i></button></div><div class="modal-body"><input type="hidden" id="uploadSKPenangananId"><div class="form-group"><label>No. SK</label><input type="text" class="form-control" id="uploadSKNomor" readonly></div><div class="form-group"><label>Upload PDF (Max 5MB)</label><div class="upload-area" id="uploadSKArea" onclick="document.getElementById('uploadSKFile').click()"><i class="fas fa-cloud-upload-alt"></i><p>Klik pilih file PDF</p><div class="file-name" id="uploadSKFileName"></div></div><input type="file" id="uploadSKFile" accept=".pdf" style="display:none" onchange="handleSKFileSelect(event)"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalUploadSK')">Batal</button><button class="btn btn-primary" onclick="saveSKUpload()"><i class="fas fa-save"></i> Upload</button></div></div></div>
 <div class="modal-overlay" id="modalMaster"><div class="modal modal-sm"><div class="modal-header"><h3 id="modalMasterTitle"><i class="fas fa-tag"></i> Tambah Kategori</h3><button class="modal-close" onclick="closeModal('modalMaster')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="formMaster"><input type="hidden" id="masterId"><input type="hidden" id="masterType"><div class="form-group"><label>Kode <span class="required">*</span></label><input type="text" class="form-control" id="masterKode" required></div><div class="form-group"><label>Nama <span class="required">*</span></label><input type="text" class="form-control" id="masterNama" required></div><div class="form-group"><label>Deskripsi</label><textarea class="form-control" id="masterDesc" rows="2"></textarea></div><div class="form-group"><label>Status</label><select class="form-control" id="masterStatus"><option value="Aktif">Aktif</option><option value="Nonaktif">Nonaktif</option></select></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalMaster')">Batal</button><button class="btn btn-primary" onclick="saveMaster()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
 <div class="modal-overlay" id="modalUser"><div class="modal"><div class="modal-header"><h3 id="modalUserTitle"><i class="fas fa-user-plus"></i> Tambah User</h3><button class="modal-close" onclick="closeModal('modalUser')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="formUser"><input type="hidden" id="userId"><div class="form-row"><div class="form-group"><label>Username <span class="required">*</span></label><input type="text" class="form-control" id="userUsername" required></div><div class="form-group"><label>Nama <span class="required">*</span></label><input type="text" class="form-control" id="userNama" required></div></div><div class="form-row"><div class="form-group"><label>Email <span class="required">*</span></label><input type="email" class="form-control" id="userEmail" required></div><div class="form-group"><label>HP</label><input type="text" class="form-control" id="userHP"></div></div><div class="form-row"><div class="form-group"><label>Password</label><input type="password" class="form-control" id="userPassword" placeholder="Default: 123"></div><div class="form-group"><label>Role <span class="required">*</span></label><select class="form-control" id="userRole" required><option value="Admin">Admin</option><option value="Operator">Operator</option><option value="Komite Etik">Komite Etik</option><option value="Komite Profesi">Komite Profesi</option><option value="PIC">PIC</option><option value="Otorisator">Otorisator</option><option value="Pelapor">Pelapor</option></select></div></div><div class="form-group"><label>Status</label><select class="form-control" id="userStatus"><option value="Aktif">Aktif</option><option value="Nonaktif">Nonaktif</option></select></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalUser')">Batal</button><button class="btn btn-primary" onclick="saveUser()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
 <div class="modal-overlay" id="modalChangePass"><div class="modal modal-sm"><div class="modal-header"><h3><i class="fas fa-key"></i> Ubah Password</h3><button class="modal-close" onclick="closeModal('modalChangePass')"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="form-group"><label>Password Lama</label><input type="password" class="form-control" id="oldPassword"></div><div class="form-group"><label>Password Baru</label><input type="password" class="form-control" id="newPassword"></div><div class="form-group"><label>Konfirmasi</label><input type="password" class="form-control" id="confirmPassword"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalChangePass')">Batal</button><button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
@@ -657,53 +804,177 @@ function setSettings(d){localStorage.setItem(DB_KEYS.settings,JSON.stringify(d))
 function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 function now(){return new Date().toLocaleString('id-ID');}
 function today(){return new Date().toISOString().split('T')[0];}
-let currentUser=null,charts={},skFileData=null,currentMasterGenericType=null,currentMasterGenericId=null;
+
+let currentUser=JSON.parse(localStorage.getItem('currentUser')) || null;
+let charts={},currentMasterGenericType=null,currentMasterGenericId=null;
 
 function addLog(type,msg){const logs=getDB('logs');logs.unshift({id:genId(),time:now(),type,msg,user:currentUser?.nama||'System'});if(logs.length>200)logs.length=200;setDB('logs',logs);}
 function renderLogs(){const logs=getDB('logs');const c=document.getElementById('logContainer');if(!logs.length){c.innerHTML='<div style="text-align:center;color:var(--gray);padding:20px">Belum ada log</div>';return;}const icMap={success:'check-circle',warning:'exclamation-triangle',danger:'times-circle',info:'info-circle',primary:'info-circle'};c.innerHTML=logs.map(l=>`<div class="log-entry log-${l.type}"><span class="log-time">${l.time}</span><span class="log-icon"><i class="fas fa-${icMap[l.type]||'circle'}"></i></span><span class="log-msg"><strong>${l.user}</strong>: ${l.msg}</span></div>`).join('');}
 function clearLogs(){if(!confirm('Hapus semua log?'))return;setDB('logs',[]);renderLogs();showToast('success','Log dihapus');}
 
-function addNotification(from,msg,type,targetRole){const n=getDB('notifications');n.unshift({id:genId(),time:now(),from,msg,type,targetRole,read:false,penangananId:null});setDB('notifications',n);updateNotifBadge();}
-function addNotifWithRef(from,msg,type,targetRole,penId){const n=getDB('notifications');n.unshift({id:genId(),time:now(),from,msg,type,targetRole,read:false,penangananId:penId});setDB('notifications',n);updateNotifBadge();}
-function updateNotifBadge(){const n=getDB('notifications');const unread=n.filter(x=>!x.read&&(currentUser?.role==='SuperAdmin'||x.targetRole==='Semua'||x.targetRole===currentUser?.role)).length;document.getElementById('notifBadge').textContent=unread;document.getElementById('headerNotifDot').style.display=unread>0?'':'none';}
-function renderNotifications(){const n=getDB('notifications');const filtered=n.filter(x=>currentUser?.role==='SuperAdmin'||x.targetRole==='Semua'||x.targetRole===currentUser?.role);const tc={info:'badge-info',success:'badge-success',warning:'badge-warning',danger:'badge-danger',otorisasi:'badge-purple'};let h='';filtered.forEach((x,i)=>{h+=`<tr class="${!x.read?'notif-unread':''}"><td>${i+1}</td><td style="font-size:10px;white-space:nowrap">${x.time}</td><td>${x.from}</td><td>${x.msg}</td><td><span class="badge ${tc[x.type]||'badge-secondary'}">${x.type}</span></td><td><span class="badge badge-primary">${x.targetRole}</span></td><td>${x.read?'<span class="badge badge-secondary">Dibaca</span>':'<span class="badge badge-warning">Baru</span>'}</td><td class="actions-cell">${!x.read?`<button class="btn btn-info btn-xs" onclick="markRead('${x.id}')"><i class="fas fa-check"></i></button>`:''}${x.type==='otorisasi'&&currentUser?.role==='Otorisator'&&!x.read?`<button class="btn btn-success btn-xs" onclick="otorisasiSK('${x.penangananId}','${x.id}')"><i class="fas fa-stamp"></i> Otorisasi</button>`:''}</td></tr>`;});document.getElementById('notifTableBody').innerHTML=h||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px">Tidak ada notifikasi</td></tr>';}
-function markRead(id){let n=getDB('notifications');n=n.map(x=>x.id===id?{...x,read:true}:x);setDB('notifications',n);renderNotifications();updateNotifBadge();}
-function markAllRead(){let n=getDB('notifications');n=n.map(x=>({...x,read:true}));setDB('notifications',n);renderNotifications();updateNotifBadge();showToast('success','Semua dibaca');}
-function otorisasiSK(penId,notifId){if(!confirm('Otorisasi surat ini?'))return;let d=getDB('penanganan');d=d.map(p=>{if(p.id===penId){p.status='Diotorisasi';p.otorisasiOleh=currentUser.nama;p.otorisasiTgl=now();}return p;});setDB('penanganan',d);markRead(notifId);addLog('success',`SK ID ${penId.substring(0,8)} diotorisasi`);addNotification(currentUser.nama,`Surat penetapan diotorisasi oleh ${currentUser.nama}`,'success','Semua');showToast('success','Surat diotorisasi!');renderNotifications();renderPenangananTable();}
+function addNotification(from,msg,type,targetRole,targetUserId=null,penId=null){
+    const n=getDB('notifications');
+    n.unshift({id:genId(),time:now(),from,msg,type,targetRole,targetUserId,read:false,penangananId:penId});
+    setDB('notifications',n);updateNotifBadge();
+}
 
-function generateSKNumber(idx){return `SK/ETIK/${String(idx+1).padStart(4,'0')}/${new Date().getFullYear()}`;}
-function generateSKHal(terlapor,kodeAduan){return `Surat Penetapan Hasil Penanganan Etik dan Hukum a.n. "${terlapor}" atas aduan : "No Kode aduan ${kodeAduan}"`;}
+function checkDraftNotifs() {
+    if (currentUser?.role === 'Pelapor') {
+        const drafts = getDB('aduan').filter(a => (a.userId === currentUser.id || a.email === currentUser.email) && a.statusAduan === 'Draft');
+        let n = getDB('notifications');
+        drafts.forEach(d => {
+            const exists = n.find(x => x.aduanId === d.id && x.type === 'draft');
+            if (!exists) {
+                n.unshift({
+                    id: genId(), time: now(), from: 'Sistem',
+                    msg: `Anda memiliki laporan Draft. <a href="#" onclick="navigateTo('aduan', document.querySelector('[data-page=aduan]')); editAduan('${d.id}'); event.preventDefault();" style="color:var(--primary); font-weight:bold; text-decoration:underline;">Klik di sini untuk melanjutkan</a>`,
+                    type: 'draft', targetRole: 'Pelapor', read: false, aduanId: d.id, targetUserId: currentUser.id
+                });
+            }
+        });
+        setDB('notifications', n);
+        updateNotifBadge();
+    }
+}
+
+function updateNotifBadge(){
+    const n=getDB('notifications');
+    const unread=n.filter(x => {
+        if(!x.read) {
+            if(x.targetUserId && x.targetUserId !== currentUser?.id) return false;
+            if(x.type === 'draft' && x.targetUserId !== currentUser?.id) return false;
+            if(x.specificPIC && x.specificPIC !== currentUser?.nama && currentUser?.role !== 'SuperAdmin') return false;
+            if(currentUser?.role === 'SuperAdmin' || x.targetRole === 'Semua' || x.targetRole === currentUser?.role) return true;
+        }
+        return false;
+    }).length;
+    document.getElementById('notifBadge').textContent=unread;
+    document.getElementById('headerNotifDot').style.display=unread>0?'':'none';
+}
+
+function renderNotifications(){
+    const n=getDB('notifications');
+    const filtered=n.filter(x=>{
+        if (x.targetUserId && x.targetUserId !== currentUser?.id) return false;
+        if (x.type === 'draft' && x.targetUserId !== currentUser?.id) return false;
+        if (x.specificPIC && x.specificPIC !== currentUser?.nama && currentUser?.role !== 'SuperAdmin') return false;
+        return currentUser?.role==='SuperAdmin'||x.targetRole==='Semua'||x.targetRole===currentUser?.role;
+    });
+    const tc={info:'badge-info',success:'badge-success',warning:'badge-warning',danger:'badge-danger',otorisasi:'badge-purple',draft:'badge-warning'};
+    let h='';
+    filtered.forEach((x,i)=>{
+        h+=`<tr class="${!x.read?'notif-unread':''}">
+            <td>${i+1}</td><td style="font-size:10px;white-space:nowrap">${x.time}</td>
+            <td>${x.from}</td><td>${x.msg}</td>
+            <td><span class="badge ${tc[x.type]||'badge-secondary'}">${x.type}</span></td>
+            <td><span class="badge badge-primary">${x.targetRole}</span></td>
+            <td>${x.read?'<span class="badge badge-secondary">Dibaca</span>':'<span class="badge badge-warning">Baru</span>'}</td>
+            <td class="actions-cell">
+                ${!x.read?`<button class="btn btn-info btn-xs" onclick="markRead('${x.id}')"><i class="fas fa-check"></i></button>`:''}
+                ${x.type==='otorisasi'&&currentUser?.role==='Otorisator'&&!x.read?`<button class="btn btn-success btn-xs" onclick="otorisasiSK('${x.penangananId}', '${x.id}')"><i class="fas fa-stamp"></i> Otorisasi</button>`:''}
+            </td>
+        </tr>`;
+    });
+    document.getElementById('notifTableBody').innerHTML=h||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px">Tidak ada notifikasi</td></tr>';
+}
+function markRead(id){let n=getDB('notifications');n=n.map(x=>x.id===id?{...x,read:true}:x);setDB('notifications',n);renderNotifications();updateNotifBadge();}
+function markAllRead(){let n=getDB('notifications');n=n.map(x=>{
+    if(x.targetUserId && x.targetUserId !== currentUser?.id) return x;
+    if(x.type === 'draft' && x.targetUserId !== currentUser?.id) return x;
+    if(x.specificPIC && x.specificPIC !== currentUser?.nama && currentUser?.role !== 'SuperAdmin') return x;
+    if(currentUser?.role==='SuperAdmin'||x.targetRole==='Semua'||x.targetRole===currentUser?.role) return {...x, read:true};
+    return x;
+});setDB('notifications',n);renderNotifications();updateNotifBadge();showToast('success','Semua dibaca');}
+
+function updateStatusAduan(aduanId, newStatus) {
+    let a = getDB('aduan');
+    a = a.map(x => x.id === aduanId ? {...x, statusAduan: newStatus} : x);
+    setDB('aduan', a);
+    
+    let p = getDB('penanganan');
+    p = p.map(x => x.aduanId === aduanId ? {...x, status: newStatus} : x);
+    setDB('penanganan', p);
+}
+
+function reqKirimAduan(aduanId) {
+    const ad = getDB('aduan').find(a => a.id === aduanId);
+    if(!ad) return;
+    addNotification(currentUser.nama, `Mohon segera lengkapi dan kirim Aduan (ID ${aduanId.substring(0,8)}) dari form Draft.`, 'info', 'Pelapor', ad.userId);
+    showToast('success', 'Request kirim aduan dikirim ke pelapor.');
+    addLog('info', `Operator mengirim request kelengkapan aduan draft ID ${aduanId.substring(0,8)}`);
+}
+
+function operatorVerifikasi(penId) {
+    let p = getDB('penanganan');
+    let aduanId = null;
+    p = p.map(x => {
+        if(x.id === penId) {
+            aduanId = x.aduanId;
+            return {...x, status: 'Verifikasi'};
+        }
+        return x;
+    });
+    setDB('penanganan', p);
+    if(aduanId) updateStatusAduan(aduanId, 'Verifikasi');
+    
+    renderPenangananTable();
+    showToast('success', 'Status berhasil diubah menjadi Verifikasi!');
+    addLog('success', `Operator memverifikasi aduan ID ${aduanId?.substring(0,8)}`);
+}
+
+function reqOtorisasi(penId) {
+    let p = getDB('penanganan').find(x => x.id === penId);
+    if(!p) return;
+    addNotification(currentUser.nama, `Permintaan Otorisasi untuk Aduan ID ${p.aduanId.substring(0,8)}`, 'otorisasi', 'Otorisator', null, penId);
+    showToast('success', 'Request otorisasi telah dikirim ke Otorisator!');
+    addLog('info', `PIC mengirim request otorisasi untuk ID ${p.aduanId.substring(0,8)}`);
+}
+
 function getMasterOptions(key,valueField,labelField,placeholder){const data=getDB(key).filter(d=>d.status==='Aktif');let html=`<option value="">${placeholder}</option>`;data.forEach(d=>{html+=`<option value="${d[valueField]||d.nama}">${d[labelField]||d.nama}</option>`;});return html;}
-function populatePICSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;sel.innerHTML=getMasterOptions('masterPIC','nama','nama','Pilih PIC');if(currentVal)sel.value=currentVal;}
+function populatePICSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;sel.innerHTML=getMasterOptions('masterPIC','nama','nama','Pilih PIC Tujuan');if(currentVal)sel.value=currentVal;}
 function populateEskalasiSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;sel.innerHTML=getMasterOptions('masterEskalasi','nama','nama','Pilih Eskalasi');if(currentVal)sel.value=currentVal;}
-function populateStatusSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;const data=getDB('masterStatusPenanganan').filter(d=>d.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));let html='';data.forEach(d=>{html+=`<option value="${d.nama}">${d.nama}</option>`;});if(!html)html='<option value="Proses">Proses</option><option value="Selesai">Selesai</option>';sel.innerHTML=html;if(currentVal)sel.value=currentVal;}
-function populateStatusFilter(){const sel=document.getElementById('filterStatusPenanganan');if(!sel)return;const data=getDB('masterStatusPenanganan').filter(d=>d.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));let html='<option value="">Semua Status</option>';data.forEach(d=>{html+=`<option value="${d.nama}">${d.nama}</option>`;});if(data.length===0){html+='<option value="Proses">Proses</option><option value="Selesai">Selesai</option><option value="Diotorisasi">Diotorisasi</option>';}sel.innerHTML=html;}
+function populateStatusSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;const data=getDB('masterStatusPenanganan').filter(d=>d.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));let html='';data.forEach(d=>{html+=`<option value="${d.nama}">${d.nama}</option>`;});if(!html)html='<option value="di Proses">di Proses</option><option value="Selesai">Selesai</option>';sel.innerHTML=html;if(currentVal)sel.value=currentVal;}
+function populateStatusFilter(){const sel=document.getElementById('filterStatusPenanganan');if(!sel)return;const data=getDB('masterStatusPenanganan').filter(d=>d.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));let html='<option value="">Semua Status</option>';data.forEach(d=>{html+=`<option value="${d.nama}">${d.nama}</option>`;});if(data.length===0){html+='<option value="di Proses">di Proses</option><option value="Selesai">Selesai</option><option value="Penetapan">Penetapan</option><option value="di Eskalasi">di Eskalasi</option>';}sel.innerHTML=html;}
 
 function initApp(){
-    let sas=getDB('superadmins');if(!sas.length){sas.push({id:genId(),username:'superadmin',nama:'Super Administrator',email:'superadmin@sigap.com',password:'123//',status:'Aktif'});setDB('superadmins',sas);}
-    if(!getDB('masterEtik').length)setDB('masterEtik',[{id:genId(),kode:'ET-01',nama:'Pelanggaran Kode Etik Profesi',desc:'Pelanggaran kode etik profesi yang berlaku',status:'Aktif'},{id:genId(),kode:'ET-02',nama:'Konflik Kepentingan',desc:'Konflik kepentingan dalam pelaksanaan tugas',status:'Aktif'},{id:genId(),kode:'ET-03',nama:'Penyalahgunaan Wewenang',desc:'Penyalahgunaan wewenang jabatan',status:'Aktif'},{id:genId(),kode:'ET-04',nama:'Diskriminasi / Pelecehan',desc:'Diskriminasi atau pelecehan di lingkungan kerja',status:'Aktif'},{id:genId(),kode:'ET-05',nama:'Pelanggaran Disiplin',desc:'Pelanggaran aturan disiplin kerja',status:'Aktif'}]);
-    if(!getDB('masterHukum').length)setDB('masterHukum',[{id:genId(),kode:'HK-01',nama:'Tindak Pidana Korupsi',desc:'Dugaan tindak pidana korupsi',status:'Aktif'},{id:genId(),kode:'HK-02',nama:'Penipuan / Fraud',desc:'Dugaan penipuan atau fraud',status:'Aktif'},{id:genId(),kode:'HK-03',nama:'Penggelapan',desc:'Dugaan penggelapan aset/dana',status:'Aktif'},{id:genId(),kode:'HK-04',nama:'Pelanggaran Kontrak',desc:'Pelanggaran perjanjian/kontrak',status:'Aktif'},{id:genId(),kode:'HK-05',nama:'Tindak Kekerasan',desc:'Dugaan tindak kekerasan',status:'Aktif'}]);
-    if(!getDB('masterPIC').length)setDB('masterPIC',[{id:genId(),kode:'PIC-01',nama:'Komite',jabatan:'Komite Etik & Profesi',desc:'Penanganan oleh komite internal',status:'Aktif'},{id:genId(),kode:'PIC-02',nama:'Direksi',jabatan:'Dewan Direksi',desc:'Penanganan level direksi',status:'Aktif'},{id:genId(),kode:'PIC-03',nama:'APH/Litigator',jabatan:'Aparat Penegak Hukum',desc:'Penanganan hukum eksternal',status:'Aktif'},{id:genId(),kode:'PIC-04',nama:'HRD',jabatan:'Human Resources',desc:'Penanganan HR',status:'Aktif'}]);
-    if(!getDB('masterEskalasi').length)setDB('masterEskalasi',[{id:genId(),kode:'ESK-01',nama:'Level 1 - Internal',desc:'Penanganan internal unit',waktu:'3',status:'Aktif'},{id:genId(),kode:'ESK-02',nama:'Level 2 - Komite',desc:'Eskalasi ke komite etik',waktu:'7',status:'Aktif'},{id:genId(),kode:'ESK-03',nama:'Level 3 - Direksi',desc:'Eskalasi ke direksi',waktu:'14',status:'Aktif'},{id:genId(),kode:'ESK-04',nama:'Level 4 - Eksternal',desc:'Eskalasi ke pihak eksternal/APH',waktu:'30',status:'Aktif'}]);
-    if(!getDB('masterStatusPenanganan').length)setDB('masterStatusPenanganan',[{id:genId(),kode:'ST-01',nama:'Proses',warna:'warning',urutan:1,desc:'Sedang dalam proses penanganan',status:'Aktif'},{id:genId(),kode:'ST-02',nama:'Selesai',warna:'success',urutan:2,desc:'Penanganan selesai',status:'Aktif'},{id:genId(),kode:'ST-03',nama:'Diotorisasi',warna:'purple',urutan:3,desc:'Telah diotorisasi',status:'Aktif'},{id:genId(),kode:'ST-04',nama:'Ditunda',warna:'secondary',urutan:4,desc:'Penanganan ditunda',status:'Aktif'},{id:genId(),kode:'ST-05',nama:'Dibatalkan',warna:'danger',urutan:5,desc:'Aduan dibatalkan',status:'Aktif'}]);
-    if(!getSettings().appName)setSettings({appName:'SIGAP',instName:'Sistem Informasi Pengelolaan Aduan dan Pelaporan',instLogo:'',appLogo:'',toastURL:''});
-    if(!getDB('aduan').length)setDB('aduan',[{id:genId(),timestamp:'2024-01-15 08:30:00',email:'pelapor1@email.com',nama:'Ahmad Fauzi',hp:'081234567890',tglKejadian:'2024-01-10',deskripsi:'Penyalahgunaan wewenang dalam pengadaan.',namaDilaporkan:'Budi Santoso',jabatan:'Kepala Pengadaan',unitKerja:'Bagian Pengadaan Lt. 3',lampiran:'https://drive.google.com/doc1'},{id:genId(),timestamp:'2024-01-18 14:22:00',email:'pelapor2@email.com',nama:'Siti Rahmawati',hp:'087654321098',tglKejadian:'2024-01-16',deskripsi:'Konflik kepentingan vendor IT.',namaDilaporkan:'Doni Pratama',jabatan:'Manager IT',unitKerja:'Divisi IT',lampiran:''},{id:genId(),timestamp:'2024-02-01 09:15:00',email:'pelapor3@email.com',nama:'Rizky Aditya',hp:'089876543210',tglKejadian:'2024-01-28',deskripsi:'Dugaan penggelapan dana operasional.',namaDilaporkan:'Eko Wijaya',jabatan:'Kepala Cabang',unitKerja:'Cabang Surabaya',lampiran:'https://dropbox.com/ev1'}]);
-    if(!getDB('penanganan').length){const al=getDB('aduan');setDB('penanganan',[{id:genId(),aduanId:al[0]?.id,tglVerif:'2024-01-16',kategori:'Etik',subKategori:'Penyalahgunaan Wewenang',urgensi:'Berat',status:'Proses',pic:'Komite',eskalasi:'Level 2 - Komite',estimasi:'14 Hari',tglMulai:'2024-01-17',tanggapan:'Investigasi mendalam',tglSelesai:'',keputusan:'',halKeputusan:'',bukti:'',skFile:null,skUploaded:false,reqSurat:false,otorisasiOleh:'',otorisasiTgl:''},{id:genId(),aduanId:al[1]?.id,tglVerif:'2024-01-19',kategori:'Etik',subKategori:'Konflik Kepentingan',urgensi:'Sedang',status:'Selesai',pic:'Komite',eskalasi:'Level 1 - Internal',estimasi:'7 Hari',tglMulai:'2024-01-20',tanggapan:'Verifikasi selesai',tglSelesai:'2024-01-26',keputusan:'SK/ETIK/0002/2024',halKeputusan:'Surat Penetapan Hasil Penanganan Etik dan Hukum a.n. "Doni Pratama" atas aduan : "No Kode aduan '+al[1]?.id?.substring(0,8)+'"',bukti:'https://drive.google.com/result1',skFile:null,skUploaded:false,reqSurat:true,otorisasiOleh:'',otorisasiTgl:''}]);}
-    if(!getDB('users').length)setDB('users',[{id:genId(),username:'admin',nama:'Administrator',email:'admin@sigap.com',hp:'081111111111',role:'Admin',password:'123',status:'Aktif'},{id:genId(),username:'komite_etik',nama:'Dr. Komite Etik',email:'etik@sigap.com',hp:'083333333333',role:'Komite Etik',password:'123',status:'Aktif'},{id:genId(),username:'komite_profesi',nama:'Dr. Komite Profesi',email:'profesi@sigap.com',hp:'083444444444',role:'Komite Profesi',password:'123',status:'Aktif'},{id:genId(),username:'otorisator1',nama:'Otorisator Utama',email:'otorisator@sigap.com',hp:'085555555555',role:'Otorisator',password:'123',status:'Aktif'}]);
+    let sas=getDB('superadmins');
+    if(!sas.length){
+        sas.push({id:genId(),username:'superadmin',nama:'Super Administrator',email:'superadmin@sigap.com',password:'123//',status:'Aktif'});
+        setDB('superadmins',sas);
+    }
     
-    // Perbaikan default Roles (controlPanel DIHILANGKAN sepenuhnya dari role lain agar tidak bisa dimanipulasi)
+    if(!getDB('masterEtik').length) setDB('masterEtik', []);
+    if(!getDB('masterHukum').length) setDB('masterHukum', []);
+    if(!getDB('masterPIC').length) setDB('masterPIC', []);
+    if(!getDB('masterEskalasi').length) setDB('masterEskalasi', []);
+    if(!getDB('masterStatusPenanganan').length) setDB('masterStatusPenanganan', []);
+    if(!getDB('aduan').length) setDB('aduan', []);
+    if(!getDB('penanganan').length) setDB('penanganan', []);
+    if(!getDB('users').length) setDB('users', []);
+    
+    if(!getSettings().appName) setSettings({appName:'SIGAP',instName:'Sistem Informasi Pengelolaan Aduan dan Pelaporan',instLogo:'',appLogo:'',toastURL:''});
+    
     if(!localStorage.getItem(DB_KEYS.roles)) {
         localStorage.setItem(DB_KEYS.roles,JSON.stringify({
-            'Admin':{dashboard:true,aduan:true,penanganan:true,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:true,masterEskalasi:true,masterEtik:true,masterHukum:true,masterStatusPenanganan:true,users:true,roles:false,settings:true,exportImport:true},
-            'Operator':{dashboard:true,aduan:true,penanganan:true,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
-            'Komite Etik':{dashboard:true,aduan:true,penanganan:true,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:false,masterEskalasi:false,masterEtik:true,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
-            'Komite Profesi':{dashboard:true,aduan:true,penanganan:true,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:true,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
-            'PIC':{dashboard:true,aduan:true,penanganan:true,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
-            'Otorisator':{dashboard:true,aduan:true,penanganan:true,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:true,masterEskalasi:true,masterEtik:true,masterHukum:true,masterStatusPenanganan:true,users:true,roles:true,settings:true,exportImport:false},
-            'Pelapor':{dashboard:false,aduan:true,penanganan:false,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false}
+            'Admin':{dashboard:true,aduan:true,verifikasi:true,penanganan:true,otorisasi:true,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:true,masterEskalasi:true,masterEtik:true,masterHukum:true,masterStatusPenanganan:true,users:true,roles:false,settings:true,exportImport:true},
+            'Operator':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
+            'Komite Etik':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:false,masterEskalasi:false,masterEtik:true,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
+            'Komite Profesi':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:true,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
+            'PIC':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false},
+            'Otorisator':{dashboard:true,aduan:true,verifikasi:false,penanganan:true,otorisasi:true,cetakLaporan:true,notifikasi:true,logActivity:true,masterPIC:true,masterEskalasi:true,masterEtik:true,masterHukum:true,masterStatusPenanganan:true,users:true,roles:true,settings:true,exportImport:false},
+            'Pelapor':{dashboard:false,aduan:true,verifikasi:false,penanganan:true,otorisasi:false,cetakLaporan:false,notifikasi:true,logActivity:false,masterPIC:false,masterEskalasi:false,masterEtik:false,masterHukum:false,masterStatusPenanganan:false,users:false,roles:false,settings:false,exportImport:false}
         }));
     }
-    applySettings();setTimeout(()=>document.getElementById('loader').classList.add('hide'),800);createParticles();
+    
+    applySettings();
+    setTimeout(()=>document.getElementById('loader').classList.add('hide'),800);
+    createParticles();
+
+    if(currentUser) {
+        document.getElementById('landingPage').style.display='none';
+        document.getElementById('appContainer').classList.add('active');
+        enterApp(false);
+    }
 }
 
 function createParticles(){const c=document.getElementById('particles');for(let i=0;i<40;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*10+5)+'s';p.style.animationDelay=Math.random()*5+'s';p.style.width=p.style.height=(Math.random()*3+2)+'px';c.appendChild(p);}}
@@ -715,11 +986,34 @@ function showToast(type,msg){const c=document.getElementById('toastContainer');c
 function showAuth(t){document.getElementById(t==='login'?'authLogin':'authRegister').classList.add('active');}
 function closeAuth(id){document.getElementById(id).classList.remove('active');}
 function switchAuth(f,t){closeAuth(f);setTimeout(()=>document.getElementById(t).classList.add('active'),200);}
-function handleLogin(e){e.preventDefault();const u=document.getElementById('loginUsername').value.trim(),p=document.getElementById('loginPassword').value;const sa=getDB('superadmins').find(x=>(x.username===u||x.email===u)&&x.password===p);if(sa){currentUser={...sa,role:'SuperAdmin'};closeAuth('authLogin');enterApp();return;}const user=getDB('users').find(x=>(x.username===u||x.email===u)&&x.password===p&&x.status==='Aktif');if(user){currentUser=user;closeAuth('authLogin');enterApp();return;}showToast('error','Username/password salah!');}
-function handleRegister(e){e.preventDefault();const name=document.getElementById('regName').value.trim(),email=document.getElementById('regEmail').value.trim(),username=document.getElementById('regUsername').value.trim(),phone=document.getElementById('regPhone').value.trim(),pass=document.getElementById('regPassword').value,pass2=document.getElementById('regPassword2').value;if(pass!==pass2){showToast('error','Password tidak cocok!');return;}const users=getDB('users');if(users.find(x=>x.username===username||x.email===email)){showToast('error','Sudah terdaftar!');return;}users.push({id:genId(),username,nama:name,email,hp:phone,role:'Pelapor',password:pass,status:'Aktif'});setDB('users',users);closeAuth('authRegister');showToast('success','Registrasi berhasil!');setTimeout(()=>showAuth('login'),500);}
-function handleLogout(){currentUser=null;document.getElementById('appContainer').classList.remove('active');document.getElementById('landingPage').style.display='';document.getElementById('profileMenu').classList.remove('show');showToast('info','Keluar.');}
 
-function enterApp(){
+function handleLogin(e){
+    e.preventDefault();
+    const u=document.getElementById('loginUsername').value.trim(),p=document.getElementById('loginPassword').value;
+    const sa=getDB('superadmins').find(x=>(x.username===u||x.email===u)&&x.password===p);
+    if(sa){currentUser={...sa,role:'SuperAdmin'};}
+    else {
+        const user=getDB('users').find(x=>(x.username===u||x.email===u)&&x.password===p&&x.status==='Aktif');
+        if(user){currentUser=user;}
+    }
+
+    if(currentUser){
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        closeAuth('authLogin');
+        enterApp(true);
+    } else {
+        showToast('error','Username/password salah!');
+    }
+}
+
+function handleRegister(e){e.preventDefault();const name=document.getElementById('regName').value.trim(),email=document.getElementById('regEmail').value.trim(),username=document.getElementById('regUsername').value.trim(),phone=document.getElementById('regPhone').value.trim(),pass=document.getElementById('regPassword').value,pass2=document.getElementById('regPassword2').value;if(pass!==pass2){showToast('error','Password tidak cocok!');return;}const users=getDB('users');if(users.find(x=>x.username===username||x.email===email)){showToast('error','Sudah terdaftar!');return;}users.push({id:genId(),username,nama:name,email,hp:phone,role:'Pelapor',password:pass,status:'Aktif'});setDB('users',users);closeAuth('authRegister');showToast('success','Registrasi berhasil!');setTimeout(()=>showAuth('login'),500);}
+
+function handleLogout(){
+    localStorage.removeItem('currentUser');
+    window.location.reload(); 
+}
+
+function enterApp(showWelcome = true){
     document.getElementById('landingPage').style.display='none';
     document.getElementById('appContainer').classList.add('active');
     const ini=currentUser.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -728,10 +1022,14 @@ function enterApp(){
     document.getElementById('sidebarRole').textContent=currentUser.role;
     
     applyPermissions();
+    checkDraftNotifs(); 
     updateNotifBadge();
-    navigateTo('dashboard',document.querySelector('[data-page="dashboard"]'));
-    addLog('info','Login berhasil');
-    showToast('success',`Selamat datang, ${currentUser.nama}!`);
+    navigateTo(currentUser.role === 'Pelapor' ? 'aduan' : 'dashboard', document.querySelector(`[data-page="${currentUser.role === 'Pelapor' ? 'aduan' : 'dashboard'}"]`));
+    
+    if(showWelcome) {
+        addLog('info','Login berhasil');
+        showToast('success',`Selamat datang, ${currentUser.nama}!`);
+    }
     setTimeout(restrictExportImport, 200); 
 }
 
@@ -746,7 +1044,6 @@ function applyPermissions(){
         return;
     }
     
-    // Sembunyikan mutlak Control Panel dari non-SuperAdmin
     if(cpMenu) cpMenu.style.display = 'none';
     if(cpItem) cpItem.style.display = 'none';
     
@@ -761,7 +1058,7 @@ function applyPermissions(){
 
 function navigateTo(page,el){
     if(currentUser && currentUser.role !== 'SuperAdmin' && page !== 'dashboard'){
-        if(page === 'controlPanel') { showToast('error', 'Akses Ilegal!'); return; } // Kunci mati
+        if(page === 'controlPanel') { showToast('error', 'Akses Ilegal!'); return; } 
         const perms = JSON.parse(localStorage.getItem(DB_KEYS.roles)) || {};
         const rp = perms[currentUser.role] || {};
         if(!rp[page]){
@@ -773,13 +1070,13 @@ function navigateTo(page,el){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.querySelectorAll('.menu-item').forEach(m=>m.classList.remove('active'));
     
-    const pm={dashboard:'pageDashboard',aduan:'pageAduan',penanganan:'pagePenanganan',cetakLaporan:'pageCetakLaporan',notifikasi:'pageNotifikasi',logActivity:'pageLogActivity',masterPIC:'pageMasterPIC',masterEskalasi:'pageMasterEskalasi',masterEtik:'pageMasterEtik',masterHukum:'pageMasterHukum',masterStatusPenanganan:'pageMasterStatusPenanganan',users:'pageUsers',roles:'pageRoles',settings:'pageSettings', 'settings-landing':'pageSettingsLanding', controlPanel:'pageControlPanel'};
-    const titles={dashboard:['Dashboard','Ringkasan statistik'],aduan:['Pelaporan Aduan','Kelola aduan'],penanganan:['Penanganan Aduan','Kelola penanganan'],cetakLaporan:['Cetak Laporan','Unduh PDF Penanganan'],notifikasi:['Notifikasi','Notifikasi proses'],logActivity:['Log Aktivitas','Riwayat aktivitas'],masterPIC:['Master PIC','Data PIC penanganan'],masterEskalasi:['Master Eskalasi','Level eskalasi'],masterEtik:['Masalah Etik','Kategori masalah etik'],masterHukum:['Masalah Hukum','Kategori masalah hukum'],masterStatusPenanganan:['Status Penanganan','Master status'],users:['Manajemen User','Kelola pengguna'],roles:['Hak Akses','Konfigurasi role'],settings:['Pengaturan Sistem & API','Kustomisasi & Sinkronisasi'], 'settings-landing':['Pengaturan Landing Page', 'Kelola tampilan halaman depan'], controlPanel:['Control Panel','SuperAdmin']};    
+    const pm={dashboard:'pageDashboard',aduan:'pageAduan',verifikasi:'pageVerifikasi',penanganan:'pagePenanganan',otorisasi:'pageOtorisasi',cetakLaporan:'pageCetakLaporan',notifikasi:'pageNotifikasi',logActivity:'pageLogActivity',masterPIC:'pageMasterPIC',masterEskalasi:'pageMasterEskalasi',masterEtik:'pageMasterEtik',masterHukum:'pageMasterHukum',masterStatusPenanganan:'pageMasterStatusPenanganan',users:'pageUsers',roles:'pageRoles',settings:'pageSettings', 'settings-landing':'pageSettingsLanding', controlPanel:'pageControlPanel'};
+    const titles={dashboard:['Dashboard','Ringkasan statistik'],aduan:['Pelaporan Aduan','Kelola aduan'],verifikasi:['Verifikasi Aduan','Pengecekan awal aduan'],penanganan:['Penanganan Aduan','Kelola penanganan'],otorisasi:['Otorisasi Penanganan','Persetujuan akhir'],cetakLaporan:['Cetak Laporan','Unduh PDF Penanganan'],notifikasi:['Notifikasi','Notifikasi proses'],logActivity:['Log Aktivitas','Riwayat aktivitas'],masterPIC:['Master PIC','Data PIC penanganan'],masterEskalasi:['Master Eskalasi','Level eskalasi'],masterEtik:['Masalah Etik','Kategori masalah etik'],masterHukum:['Masalah Hukum','Kategori masalah hukum'],masterStatusPenanganan:['Status Penanganan','Master status'],users:['Manajemen User','Kelola pengguna'],roles:['Hak Akses','Konfigurasi role'],settings:['Pengaturan Sistem & API','Kustomisasi & Sinkronisasi'], 'settings-landing':['Pengaturan Landing Page', 'Kelola tampilan halaman depan'], controlPanel:['Control Panel','SuperAdmin']};    
     
     const tp=document.getElementById(pm[page]);if(tp)tp.classList.add('active');if(el)el.classList.add('active');
     document.getElementById('pageTitle').textContent=titles[page]?.[0]||'';document.getElementById('pageSubtitle').textContent=titles[page]?.[1]||'';
     
-    switch(page){case'dashboard':loadDashboard();break;case'aduan':renderAduanTable();break;case'penanganan':populateStatusFilter();renderPenangananTable();break;case'cetakLaporan':break;case'notifikasi':renderNotifications();break;case'logActivity':renderLogs();break;case'masterPIC':renderMasterPIC();break;case'masterEskalasi':renderMasterEskalasi();break;case'masterEtik':renderMasterTable('etik');break;case'masterHukum':renderMasterTable('hukum');break;case'masterStatusPenanganan':renderMasterStatusPenanganan();break;case'users':renderUsersTable();break;case'roles':renderRolesPage();break;case'settings':loadSettingsForm();break;case'controlPanel':renderControlPanel();break;}
+    switch(page){case'dashboard':loadDashboard();break;case'aduan':renderAduanTable();break;case'penanganan':populateStatusFilter();renderPenangananTable();break;case'otorisasi':renderOtorisasiTable();break;case'cetakLaporan':break;case'notifikasi':renderNotifications();break;case'logActivity':renderLogs();break;case'masterPIC':renderMasterPIC();break;case'masterEskalasi':renderMasterEskalasi();break;case'masterEtik':renderMasterTable('etik');break;case'masterHukum':renderMasterTable('hukum');break;case'masterStatusPenanganan':renderMasterStatusPenanganan();break;case'users':renderUsersTable();break;case'roles':renderRolesPage();break;case'settings':loadSettingsForm();break;case'controlPanel':renderControlPanel();break;}
     closeMobileSidebar();
 }
 
@@ -791,92 +1088,98 @@ function loadDashboard(){
     let aduan=getDB('aduan');
     const pen=getDB('penanganan');
     
-    if (currentUser && currentUser.role !== 'Pelapor' && currentUser.role !== 'SuperAdmin') {
-        aduan = aduan.filter(a => a.statusAduan !== 'Draft');
+    if (currentUser && currentUser.role !== 'SuperAdmin') {
+        if(currentUser.role === 'Pelapor') {
+            aduan = aduan.filter(a => a.userId === currentUser.id || a.email === currentUser.email);
+        } else {
+            aduan = aduan.filter(a => a.statusAduan !== 'Draft');
+        }
     }
 
     const allStatuses=getDB('masterStatusPenanganan').filter(s=>s.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));
     document.getElementById('statTotal').textContent=aduan.length;
-    document.getElementById('statProses').textContent=pen.filter(p=>p.status==='Proses').length;
-    document.getElementById('statSelesai').textContent=pen.filter(p=>['Selesai','Diotorisasi'].includes(p.status)).length;
+    document.getElementById('statProses').textContent=pen.filter(p=>p.status==='di Proses' || p.status==='Verifikasi' || p.status==='di Eskalasi').length;
+    document.getElementById('statSelesai').textContent=pen.filter(p=>['Selesai','Diotorisasi','Penetapan'].includes(p.status)).length;
     document.getElementById('statBerat').textContent=pen.filter(p=>p.urgensi==='Berat').length;
-    document.getElementById('aduanBadge').textContent=pen.filter(p=>p.status==='Proses').length;
+    document.getElementById('aduanBadge').textContent=pen.filter(p=>p.status==='di Proses'||p.status==='Terkirim').length;
     const miniColors=['#4f46e5','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4'];
     let miniHtml='';
     if(allStatuses.length>0){allStatuses.forEach((st,i)=>{const cnt=pen.filter(p=>p.status===st.nama).length;miniHtml+=`<div class="mini-stat" style="border-top-color:${miniColors[i%miniColors.length]}"><h4>${cnt}</h4><p>${st.nama}</p></div>`;});}
-    else{const defStats=[{l:'Proses',c:pen.filter(p=>p.status==='Proses').length},{l:'Selesai',c:pen.filter(p=>p.status==='Selesai').length},{l:'Diotorisasi',c:pen.filter(p=>p.status==='Diotorisasi').length}];defStats.forEach((s,i)=>{miniHtml+=`<div class="mini-stat" style="border-top-color:${miniColors[i]}"><h4>${s.c}</h4><p>${s.l}</p></div>`;});}
+    else{const defStats=[{l:'di Proses',c:pen.filter(p=>p.status==='di Proses').length},{l:'Selesai',c:pen.filter(p=>p.status==='Selesai').length},{l:'Penetapan',c:pen.filter(p=>p.status==='Penetapan').length}];defStats.forEach((s,i)=>{miniHtml+=`<div class="mini-stat" style="border-top-color:${miniColors[i]}"><h4>${s.c}</h4><p>${s.l}</p></div>`;});}
     miniHtml+=`<div class="mini-stat" style="border-top-color:#94a3b8"><h4>${pen.filter(p=>p.skUploaded).length}</h4><p>SK Diupload</p></div>`;
-    miniHtml+=`<div class="mini-stat" style="border-top-color:#f97316"><h4>${pen.filter(p=>p.reqSurat&&!p.skUploaded).length}</h4><p>Menunggu SK</p></div>`;
+    miniHtml+=`<div class="mini-stat" style="border-top-color:#f97316"><h4>${pen.filter(p=>p.status==='Penetapan'&&!p.skUploaded).length}</h4><p>Menunggu SK</p></div>`;
     document.getElementById('miniStatsGrid').innerHTML=miniHtml;
     destroyCharts();createBarChart();createPieChart();createLineChart();createDoughnutChart();
-    let h='';pen.slice(-8).reverse().forEach((p,i)=>{const ad=aduan.find(a=>a.id===p.aduanId);const ucl={Ringan:'badge-info',Sedang:'badge-warning',Berat:'badge-danger'};const stcl=p.status==='Diotorisasi'?'badge-purple':p.status==='Selesai'?'badge-success':p.status==='Ditunda'?'badge-secondary':p.status==='Dibatalkan'?'badge-danger':'badge-warning';h+=`<tr><td>${i+1}</td><td>${ad?.nama||'-'}</td><td><span class="badge badge-primary">${p.kategori}</span></td><td><span class="badge ${ucl[p.urgensi]||'badge-secondary'}">${p.urgensi}</span></td><td><span class="badge ${stcl}">${p.status}</span></td><td>${p.pic||'-'}</td><td>${p.eskalasi||'-'}</td><td>${p.estimasi||'-'}</td></tr>`;});
+    let h='';pen.slice(-8).reverse().forEach((p,i)=>{const ad=aduan.find(a=>a.id===p.aduanId);const ucl={Ringan:'badge-info',Sedang:'badge-warning',Berat:'badge-danger'};const stcl=p.status==='Penetapan'?'badge-purple':p.status==='Selesai'?'badge-success':p.status==='Ditunda'?'badge-secondary':p.status==='Dibatalkan'?'badge-danger':'badge-warning';h+=`<tr><td>${i+1}</td><td>${ad?.nama||'-'}</td><td><span class="badge badge-primary">${p.kategori||'-'}</span></td><td><span class="badge ${ucl[p.urgensi]||'badge-secondary'}">${p.urgensi||'-'}</span></td><td><span class="badge ${stcl}">${p.status||'-'}</span></td><td>${p.pic||'-'}</td><td>${p.eskalasi||'-'}</td><td>${p.estimasi||'-'}</td></tr>`;});
     document.getElementById('dashStatusBody').innerHTML=h||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:20px">Belum ada data</td></tr>';
-    const picList=getDB('masterPIC').filter(p=>p.status==='Aktif');let phHtml='';
-    if(picList.length>0){picList.forEach(pic=>{const t=pen.filter(p=>p.pic===pic.nama).length,pr=pen.filter(p=>p.pic===pic.nama&&p.status==='Proses').length,se=pen.filter(p=>p.pic===pic.nama&&['Selesai','Diotorisasi'].includes(p.status)).length;phHtml+=`<tr><td>${pic.nama}</td><td><strong>${t}</strong></td><td>${pr}</td><td>${se}</td></tr>`;});}
-    else{['Komite','Direksi','APH/Litigator'].forEach(pic=>{const t=pen.filter(p=>p.pic===pic).length,pr=pen.filter(p=>p.pic===pic&&p.status==='Proses').length,se=pen.filter(p=>p.pic===pic&&['Selesai','Diotorisasi'].includes(p.status)).length;phHtml+=`<tr><td>${pic}</td><td><strong>${t}</strong></td><td>${pr}</td><td>${se}</td></tr>`;});}
-    document.getElementById('dashPICBody').innerHTML=phHtml||'<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:16px">Belum ada data</td></tr>';
-    const eskList=getDB('masterEskalasi').filter(e=>e.status==='Aktif');let ehHtml='';
-    if(eskList.length>0){eskList.forEach(esk=>{const t=pen.filter(p=>p.eskalasi===esk.nama).length,pct=pen.length?Math.round(t/pen.length*100):0;ehHtml+=`<tr><td>${esk.nama}</td><td><strong>${t}</strong></td><td>${pct}%</td></tr>`;});}
-    else ehHtml='<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:16px">Belum ada data</td></tr>';
-    document.getElementById('dashEskalasiBody').innerHTML=ehHtml;
-    const allKat=[...new Set(pen.map(p=>p.kategori).filter(Boolean))];let sHtml='';
-    allKat.forEach(kat=>{const subs=[...new Set(pen.filter(p=>p.kategori===kat).map(p=>p.subKategori).filter(Boolean))];
-    if(subs.length===0){const cnt=pen.filter(p=>p.kategori===kat).length,pr=pen.filter(p=>p.kategori===kat&&p.status==='Proses').length,se=pen.filter(p=>p.kategori===kat&&p.status==='Selesai').length,ot=pen.filter(p=>p.kategori===kat&&p.status==='Diotorisasi').length,pct=cnt?Math.round((se+ot)/cnt*100):0;sHtml+=`<tr><td><span class="badge ${kat==='Etik'?'badge-primary':'badge-danger'}">${kat}</span></td><td>-</td><td><strong>${cnt}</strong></td><td>${pr}</td><td>${se}</td><td>${ot}</td><td>${pct}%</td></tr>`;}
-    else{subs.forEach((sub,si)=>{const cnt=pen.filter(p=>p.kategori===kat&&p.subKategori===sub).length,pr=pen.filter(p=>p.kategori===kat&&p.subKategori===sub&&p.status==='Proses').length,se=pen.filter(p=>p.kategori===kat&&p.subKategori===sub&&p.status==='Selesai').length,ot=pen.filter(p=>p.kategori===kat&&p.subKategori===sub&&p.status==='Diotorisasi').length,pct=cnt?Math.round((se+ot)/cnt*100):0;sHtml+=`<tr><td>${si===0?`<span class="badge ${kat==='Etik'?'badge-primary':'badge-danger'}">${kat}</span>`:'↳'}</td><td><span class="badge badge-secondary">${sub}</span></td><td><strong>${cnt}</strong></td><td>${pr}</td><td>${se}</td><td>${ot}</td><td>${pct}%</td></tr>`;});}});
-    if(!sHtml)sHtml='<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:20px">Belum ada data</td></tr>';
-    document.getElementById('dashStatsBody').innerHTML=sHtml;
+    document.getElementById('dashPICBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:16px">Belum ada data</td></tr>';
+    document.getElementById('dashEskalasiBody').innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:16px">Belum ada data</td></tr>';
+    document.getElementById('dashStatsBody').innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:20px">Belum ada data</td></tr>';
 }
 
 function destroyCharts(){Object.values(charts).forEach(c=>c?.destroy());charts={};}
 function createBarChart(){const ms=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];const a=getDB('aduan');charts.bar=new Chart(document.getElementById('chartBar'),{type:'bar',data:{labels:ms,datasets:[{label:'Aduan',data:ms.map((m,i)=>a.filter(x=>{const d=new Date(x.tglKejadian||x.timestamp);return d.getMonth()===i;}).length),backgroundColor:'rgba(79,70,229,0.8)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}}}});}
 function createPieChart(){const p=getDB('penanganan');const allKat=[...new Set(p.map(x=>x.kategori).filter(Boolean))];const colors=['#818cf8','#f87171','#94a3b8','#34d399','#fbbf24'];charts.pie=new Chart(document.getElementById('chartPie'),{type:'pie',data:{labels:allKat.length?allKat:['Etik','Hukum'],datasets:[{data:allKat.length?allKat.map(k=>p.filter(x=>x.kategori===k).length):[p.filter(x=>x.kategori==='Etik').length,p.filter(x=>x.kategori==='Hukum').length],backgroundColor:colors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});}
-function createLineChart(){const ms=['Jan','Feb','Mar','Apr','Mei','Jun'];const p=getDB('penanganan');const allStatuses=getDB('masterStatusPenanganan').filter(s=>s.status==='Aktif').slice(0,3);const colors=['#f59e0b','#10b981','#8b5cf6'];const datasets=allStatuses.length>0?allStatuses.map((st,i)=>({label:st.nama,data:ms.map((_,mi)=>p.filter(x=>x.status===st.nama&&new Date(x.tglMulai||x.tglVerif).getMonth()===mi).length),borderColor:colors[i%colors.length],backgroundColor:colors[i%colors.length]+'19',tension:.4,fill:true})):[{label:'Proses',data:ms.map((_,i)=>p.filter(x=>x.status==='Proses'&&new Date(x.tglMulai||x.tglVerif).getMonth()===i).length),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',tension:.4,fill:true},{label:'Selesai',data:ms.map((_,i)=>p.filter(x=>['Selesai','Diotorisasi'].includes(x.status)&&new Date(x.tglSelesai||x.tglVerif).getMonth()===i).length),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.1)',tension:.4,fill:true}];charts.line=new Chart(document.getElementById('chartLine'),{type:'line',data:{labels:ms,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true}}}});}
-function createDoughnutChart(){const p=getDB('penanganan');const allStatuses=getDB('masterStatusPenanganan').filter(s=>s.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));const colors=['#f59e0b','#10b981','#8b5cf6','#94a3b8','#ef4444','#06b6d4'];const labels=allStatuses.length?allStatuses.map(s=>s.nama):['Proses','Selesai','Diotorisasi'];const data=allStatuses.length?allStatuses.map(s=>p.filter(x=>x.status===s.nama).length):[p.filter(x=>x.status==='Proses').length,p.filter(x=>x.status==='Selesai').length,p.filter(x=>x.status==='Diotorisasi').length];charts.doughnut=new Chart(document.getElementById('chartDoughnut'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},cutout:'65%'}});}
+function createLineChart(){const ms=['Jan','Feb','Mar','Apr','Mei','Jun'];const p=getDB('penanganan');const allStatuses=getDB('masterStatusPenanganan').filter(s=>s.status==='Aktif').slice(0,3);const colors=['#f59e0b','#10b981','#8b5cf6'];const datasets=allStatuses.length>0?allStatuses.map((st,i)=>({label:st.nama,data:ms.map((_,mi)=>p.filter(x=>x.status===st.nama&&new Date(x.tglMulai||x.tglVerif).getMonth()===mi).length),borderColor:colors[i%colors.length],backgroundColor:colors[i%colors.length]+'19',tension:.4,fill:true})):[{label:'di Proses',data:ms.map((_,i)=>p.filter(x=>x.status==='di Proses'&&new Date(x.tglMulai||x.tglVerif).getMonth()===i).length),borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,0.1)',tension:.4,fill:true},{label:'Selesai',data:ms.map((_,i)=>p.filter(x=>['Selesai','Penetapan'].includes(x.status)&&new Date(x.tglSelesai||x.tglVerif).getMonth()===i).length),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.1)',tension:.4,fill:true}];charts.line=new Chart(document.getElementById('chartLine'),{type:'line',data:{labels:ms,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true}}}});}
+function createDoughnutChart(){const p=getDB('penanganan');const allStatuses=getDB('masterStatusPenanganan').filter(s=>s.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));const colors=['#f59e0b','#10b981','#8b5cf6','#94a3b8','#ef4444','#06b6d4'];const labels=allStatuses.length?allStatuses.map(s=>s.nama):['di Proses','Selesai','Penetapan'];const data=allStatuses.length?allStatuses.map(s=>p.filter(x=>x.status===s.nama).length):[p.filter(x=>x.status==='di Proses').length,p.filter(x=>x.status==='Selesai').length,p.filter(x=>x.status==='Penetapan').length];charts.doughnut=new Chart(document.getElementById('chartDoughnut'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},cutout:'65%'}});}
 
 function renderAduanTable(){
-    const d=getDB('aduan'), penanganan=getDB('penanganan');
+    let d=getDB('aduan');
     const isSA = currentUser?.role === 'SuperAdmin';
     let h='', count=0;
     
+    if (currentUser?.role === 'Pelapor') {
+        d = d.filter(a => a.userId === currentUser.id || a.email === currentUser.email);
+    } else if (!isSA) {
+        if(currentUser?.role !== 'Operator') {
+            d = d.filter(a => a.statusAduan !== 'Draft');
+        }
+    }
+    
     d.forEach((a,i)=>{
         const stat = a.statusAduan || 'Terkirim';
-        if(stat === 'Draft' && currentUser?.role !== 'Pelapor' && !isSA) return;
         count++;
         
-        const pTerkait = penanganan.find(p => p.aduanId === a.id);
-        const isSelesai = pTerkait && ['Selesai','Diotorisasi'].includes(pTerkait.status);
-        const hasTglVerif = pTerkait && pTerkait.tglVerif;
+        let isGlobalLocked = stat === 'Selesai' && !isSA;
+
+        const canEdit = !isGlobalLocked && (isSA || stat === 'Terkirim' || (stat === 'Draft' && (currentUser?.role === 'Pelapor' || currentUser?.role === 'Operator')));
+        const actionDisabled = canEdit ? '' : 'disabled';
         
-        const actionDisabled = (isSelesai && !isSA) ? 'disabled' : '';
-        
-        let btnEdit = '';
-        if(stat === 'Draft' || hasTglVerif || isSA) {
-            btnEdit = `<button class="btn btn-warning btn-xs" onclick="editAduan('${a.id}')" ${actionDisabled}><i class="fas fa-edit"></i></button>`;
-        }
+        let btnEdit = `<button class="btn btn-warning btn-xs" onclick="editAduan('${a.id}')" ${actionDisabled}><i class="fas fa-edit"></i></button>`;
         
         let btnHapus = '';
-        if(isSA) {
-            btnHapus = `<button class="btn btn-danger btn-xs" onclick="deleteItem('aduan','${a.id}')" ${actionDisabled}><i class="fas fa-trash"></i></button>`;
+        if (!isGlobalLocked && (isSA || (stat === 'Draft' && currentUser?.role === 'Pelapor'))) {
+            btnHapus = `<button class="btn btn-danger btn-xs" onclick="deleteItem('aduan','${a.id}')"><i class="fas fa-trash"></i></button>`;
         }
         
-        const badgeCls = stat === 'Draft' ? 'badge-warning' : 'badge-success';
+        let btnReqKirim = '';
+        if(!isGlobalLocked && currentUser?.role === 'Operator' && stat === 'Draft') {
+            btnReqKirim = `<button class="btn btn-info btn-xs" onclick="reqKirimAduan('${a.id}')"><i class="fas fa-paper-plane"></i> Req Kirim</button>`;
+        }
+        
+        const badgeCls = stat === 'Draft' ? 'badge-warning' : (stat === 'Selesai' ? 'badge-success' : 'badge-primary');
 
         h+=`<tr>
             <td>${count}</td><td style="font-size:10px;white-space:nowrap">${a.timestamp}</td>
             <td>${a.email}</td><td class="sticky-col"><strong>${a.nama}</strong></td>
             <td>${a.hp}</td><td>${a.tglKejadian}</td>
-            <td><div class="text-truncate" title="${a.deskripsi}">${a.deskripsi}</div></td>
+            <td><div class="text-wrap-full">${a.deskripsi}</div></td>
             <td>${a.namaDilaporkan}</td><td>${a.jabatan||'-'}</td><td>${a.unitKerja}</td>
             <td>${a.lampiran?'<a href="'+a.lampiran+'" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-paperclip"></i></a>':'-'}</td>
             <td><span class="badge ${badgeCls}">${stat}</span></td>
-            <td class="sticky-col-right"><div class="actions-cell">${btnEdit}${btnHapus}</div></td>
+            <td class="sticky-col-right"><div class="actions-cell">${btnReqKirim}${btnEdit}${btnHapus}</div></td>
         </tr>`;
     });
     document.getElementById('aduanTableBody').innerHTML=h||'<tr><td colspan="13" style="text-align:center;color:var(--gray);padding:32px">Belum ada data</td></tr>';
     document.getElementById('aduanInfo').textContent=`${count} data`;
 }
 
-function showModalAduan(e){document.getElementById('modalAduanTitle').innerHTML=`<i class="fas fa-bullhorn"></i> ${e?'Edit':'Tambah'} Aduan`;if(!e){document.getElementById('formAduan').reset();document.getElementById('aduanId').value='';}document.getElementById('modalAduan').classList.add('active');}
+// FORM ADUAN
+function showModalAduan(e){
+    document.getElementById('modalAduanTitle').innerHTML=`<i class="fas fa-bullhorn"></i> ${e?'Edit':'Tambah'} Aduan`;
+    if(!e){document.getElementById('formAduan').reset();document.getElementById('aduanId').value='';}
+    document.getElementById('modalAduan').classList.add('active');
+}
 function editAduan(id) {
     const d = getDB('aduan').find(a => a.id === id);
     if (!d) return;
@@ -893,16 +1196,12 @@ function editAduan(id) {
     document.getElementById('buktiFile').value = ''; 
     showModalAduan(true);
 }
-
 function saveAduan(statusTarget) {
     const id = document.getElementById('aduanId').value;
     const fileInput = document.getElementById('buktiFile');
     let lampiranVal = document.getElementById('buktiLink').value;
+    if (fileInput && fileInput.files.length > 0) lampiranVal = "File: " + fileInput.files[0].name; 
     
-    if (fileInput && fileInput.files.length > 0) {
-        lampiranVal = "File: " + fileInput.files[0].name; 
-    }
-
     const o = {
         email: document.getElementById('aduanEmail').value,
         nama: document.getElementById('aduanNama').value,
@@ -913,15 +1212,16 @@ function saveAduan(statusTarget) {
         jabatan: document.getElementById('aduanJabatan').value,
         unitKerja: document.getElementById('aduanUnitKerja').value,
         lampiran: lampiranVal,
-        statusAduan: statusTarget || 'Terkirim'
+        statusAduan: statusTarget || 'Terkirim',
+        userId: currentUser ? currentUser.id : null
     };
 
-    if (!o.email || !o.nama || !o.deskripsi) {
-        showToast('error', 'Isi field wajib!'); return;
-    }
+    if (!o.email || !o.nama || !o.deskripsi) { showToast('error', 'Isi field wajib!'); return; }
 
     let d = getDB('aduan');
     if (id) {
+        const oldAd = d.find(a => a.id === id);
+        if (oldAd && oldAd.statusAduan !== 'Draft' && oldAd.statusAduan !== 'Terkirim') { o.statusAduan = oldAd.statusAduan; }
         d = d.map(a => a.id === id ? { ...a, ...o } : a);
         addLog('info', `Aduan ${o.nama} diperbarui ke ${o.statusAduan}`);
     } else {
@@ -929,96 +1229,421 @@ function saveAduan(statusTarget) {
         addLog('success', `Aduan baru: ${o.nama} (${o.statusAduan})`);
     }
 
-    setDB('aduan', d);
-    closeModal('modalAduan');
-    renderAduanTable();
+    setDB('aduan', d); 
+    
+    if (o.statusAduan === 'Terkirim') {
+        let penDB = getDB('penanganan');
+        if(!penDB.find(p => p.aduanId === (id || o.id))) {
+            penDB.push({
+                id: genId(), aduanId: id || o.id, status: 'Terkirim', tglVerif: today(), skUploaded: false, reqSurat: false
+            });
+            setDB('penanganan', penDB);
+        }
+    }
+    
+    closeModal('modalAduan'); renderAduanTable(); checkDraftNotifs();
     showToast('success', `Aduan ${o.statusAduan}!`);
 }
 
-function togglePenangananLanjutan() {
-    const pic = document.getElementById('penangananPIC').value;
-    const panel = document.getElementById('penangananLanjutan');
-    if(panel) panel.style.display = pic ? 'block' : 'none';
+function loadPenSubKategori() {
+    const k = document.getElementById('penKategori').value;
+    const sub = document.getElementById('penSubKategori');
+    if(!sub) return;
+    let html = '<option value="">Pilih Sub Kategori</option>';
+    if (k === 'Etik') {
+        getDB('masterEtik').filter(x => x.status === 'Aktif').forEach(d => html += `<option value="${d.nama}">${d.nama}</option>`);
+    } else if (k === 'Hukum') {
+        getDB('masterHukum').filter(x => x.status === 'Aktif').forEach(d => html += `<option value="${d.nama}">${d.nama}</option>`);
+    }
+    const currentVal = sub.value;
+    sub.innerHTML = html;
+    if(currentVal) sub.value = currentVal;
+}
+
+function handleBuktiUpload(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 5*1024*1024) { showToast('error','Gagal: Ukuran maksimal 5MB!'); e.target.value = ''; return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+        document.getElementById('penBukti').value = ev.target.result;
+        document.getElementById('penBuktiName').textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+}
+
+function handleSKUploadForm(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 5*1024*1024) { showToast('error','Gagal: Ukuran maksimal 5MB!'); e.target.value = ''; return; }
+    const reader = new FileReader();
+    reader.onload = ev => {
+        document.getElementById('penSKData').value = ev.target.result;
+        document.getElementById('penSKName').textContent = file.name;
+    };
+    reader.readAsDataURL(file);
 }
 
 function renderPenangananTable(){
-    const data=getDB('penanganan'), aduan=getDB('aduan');
-    const isSA = currentUser?.role === 'SuperAdmin';
-    const canUploadSK=currentUser&&(currentUser.role==='Komite Etik'||currentUser.role==='Komite Profesi'||isSA);
-    const statusColors={Proses:'badge-warning',Selesai:'badge-success',Diotorisasi:'badge-purple',Ditunda:'badge-secondary',Dibatalkan:'badge-danger'};
+    let data=getDB('penanganan');
+    const aduan=getDB('aduan');
+    const role = currentUser?.role;
+    const isSA = role === 'SuperAdmin';
+    
+    // ROLE FILTERS
+    if (role === 'Pelapor') {
+        data = data.filter(p => {
+            const ad = aduan.find(a => a.id === p.aduanId);
+            return ad && (ad.userId === currentUser.id || ad.email === currentUser.email);
+        });
+    }
+    if (role === 'Operator') {
+        data = data.filter(p => p.status === 'Terkirim');
+    }
+    if (role === 'Komite Etik') {
+        data = data.filter(p => p.status === 'Verifikasi' || p.status === 'Penetapan');
+    }
+    if (role === 'PIC') {
+        data = data.filter(p => p.status === 'di Eskalasi' || p.status === 'di Proses');
+    }
+    if (role === 'Otorisator') {
+        data = data.filter(p => p.status === 'di Proses');
+    }
+    if (role === 'Admin') {
+        data = data.filter(p => p.status === 'Selesai' || p.status === 'Penetapan');
+    }
+
+    const statusColors={
+        'Terkirim':'badge-secondary',
+        'Verifikasi':'badge-info',
+        'di Eskalasi':'badge-primary',
+        'di Proses':'badge-warning',
+        'Penetapan':'badge-purple',
+        'Selesai':'badge-success',
+        'Ditunda':'badge-secondary',
+        'Dibatalkan':'badge-danger'
+    };
+
     let h='';
     
     data.forEach((p,i)=>{
-        const ad=aduan.find(a=>a.id===p.aduanId); const ucl={Ringan:'badge-info',Sedang:'badge-warning',Berat:'badge-danger'};
+        const ad=aduan.find(a=>a.id===p.aduanId); 
+        const ucl={Ringan:'badge-info',Sedang:'badge-warning',Berat:'badge-danger'};
         const sc=statusColors[p.status]||'badge-warning';
-        const isSelesai=['Selesai','Diotorisasi'].includes(p.status), skUploaded=p.skUploaded;
+        const skUploaded=p.skUploaded;
         
-        const actionDisabled = (isSelesai && !isSA) ? 'disabled' : '';
+        const aduanStat = ad ? (ad.statusAduan || 'Terkirim') : 'Terkirim';
+        let isGlobalLocked = p.status === 'Selesai' && !isSA;
         
-        let reqSuratHtml='-';if(isSelesai&&!p.reqSurat)reqSuratHtml=`<button class="btn btn-primary btn-xs" onclick="requestSurat('${p.id}')"><i class="fas fa-envelope"></i></button>`;else if(p.reqSurat)reqSuratHtml='<span class="badge badge-success"><i class="fas fa-check"></i> Sent</span>';
-        let uploadSKHtml='-';if(isSelesai&&canUploadSK&&!skUploaded)uploadSKHtml=`<button class="btn btn-warning btn-xs" onclick="showUploadSK('${p.id}')"><i class="fas fa-upload"></i></button>`;else if(skUploaded)uploadSKHtml='<span class="badge badge-success"><i class="fas fa-file-pdf"></i> Done</span>';else if(isSelesai&&!canUploadSK)uploadSKHtml='<span class="badge badge-secondary" style="font-size:9px">Komite</span>';
+        let canEdit = false;
+        let btnVerifOp = '';
+        let btnReqOtorisasi = '';
+
+        if (!isGlobalLocked) {
+            if (isSA) {
+                canEdit = true;
+            } else if (role === 'Admin') {
+                if (p.status === 'Penetapan' || p.status === 'Selesai') canEdit = true;
+            } else if (role === 'Operator') {
+                canEdit = true; 
+                if (p.status === 'Terkirim') {
+                    btnVerifOp = `<button class="btn btn-success btn-xs" onclick="operatorVerifikasi('${p.id}')"><i class="fas fa-check"></i> Verifikasi</button>`;
+                }
+            } else if (role === 'Komite Etik' || role === 'Komite Profesi') {
+                if (p.status === 'Verifikasi' || p.status === 'Penetapan') canEdit = true;
+            } else if (role === 'PIC') {
+                if (p.status === 'di Eskalasi') canEdit = true;
+                if (p.status === 'di Proses') {
+                    canEdit = false;
+                    btnReqOtorisasi = `<button class="btn btn-primary btn-xs" onclick="reqOtorisasi('${p.id}')"><i class="fas fa-stamp"></i> Req Otorisasi</button>`;
+                }
+            }
+        } else {
+            // Admin receives exception to edit Selesai explicitly for SK based on prompt
+            if (role === 'Admin' || isSA) canEdit = true;
+        }
         
+        const actionDisabled = canEdit ? '' : 'disabled';
+        let btnEdit = `<button class="btn btn-warning btn-xs" onclick="editPenanganan('${p.id}')" ${actionDisabled}><i class="fas fa-edit"></i></button>`;
+        let btnHapus = (!isGlobalLocked && isSA) ? `<button class="btn btn-danger btn-xs" onclick="deleteItem('penanganan','${p.id}')"><i class="fas fa-trash"></i></button>` : '';
+
+        let buktiHtml = '-';
+        if(p.bukti) {
+            buktiHtml = `<a href="${p.bukti}" download="Dokumentasi_${p.aduanId?.substring(0,8)}.pdf" class="btn btn-info btn-xs" title="Download Dokumentasi PDF"><i class="fas fa-file-pdf"></i></a>`;
+        }
+        
+        let uploadSKHtml='-';
+        if(skUploaded) {
+            uploadSKHtml='<span class="badge badge-success"><i class="fas fa-file-pdf"></i> Done</span>';
+        } else if(p.status === 'Penetapan') {
+            uploadSKHtml='<span class="badge badge-warning" style="font-size:9px">Waiting SK</span>';
+        }
+        
+        let gabunganTanggapan = '';
+        if (p.tanggapanProses) gabunganTanggapan += `<div style="margin-bottom:6px"><strong>Proses:</strong><br>${p.tanggapanProses}</div>`;
+        if (p.tanggapanAkhir) gabunganTanggapan += `<div><strong>Akhir:</strong><br>${p.tanggapanAkhir}</div>`;
+        if (!gabunganTanggapan) gabunganTanggapan = '-';
+
         h+=`<tr>
             <td>${i+1}</td><td style="font-size:10px">${p.aduanId?.substring(0,8)||'-'}</td>
-            <td class="sticky-col"><strong>${ad?.nama||'-'}</strong></td><td>${p.tglVerif}</td>
-            <td><span class="badge badge-primary">${p.kategori}</span></td><td><span class="badge badge-secondary">${p.subKategori||'-'}</span></td>
-            <td><span class="badge ${ucl[p.urgensi]||'badge-secondary'}">${p.urgensi}</span></td>
-            <td><span class="badge ${sc}">${p.status}</span>${p.otorisasiOleh?`<br><small style="font-size:9px;color:var(--gray)">${p.otorisasiOleh}</small>`:''}</td>
-            <td>${p.pic||'-'}</td><td>${p.eskalasi||'-'}</td><td>${p.estimasi}</td><td>${p.tglMulai||'-'}</td>
-            <td><div class="text-truncate text-truncate-sm" title="${p.tanggapan||''}">${p.tanggapan||'-'}</div></td>
-            <td>${p.tglSelesai||'-'}</td><td><div class="text-truncate" title="${p.keputusan||''}">${p.keputusan||'-'}</div></td>
-            <td><div class="text-truncate" title="${p.halKeputusan||''}">${p.halKeputusan||'-'}</div></td>
-            <td>${p.bukti?'<a href="'+p.bukti+'" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-paperclip"></i></a>':'-'}</td>
-            <td>${uploadSKHtml}</td><td>${reqSuratHtml}</td>
+            <td class="sticky-col"><strong>${ad?.nama||'-'}</strong></td><td>${p.tglVerif||'-'}</td>
+            <td><span class="badge badge-primary">${p.kategori||'-'}</span></td><td><span class="badge badge-secondary">${p.subKategori||'-'}</span></td>
+            <td><span class="badge ${ucl[p.urgensi]||'badge-secondary'}">${p.urgensi||'-'}</span></td>
+            <td><span class="badge ${sc}">${p.status}</span></td>
+            <td>${p.pic||'-'}</td><td>${p.eskalasi||'-'}</td><td>${p.estimasi||'-'}</td><td>${p.tglMulai||'-'}</td>
+            <td><div class="text-wrap-full">${gabunganTanggapan}</div></td>
+            <td>${p.tglSelesai||'-'}</td>
+            <td><div class="text-wrap-full" style="min-width:150px">${p.keputusan||'-'}</div></td>
+            <td><div class="text-wrap-full">${p.halKeputusan||'-'}</div></td>
+            <td>${buktiHtml}</td>
+            <td>${uploadSKHtml}</td>
             <td class="sticky-col-right"><div class="actions-cell">
-                <button class="btn btn-warning btn-xs" onclick="editPenanganan('${p.id}')" ${actionDisabled}><i class="fas fa-edit"></i></button>
-                <button class="btn btn-danger btn-xs" onclick="deleteItem('penanganan','${p.id}')" ${actionDisabled}><i class="fas fa-trash"></i></button>
+                ${btnVerifOp}
+                ${btnEdit}
+                ${btnReqOtorisasi}
+                ${btnHapus}
             </div></td>
         </tr>`;
     });
-    document.getElementById('penangananTableBody').innerHTML=h||'<tr><td colspan="20" style="text-align:center;color:var(--gray);padding:32px">Belum ada data</td></tr>';
+    document.getElementById('penangananTableBody').innerHTML=h||'<tr><td colspan="19" style="text-align:center;color:var(--gray);padding:32px">Belum ada data dengan status tersebut</td></tr>';
     document.getElementById('penangananInfo').textContent=`${data.length} data`;
 }
 
-function showModalPenanganan(e){
-    document.getElementById('modalPenangananTitle').innerHTML=`<i class="fas fa-tasks"></i> ${e?'Edit':'Tambah'} Penanganan`;
-    if(!e){
-        document.getElementById('formPenanganan').reset();
-        document.getElementById('penangananId').value='';
-        document.getElementById('penangananTglVerif').value=today();
-        document.getElementById('penangananKeputusan').value='';
-        document.getElementById('penangananHalKeputusan').value='';
-        togglePenangananLanjutan(); 
-    }
-    const a=getDB('aduan'),sel=document.getElementById('penangananAduanId');
-    sel.innerHTML='<option value="">Pilih Aduan</option>'+a.map(x=>`<option value="${x.id}">${x.nama} - ${x.deskripsi?.substring(0,40)}...</option>`).join('');
-    populatePICSelect('penangananPIC'); populateEskalasiSelect('penangananEskalasi'); populateStatusSelect('penangananStatus');
+function editPenanganan(id){
+    const p = getDB('penanganan').find(x => x.id === id);
+    if(!p) return;
+    
+    const ad = getDB('aduan').find(a => a.id === p.aduanId);
+    if(!ad) return;
+
+    document.getElementById('penPenangananId').value = id;
+    document.getElementById('penangananInfoPanel').innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div><strong>ID Aduan:</strong> ${p.aduanId.substring(0,8)}</div>
+            <div><strong>Pelapor:</strong> ${ad.nama}</div>
+            <div style="grid-column: span 2;"><strong>Deskripsi Laporan:</strong> ${ad.deskripsi}</div>
+        </div>
+    `;
+
+    document.getElementById('penKategori').value = p.kategori || '';
+    loadPenSubKategori();
+    setTimeout(() => document.getElementById('penSubKategori').value = p.subKategori || '', 50);
+    document.getElementById('penUrgensi').value = p.urgensi || '';
+
+    populatePICSelect('penPIC', p.pic);
+    populateEskalasiSelect('penEskalasi', p.eskalasi);
+    document.getElementById('penEstimasi').value = p.estimasi || '';
+    document.getElementById('penTglMulai').value = p.tglMulai || '';
+    document.getElementById('penTglSelesai').value = p.tglSelesai || '';
+    document.getElementById('penTanggapanProses').value = p.tanggapanProses || '';
+    document.getElementById('penTanggapanAkhir').value = p.tanggapanAkhir || '';
+    
+    document.getElementById('penNoSK').value = p.keputusan || '';
+    document.getElementById('penSKData').value = p.skFile || '';
+    document.getElementById('penFileSK').value = '';
+    document.getElementById('penSKName').textContent = p.skUploaded ? 'File SK Terlampir' : '';
+
+    populateStatusSelect('penStatus', p.status);
+    
+    document.getElementById('penBukti').value = p.bukti || '';
+    document.getElementById('penBuktiFile').value = '';
+    document.getElementById('penBuktiName').textContent = p.bukti ? 'File PDF Dokumentasi sudah terlampir' : '';
+
+    const role = currentUser?.role;
+    const isSA = role === 'SuperAdmin';
+    const isOp = role === 'Operator';
+    const isPIC = role === 'PIC';
+    const isKE = role === 'Komite Etik';
+    const isAdmin = role === 'Admin';
+    const isOto = role === 'Otorisator';
+
+    const isGlobalLocked = (p.status === 'Selesai' && !isSA && !isAdmin); 
+
+    const lockCore = isGlobalLocked || isOp || isAdmin || (isKE && p.status !== 'Verifikasi') || (isPIC && p.status === 'di Proses') || isOto;
+    
+    ['penKategori', 'penSubKategori', 'penUrgensi', 'penEstimasi', 'penTglMulai', 'penTglSelesai', 'penTanggapanProses', 'penTanggapanAkhir', 'penBuktiFile'].forEach(id => {
+        document.getElementById(id).disabled = lockCore;
+    });
+
+    ['penPIC', 'penEskalasi'].forEach(id => {
+        document.getElementById(id).disabled = isGlobalLocked || isOp || isPIC || isAdmin || (isKE && p.status !== 'Verifikasi') || isOto;
+    });
+
+    const canEditSK = isSA || (isAdmin && (p.status === 'Penetapan' || p.status === 'Selesai')) || (isKE && p.status === 'Penetapan');
+    document.getElementById('penNoSK').disabled = !canEditSK;
+    document.getElementById('penFileSK').disabled = !canEditSK;
+    
+    document.getElementById('penStatus').disabled = true; 
+    
+    document.getElementById('btnSavePenanganan').style.display = (isOp || isOto || (!canEditSK && lockCore)) && !isSA ? 'none' : 'inline-flex';
+
     document.getElementById('modalPenanganan').classList.add('active');
 }
 
-function editPenanganan(id){
-    const d=getDB('penanganan').find(p=>p.id===id);if(!d)return;
-    showModalPenanganan(true);
-    setTimeout(()=>{
-        document.getElementById('penangananId').value=id;
-        document.getElementById('penangananAduanId').value=d.aduanId;
-        document.getElementById('penangananTglVerif').value=d.tglVerif;
-        document.getElementById('penangananKategori').value=d.kategori;
-        loadSubKategori();
-        setTimeout(()=>document.getElementById('penangananSubKategori').value=d.subKategori||'',100);
-        document.getElementById('penangananUrgensi').value=d.urgensi;
-        populateStatusSelect('penangananStatus',d.status==='Diotorisasi'?'Selesai':d.status);
-        populatePICSelect('penangananPIC',d.pic);
-        populateEskalasiSelect('penangananEskalasi',d.eskalasi);
-        document.getElementById('penangananEstimasi').value=d.estimasi;
-        document.getElementById('penangananTglMulai').value=d.tglMulai;
-        document.getElementById('penangananTanggapan').value=d.tanggapan;
-        document.getElementById('penangananKeputusan').value=d.keputusan||'';
-        document.getElementById('penangananHalKeputusan').value=d.halKeputusan||'';
-        document.getElementById('penangananBukti').value=d.bukti;
-        togglePenangananLanjutan();
-    },100);
+function savePenanganan() {
+    const id = document.getElementById('penPenangananId').value;
+    if(!id) return;
+    const role = currentUser?.role;
+    
+    let d = getDB('penanganan');
+    let triggerEskalasi = false;
+    let triggerProses = false;
+    let triggerSelesai = false;
+
+    d = d.map(p => {
+        if(p.id === id) {
+            const updated = {...p};
+            if(!document.getElementById('penKategori').disabled) updated.kategori = document.getElementById('penKategori').value;
+            if(!document.getElementById('penSubKategori').disabled) updated.subKategori = document.getElementById('penSubKategori').value;
+            if(!document.getElementById('penUrgensi').disabled) updated.urgensi = document.getElementById('penUrgensi').value;
+            
+            if(!document.getElementById('penPIC').disabled) updated.pic = document.getElementById('penPIC').value;
+            if(!document.getElementById('penEskalasi').disabled) updated.eskalasi = document.getElementById('penEskalasi').value;
+            if(!document.getElementById('penEstimasi').disabled) updated.estimasi = document.getElementById('penEstimasi').value;
+            if(!document.getElementById('penTglMulai').disabled) updated.tglMulai = document.getElementById('penTglMulai').value;
+            if(!document.getElementById('penTglSelesai').disabled) updated.tglSelesai = document.getElementById('penTglSelesai').value;
+            if(!document.getElementById('penTanggapanProses').disabled) updated.tanggapanProses = document.getElementById('penTanggapanProses').value;
+            if(!document.getElementById('penTanggapanAkhir').disabled) updated.tanggapanAkhir = document.getElementById('penTanggapanAkhir').value;
+            if(!document.getElementById('penBuktiFile').disabled) updated.bukti = document.getElementById('penBukti').value;
+
+            if(!document.getElementById('penNoSK').disabled) updated.keputusan = document.getElementById('penNoSK').value;
+            if(!document.getElementById('penFileSK').disabled && document.getElementById('penSKData').value) {
+                updated.skFile = document.getElementById('penSKData').value;
+                updated.skUploaded = true;
+            }
+
+            // Role specific status changes
+            if (role === 'Komite Etik' && updated.pic && updated.status === 'Verifikasi') {
+                updated.status = 'di Eskalasi';
+                triggerEskalasi = true;
+            }
+            if (role === 'PIC' && updated.bukti && updated.status === 'di Eskalasi') {
+                updated.status = 'di Proses';
+                triggerProses = true;
+            }
+            if ((role === 'Admin' || role === 'Komite Etik' || role === 'SuperAdmin') && updated.keputusan && updated.skUploaded && (updated.status === 'Penetapan' || updated.status === 'Selesai')) {
+                updated.status = 'Selesai';
+                triggerSelesai = true;
+            }
+
+            return updated;
+        }
+        return p;
+    });
+
+    setDB('penanganan', d);
+    const updatedPen = d.find(p => p.id === id);
+
+    if (triggerEskalasi) updateStatusAduan(updatedPen.aduanId, 'di Eskalasi');
+    if (triggerProses) updateStatusAduan(updatedPen.aduanId, 'di Proses');
+    if (triggerSelesai) updateStatusAduan(updatedPen.aduanId, 'Selesai');
+
+    closeModal('modalPenanganan');
+    renderPenangananTable();
+    if(document.getElementById('pageOtorisasi').classList.contains('active')) renderOtorisasiTable();
+    showToast('success', 'Data Penanganan tersimpan!');
 }
+
+function renderOtorisasiTable() {
+    const penanganan = getDB('penanganan');
+    const aduan = getDB('aduan');
+    let h = '', count = 0;
+
+    const data = penanganan.filter(p => p.status === 'di Proses');
+
+    data.forEach((p, i) => {
+        const ad = aduan.find(a => a.id === p.aduanId) || {};
+        const btn = `<button class="btn btn-success btn-xs" onclick="otorisasiSK('${p.id}')"><i class="fas fa-stamp"></i> Otorisasi Keputusan</button>`;
+        
+        let gabunganTanggapan = '';
+        if (p.tanggapanProses) gabunganTanggapan += `<div style="margin-bottom:6px"><strong>Proses:</strong><br>${p.tanggapanProses}</div>`;
+        if (p.tanggapanAkhir) gabunganTanggapan += `<div><strong>Akhir:</strong><br>${p.tanggapanAkhir}</div>`;
+
+        count++;
+        h += `<tr>
+            <td>${count}</td>
+            <td>${p.aduanId.substring(0,8)}</td>
+            <td>${ad.nama || '-'}</td>
+            <td><span class="badge badge-primary">${p.kategori || '-'}</span></td>
+            <td><span class="badge ${p.urgensi==='Berat'?'badge-danger':(p.urgensi==='Sedang'?'badge-warning':'badge-info')}">${p.urgensi || '-'}</span></td>
+            <td><div class="text-wrap-full">${gabunganTanggapan}</div></td>
+            <td><span class="badge badge-warning">${p.status}</span></td>
+            <td>${btn}</td>
+        </tr>`;
+    });
+    
+    document.getElementById('otorisasiTableBody').innerHTML = h || '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--gray);">Belum ada data penanganan dengan status di Proses</td></tr>';
+}
+
+function otorisasiSK(id, notifId) {
+    if(notifId) markRead(notifId);
+    const p = getDB('penanganan').find(x => x.id === id);
+    if(!p) return;
+
+    document.getElementById('otoPenangananId').value = id;
+    document.getElementById('otorisasiInfoPanel').innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div><strong>ID Aduan:</strong> ${p.aduanId.substring(0,8)}</div>
+            <div><strong>Kategori:</strong> ${p.kategori}</div>
+            <div style="grid-column: span 2;"><strong>Tanggapan Akhir:</strong> ${p.tanggapanAkhir || '-'}</div>
+        </div>
+    `;
+
+    document.getElementById('otoNoSK').value = p.keputusan || '';
+    document.getElementById('otoHal').value = p.halKeputusan || '';
+    document.getElementById('otoTgl').value = today();
+
+    const isSA = currentUser?.role === 'SuperAdmin';
+    const isOto = currentUser?.role === 'Otorisator';
+    
+    document.getElementById('otoNoSK').disabled = !(isSA || isOto);
+    document.getElementById('otoHal').disabled = !(isSA || isOto);
+
+    document.getElementById('modalOtorisasi').classList.add('active');
+}
+
+function saveOtorisasi() {
+    const id = document.getElementById('otoPenangananId').value;
+    if(!id) return;
+
+    const keputusan = document.getElementById('otoNoSK').value;
+    const hal = document.getElementById('otoHal').value;
+
+    if(!keputusan || !hal) {
+        showToast('error', 'No Keputusan dan Hal Keputusan wajib diisi!');
+        return;
+    }
+
+    let d = getDB('penanganan');
+    let aduanId = '';
+    d = d.map(p => {
+        if(p.id === id) {
+            aduanId = p.aduanId;
+            return {
+                ...p, 
+                keputusan: keputusan, 
+                halKeputusan: hal, 
+                status: 'Penetapan',
+                otorisasiOleh: currentUser.nama,
+                otorisasiTgl: document.getElementById('otoTgl').value
+            };
+        }
+        return p;
+    });
+
+    setDB('penanganan', d);
+    if(aduanId) updateStatusAduan(aduanId, 'Penetapan');
+    
+    addNotification(currentUser.nama, `Request Upload SK untuk Aduan ID ${aduanId.substring(0,8)}`, 'info', 'Admin', null, id);
+    addNotification(currentUser.nama, `Request Upload SK untuk Aduan ID ${aduanId.substring(0,8)}`, 'info', 'Komite Etik', null, id);
+
+    closeModal('modalOtorisasi');
+    renderOtorisasiTable();
+    renderPenangananTable();
+    showToast('success', 'Keputusan berhasil diotorisasi, status menjadi Penetapan!');
+    addLog('success', `Keputusan untuk ID ${id.substring(0,8)} diotorisasi`);
+}
+
 
 function renderMasterTable(t){const k=t==='etik'?'masterEtik':'masterHukum',b=t==='etik'?'masterEtikBody':'masterHukumBody';const d=getDB(k);let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${m.kode}</strong></td><td>${m.nama}</td><td><div class="text-truncate">${m.desc||'-'}</div></td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMaster('${t}','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('${k}','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById(b).innerHTML=h||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
 function showModalMaster(t){document.getElementById('masterType').value=t;document.getElementById('masterId').value='';document.getElementById('formMaster').reset();document.getElementById('modalMasterTitle').innerHTML=`<i class="fas fa-tag"></i> Tambah ${t==='etik'?'Etik':'Hukum'}`;document.getElementById('modalMaster').classList.add('active');}
@@ -1042,8 +1667,8 @@ function resetUserPassword(id){if(!confirm('Reset ke 123?'))return;let d=getDB('
 
 function renderRolesPage(){
     const perms=JSON.parse(localStorage.getItem(DB_KEYS.roles))||{};
-    const mods=['dashboard','aduan','penanganan','cetakLaporan','notifikasi','logActivity','masterPIC','masterEskalasi','masterEtik','masterHukum','masterStatusPenanganan','settings-landing','users','roles','settings','exportImport'];
-    const ml={dashboard:'Dashboard',aduan:'Pelaporan',penanganan:'Penanganan',cetakLaporan:'Cetak Laporan',notifikasi:'Notifikasi',logActivity:'Log',masterPIC:'Master PIC',masterEskalasi:'Master Eskalasi',masterEtik:'Masalah Etik',masterHukum:'Masalah Hukum',masterStatusPenanganan:'Status','settings-landing':'Landing Page',users:'User',roles:'Hak Akses',settings:'Pengaturan',exportImport:'Ekspor/Impor'};
+    const mods=['dashboard','aduan','verifikasi','penanganan','otorisasi','cetakLaporan','notifikasi','logActivity','masterPIC','masterEskalasi','masterEtik','masterHukum','masterStatusPenanganan','settings-landing','users','roles','settings','exportImport'];
+    const ml={dashboard:'Dashboard',aduan:'Pelaporan',verifikasi:'Verifikasi Aduan',penanganan:'Penanganan',otorisasi:'Otorisasi',cetakLaporan:'Cetak Laporan',notifikasi:'Notifikasi',logActivity:'Log',masterPIC:'Master PIC',masterEskalasi:'Master Eskalasi',masterEtik:'Masalah Etik',masterHukum:'Masalah Hukum',masterStatusPenanganan:'Status','settings-landing':'Landing Page',users:'User',roles:'Hak Akses',settings:'Pengaturan',exportImport:'Ekspor/Impor'};
     const roles=['Admin','Operator','Komite Etik','Komite Profesi','PIC','Otorisator','Pelapor'];
     
     let h='<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>Modul</th>';
@@ -1083,7 +1708,24 @@ function resetAllData(){if(!confirm('PERINGATAN: Reset semua data?'))return;if(!
 function showChangePasswordModal(){document.getElementById('profileMenu').classList.remove('show');document.getElementById('modalChangePass').classList.add('active');}
 function changePassword(){const oP=document.getElementById('oldPassword').value,nP=document.getElementById('newPassword').value,cP=document.getElementById('confirmPassword').value;if(oP!==currentUser.password){showToast('error','Password lama salah!');return;}if(nP!==cP){showToast('error','Tidak cocok!');return;}if(nP.length<3){showToast('error','Min 3!');return;}if(currentUser.role==='SuperAdmin'){let d=getDB('superadmins');d=d.map(s=>s.id===currentUser.id?{...s,password:nP}:s);setDB('superadmins',d);}else{let d=getDB('users');d=d.map(u=>u.id===currentUser.id?{...u,password:nP}:u);setDB('users',d);}currentUser.password=nP;closeModal('modalChangePass');showToast('success','Password diubah!');}
 
-function deleteItem(k,id){if(!confirm('Hapus?'))return;let d=getDB(k);d=d.filter(x=>x.id!==id);setDB(k,d);showToast('success','Dihapus!');addLog('danger',`${k} ID ${id.substring(0,8)} dihapus`);const pm={aduan:'aduan',penanganan:'penanganan',masterEtik:'masterEtik',masterHukum:'masterHukum',masterPIC:'masterPIC',masterEskalasi:'masterEskalasi',masterStatusPenanganan:'masterStatusPenanganan',users:'users',superadmins:'controlPanel'};if(pm[k])navigateTo(pm[k],document.querySelector(`[data-page="${pm[k]}"]`));}
+function deleteItem(k,id){
+    if(!confirm('Hapus data ini?'))return;
+    let d=getDB(k);
+    d=d.filter(x=>x.id!==id);
+    setDB(k,d);
+    
+    if(k === 'aduan') {
+        let pen = getDB('penanganan');
+        pen = pen.filter(p => p.aduanId !== id);
+        setDB('penanganan', pen);
+    }
+    
+    showToast('success','Dihapus!');
+    addLog('danger',`${k} ID ${id.substring(0,8)} dihapus`);
+    const pm={aduan:'aduan',penanganan:'penanganan',masterEtik:'masterEtik',masterHukum:'masterHukum',masterPIC:'masterPIC',masterEskalasi:'masterEskalasi',masterStatusPenanganan:'masterStatusPenanganan',users:'users',superadmins:'controlPanel'};
+    if(pm[k])navigateTo(pm[k],document.querySelector(`[data-page="${pm[k]}"]`));
+}
+
 function closeModal(id){document.getElementById(id).classList.remove('active');}
 function filterTable(b,q){(document.getElementById(b)?.querySelectorAll('tr')||[]).forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});}
 function filterByStatus(b,s){(document.getElementById(b)?.querySelectorAll('tr')||[]).forEach(r=>{if(!s){r.style.display='';return;}let m=false;r.querySelectorAll('.badge').forEach(x=>{if(x.textContent.trim()===s)m=true;});r.style.display=m?'':'none';});}
@@ -1130,12 +1772,10 @@ function restrictExportImport() {
         }
     });
 
-    const btnTambahPenanganan = document.getElementById('btnTambahPenanganan');
     const btnExportXlsxPenanganan = document.getElementById('btnExportXlsxPenanganan');
     const btnExportPdfPenanganan = document.getElementById('btnExportPdfPenanganan');
     const btnImportPenanganan = document.getElementById('btnImportPenanganan');
     
-    if(btnTambahPenanganan) btnTambahPenanganan.style.display = isSA ? 'inline-flex' : 'none';
     if(btnExportXlsxPenanganan) btnExportXlsxPenanganan.style.display = isSA ? 'inline-flex' : 'none';
     if(btnExportPdfPenanganan) btnExportPdfPenanganan.style.display = isSA ? 'inline-flex' : 'none';
     if(btnImportPenanganan) btnImportPenanganan.style.display = isSA ? 'inline-flex' : 'none';
@@ -1232,7 +1872,6 @@ function toggleLandingContent(val) {
     }
 }
 
-// FUNGSI UPLOAD KONTEN LANDING PAGE (PDF/Video Max 5MB)
 function uploadLandingFile(input, key, type) {
     const file = input.files[0];
     const max = 5 * 1024 * 1024; // 5 MB
@@ -1273,7 +1912,6 @@ function uploadLandingFile(input, key, type) {
     reader.readAsDataURL(file);
 }
 
-// FUNGSI DOWNLOAD KONTEN LANDING PAGE
 function downloadLandingContent(key, type) {
     const s = getSettings();
     const fileData = s[`landing_content_${key}`];
@@ -1285,7 +1923,6 @@ function downloadLandingContent(key, type) {
         a.click();
         showToast('success', 'File sedang diunduh...');
     } else {
-        // Fallback jika belum pernah diupload
         if(type === 'pdf') {
             const{jsPDF}=window.jspdf;const doc=new jsPDF();
             doc.setFontSize(22);doc.setTextColor(79,70,229);doc.text(s.appName||'SIGAP',105,30,{align:'center'});
@@ -1299,7 +1936,6 @@ function downloadLandingContent(key, type) {
     }
 }
 
-// FUNGSI SINKRONISASI KE GOOGLE SHEETS / CLOUD
 async function syncToCloud() {
     const s = getSettings();
     const url = s.toastURL;
@@ -1309,24 +1945,25 @@ async function syncToCloud() {
         return;
     }
 
-    if (!confirm('Kirim seluruh data sistem ke Spreadsheet di Cloud?')) return;
+    if (!confirm('Kirim data sistem ke Spreadsheet di Cloud? (User & SuperAdmin dikecualikan)')) return;
 
     showToast('info', 'Memulai sinkronisasi ke Cloud...');
 
     const allData = {};
     Object.keys(DB_KEYS).forEach(k => {
-        allData[k] = getDB(k);
+        if(k !== 'users' && k !== 'superadmins') {
+            allData[k] = getDB(k);
+        }
     });
 
     try {
         const response = await fetch(url, {
             method: 'POST',
-            mode: 'no-cors', // Penting untuk bypass CORS Google Script dari Localhost/File URL
+            mode: 'no-cors', 
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(allData)
         });
         
-        // no-cors tidak mengembalikan status 200 yang bisa dibaca, jadi kita asumsikan sukses jika fetch tidak error
         showToast('success', 'Sinkronisasi berhasil dikirim ke Spreadsheet!');
         addLog('success', 'Database disinkronisasi ke Google Drive/Spreadsheet.');
     } catch (error) {
@@ -1334,6 +1971,9 @@ async function syncToCloud() {
         console.error("Sync Error:", error);
     }
 }
+
+document.addEventListener('contextmenu', event => event.preventDefault());
+
 </script>
 </body>
 </html>
