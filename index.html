@@ -808,7 +808,7 @@ function escapeHTML(str) {
 // ==========================================
 // KONFIGURASI SUPABASE (GANTI DENGAN KODE ANDA)
 // ==========================================
-const SUPABASE_URL = 'https://eigywrzqdxalvmrsvrtr.supabase.co/rest/v1/'; 
+const SUPABASE_URL = 'https://eigywrzqdxalvmrsvrtr.supabase.co'; 
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpZ3l3cnpxZHhhbHZtcnN2cnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzM0MTgsImV4cCI6MjA5NDUwOTQxOH0.qUPewnm4e3_FdktRlAQnhnUgZozUPepbSc0mFg_-CQ0'; 
 
 const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -819,66 +819,31 @@ const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SU
 const DB_KEYS={aduan:'sigap_aduan',penanganan:'sigap_penanganan',masterEtik:'sigap_master_etik',masterHukum:'sigap_master_hukum',masterPIC:'sigap_master_pic',masterEskalasi:'sigap_master_eskalasi',masterStatusPenanganan:'sigap_master_status',users:'sigap_users',superadmins:'sigap_superadmins',settings:'sigap_settings',roles:'sigap_roles',notifications:'sigap_notifications',logs:'sigap_logs'};
 const EXCLUDE_FROM_EXPORT=['users','superadmins'];
 
-// Konfigurasi Supabase (Ganti dengan kunci dari Dashboard Anda)
-const SUPABASE_URL = "https://proyek-anda.supabase.co"; 
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const DB_KEYS = { aduan: 'sigap_aduan', penanganan: 'sigap_penanganan', masterEtik: 'sigap_master_etik' /* dll... */ };
-
-// 1. Fungsi Menarik Data dari Supabase (Hanya data milik user yang sedang login)
-async function fetchFromSupabase() { 
-    if (!supabase || SUPABASE_URL.includes('proyek-anda')) return; 
-    
-    document.getElementById('loader').classList.remove('hide'); 
-    document.getElementById('loaderText').textContent = 'Sinkronisasi dari Cloud...'; 
-    
-    try { 
-        // Mengambil data, Supabase otomatis memfilter berdasarkan User ID (RLS)
-        const { data, error } = await supabase.from('sigap_storage').select('*'); 
-        if (error) throw error; 
-        
-        if (data && data.length > 0) { 
-            data.forEach(row => { 
-                localStorage.setItem(row.key, JSON.stringify(row.data)); 
-            }); 
-            console.log("✅ Data tersinkronisasi dari Cloud.");
-        } 
-    } catch (err) { 
-        console.error("Gagal sinkron dari Supabase:", err); 
-        showToast('error', 'Gagal menarik data dari Cloud.');
-    } finally {
-        setTimeout(() => document.getElementById('loader').classList.add('hide'), 500);
-    }
-}
-
-// 2. Fungsi Push/Upsert Data ke Supabase
-// Gunakan fungsi ini setiap kali ada perubahan data agar otomatis ter-backup
-async function pushToSupabase(key, dataArray) {
-    if (!supabase || SUPABASE_URL.includes('proyek-anda')) return;
-    
+async function fetchFromSupabase() {
+    if (!supabase || SUPABASE_URL.includes('XXXXXX')) return; 
+    document.getElementById('loader').classList.remove('hide');
+    document.getElementById('loaderText').textContent = 'Sinkronisasi dari Cloud...';
     try {
-        const { error } = await supabase
-            .from('sigap_storage')
-            .upsert({ 
-                key: key, 
-                data: dataArray 
-            }, { onConflict: 'key' }); // onConflict menimpa baris jika 'key' sudah ada
-
+        const { data, error } = await supabase.from('sigap_storage').select('*');
         if (error) throw error;
-        console.log(`✅ Data ${key} berhasil di-backup ke Supabase.`);
+        if (data && data.length > 0) {
+            data.forEach(row => {
+                localStorage.setItem(row.key, JSON.stringify(row.data));
+            });
+        }
     } catch (err) {
-        console.error(`Gagal backup ${key}:`, err);
+        console.error("Gagal sinkron dari Supabase:", err);
     }
 }
+
 function getDB(k){try{return JSON.parse(localStorage.getItem(DB_KEYS[k]))||[];}catch{return[];}}
 
-function setDB(key, data) {
-    // 1. Simpan ke local storage agar aplikasi tetap cepat
-    localStorage.setItem(DB_KEYS[key] || key, JSON.stringify(data));
-    
-    // 2. Langsung dorong ke Supabase di latar belakang (tanpa mengganggu UI)
-    pushToSupabase(DB_KEYS[key] || key, data);
+function setDB(k,d){
+    localStorage.setItem(DB_KEYS[k],JSON.stringify(d));
+    if (supabase && !SUPABASE_URL.includes('XXXXXX')) {
+        supabase.from('sigap_storage').upsert({ key: DB_KEYS[k], data: d })
+        .then(({error}) => { if (error) console.error("Supabase Sync Error:", error); });
+    }
 }
 
 function getSettings(){try{return JSON.parse(localStorage.getItem(DB_KEYS.settings))||{};}catch{return{};}}
@@ -1084,53 +1049,8 @@ function showAuth(t){document.getElementById(t==='login'?'authLogin':'authRegist
 function closeAuth(id){document.getElementById(id).classList.remove('active');}
 function switchAuth(f,t){closeAuth(f);setTimeout(()=>document.getElementById(t).classList.add('active'),200);}
 
-function handleLogin(e)
-async function loginKeSupabase(email, password) {
-    document.getElementById('loader').classList.remove('hide');
-    document.getElementById('loaderText').textContent = 'Memverifikasi Akun...';
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-    });
-
-    if (error) {
-        document.getElementById('loader').classList.add('hide');
-        showToast('error', 'Login Gagal: ' + error.message);
-        return false;
-    }
-
-    // Jika sukses, tarik data khusus milik user tersebut dari cloud
-    await fetchFromSupabase();
-    
-    document.getElementById('loader').classList.add('hide');
-    showToast('success', 'Berhasil Login!');
-    
-    return true; // Lanjutkan proses masuk ke dashboard
-}{
-    async function loginKeSupabase(email, password) {
-    document.getElementById('loader').classList.remove('hide');
-    document.getElementById('loaderText').textContent = 'Memverifikasi Akun...';
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-    });
-
-    if (error) {
-        document.getElementById('loader').classList.add('hide');
-        showToast('error', 'Login Gagal: ' + error.message);
-        return false;
-    }
-
-    // Jika sukses, tarik data khusus milik user tersebut dari cloud
-    await fetchFromSupabase();
-    
-    document.getElementById('loader').classList.add('hide');
-    showToast('success', 'Berhasil Login!');
-    
-    return true; // Lanjutkan proses masuk ke dashboard
-}e.preventDefault();
+function handleLogin(e){
+    e.preventDefault();
     const u=document.getElementById('loginUsername').value.trim(),p=document.getElementById('loginPassword').value;
     const sa=getDB('superadmins').find(x=>(x.username===u||x.email===u)&&x.password===p);
     if(sa){currentUser={...sa,role:'SuperAdmin'};}
