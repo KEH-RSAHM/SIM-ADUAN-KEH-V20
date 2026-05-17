@@ -628,39 +628,6 @@
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-server"></i> Control Panel (SuperAdmin Only)</h3></div>
                     <div class="card-body">
-                        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.1));border:1px solid rgba(59,130,246,0.3);border-radius:16px;padding:20px;margin-bottom:24px;backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.1)">
-                            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-                                <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(59,130,246,0.3)">
-                                    <i class="fas fa-database" style="color:white;font-size:20px"></i>
-                                </div>
-                                <div>
-                                    <h4 style="margin:0;font-size:18px;font-weight:700">Konfigurasi Supabase</h4>
-                                    <p style="margin:2px 0 0 0;font-size:13px;color:var(--text-secondary)">Koneksi database cloud • disimpan lokal</p>
-                                </div>
-                                <div style="margin-left:auto;display:flex;gap:8px">
-                                    <span id="supabaseStatusDot" style="width:12px;height:12px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444"></span>
-                                </div>
-                            </div>
-                            <div style="display:grid;grid-template-columns:1fr;gap:14px">
-                                <div>
-                                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px">Supabase URL</label>
-                                    <input type="text" id="cfgSupabaseUrl" placeholder="https://xxx.supabase.co" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-family:monospace;font-size:13px">
-                                </div>
-                                <div>
-                                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px">Anon Public Key</label>
-                                    <textarea id="cfgSupabaseKey" rows="3" placeholder="eyJhbGci..." style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-family:monospace;font-size:12px;resize:vertical"></textarea>
-                                </div>
-                            </div>
-                            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">
-                                <button class="btn btn-primary" onclick="saveSupabaseConfig()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-save"></i> Simpan & Reload</button>
-                                <button class="btn btn-secondary" onclick="testSupabaseConfig()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-plug"></i> Test</button>
-                                <button class="btn btn-secondary" onclick="resetSupabaseConfig()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-undo"></i> Reset</button>
-                                <button class="btn btn-secondary" onclick="exportConfig()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-download"></i> Export</button>
-                                <button class="btn btn-secondary" onclick="document.getElementById('importConfigFile').click()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-upload"></i> Import</button>
-                                <input type="file" id="importConfigFile" accept=".json" style="display:none" onchange="importConfig(event)">
-                            </div>
-                        </div>
-
                         <div class="stats-grid">
                             <div class="stat-card" style="cursor:pointer" onclick="resetAllData()"><div class="stat-info"><h3 style="font-size:16px"><i class="fas fa-trash-alt" style="color:var(--danger)"></i></h3><p>Reset DB</p></div></div>
                             <div class="stat-card" style="cursor:pointer" onclick="downloadAllDB()"><div class="stat-info"><h3 style="font-size:16px"><i class="fas fa-download" style="color:var(--success)"></i></h3><p>Backup XLSX</p></div></div>
@@ -829,14 +796,20 @@ function escapeHTML(str) {
     });
 }
 
-const DEFAULT_SUPABASE_URL = 'https://eigywrzqdxalvmrsvrtr.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpZ3l3cnpxZHhhbHZtcnN2cnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1Njg1OTgsImV4cCI6MjA3NTE0NDU5OH0.x4ORjZy7jQ8i4BzLvwyt6OH0jS-px45qr6CJYWsBYNo';
-let SUPABASE_URL = localStorage.getItem('SIGAP_SUPABASE_URL') || DEFAULT_SUPABASE_URL;
-let SUPABASE_ANON_KEY = localStorage.getItem('SIGAP_SUPABASE_ANON_KEY') || DEFAULT_SUPABASE_ANON_KEY; 
+const SUPABASE_URL = 'https://eigywrzqdxalvmrsvrtr.supabase.co'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpZ3l3cnpxZHhhbHZtcnN2cnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzM0MTgsImV4cCI6MjA5NDUwOTQxOH0.qUPewnm4e3_FdktRlAQnhnUgZozUPepbSc0mFg_-CQ0'; 
 
 let supabaseClient = null;
 if (typeof supabase !== 'undefined' && typeof SUPABASE_URL !== 'undefined' && SUPABASE_URL.startsWith('http')) {
     try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) { console.error('Supabase init error', e); }
+    // Auto fallback
+    const backendMode = localStorage.getItem('SIGAP_BACKEND_MODE') || 'supabase';
+    if(backendMode === 'supabase' && !supabaseClient){
+        console.warn('Supabase init failed, falling back to local');
+        localStorage.setItem('SIGAP_BACKEND_MODE', 'local');
+        showToast('warning','Supabase gagal, fallback ke LocalStorage');
+    }
+
 }
 
 const DB_KEYS={aduan:'sigap_aduan',penanganan:'sigap_penanganan',masterEtik:'sigap_master_etik',masterHukum:'sigap_master_hukum',masterPIC:'sigap_master_pic',masterEskalasi:'sigap_master_eskalasi',masterStatusPenanganan:'sigap_master_status',users:'sigap_users',superadmins:'sigap_superadmins',settings:'sigap_settings',roles:'sigap_roles',notifications:'sigap_notifications',logs:'sigap_logs'};
@@ -1654,6 +1627,10 @@ function loadSupabaseConfigForm(){
     if(urlEl) urlEl.value = SUPABASE_URL;
     if(keyEl) keyEl.value = SUPABASE_ANON_KEY;
     updateSupabaseStatusDot();
+    const modeEl = document.getElementById('cfgBackendMode');
+    const sheetEl = document.getElementById('cfgSheetUrl');
+    if(modeEl) modeEl.value = localStorage.getItem('SIGAP_BACKEND_MODE') || 'supabase';
+    if(sheetEl) sheetEl.value = localStorage.getItem('SIGAP_SHEET_URL') || '';
 }
 function saveSupabaseConfig(){
     const url = document.getElementById('cfgSupabaseUrl').value.trim();
@@ -1662,12 +1639,18 @@ function saveSupabaseConfig(){
     if(key.length < 20){ showToast('error','Anon Key tidak valid'); return; }
     localStorage.setItem('SIGAP_SUPABASE_URL', url);
     localStorage.setItem('SIGAP_SUPABASE_ANON_KEY', key);
+    const mode = document.getElementById('cfgBackendMode')?.value || 'supabase';
+    const sheetUrl = document.getElementById('cfgSheetUrl')?.value.trim() || '';
+    localStorage.setItem('SIGAP_BACKEND_MODE', mode);
+    localStorage.setItem('SIGAP_SHEET_URL', sheetUrl);
     showToast('success','Config disimpan, reload...');
     setTimeout(()=> location.reload(), 800);
 }
 function resetSupabaseConfig(){
     localStorage.removeItem('SIGAP_SUPABASE_URL');
     localStorage.removeItem('SIGAP_SUPABASE_ANON_KEY');
+    localStorage.removeItem('SIGAP_BACKEND_MODE');
+    localStorage.removeItem('SIGAP_SHEET_URL');
     showToast('info','Reset ke default, reload...');
     setTimeout(()=> location.reload(), 800);
 }
@@ -1679,12 +1662,12 @@ async function testSupabaseConfig(){
         const { error } = await client.from('aduan').select('id').limit(1);
         if(error) throw error;
         showToast('success','Koneksi berhasil!');
-        document.getElementById('supabaseStatusDot').style.background='#10b981';
-        document.getElementById('supabaseStatusDot').style.boxShadow='0 0 8px #10b981';
+        const dot = document.getElementById('supabaseStatusDot');
+        if(dot){ dot.style.background='#10b981'; dot.style.boxShadow='0 0 8px #10b981'; }
     }catch(e){
         showToast('error','Gagal: '+(e.message||e));
-        document.getElementById('supabaseStatusDot').style.background='#ef4444';
-        document.getElementById('supabaseStatusDot').style.boxShadow='0 0 8px #ef4444';
+        const dot = document.getElementById('supabaseStatusDot');
+        if(dot){ dot.style.background='#ef4444'; dot.style.boxShadow='0 0 8px #ef4444'; }
     }
 }
 function updateSupabaseStatusDot(){
@@ -1697,6 +1680,8 @@ function exportConfig(){
     const config = {
         supabaseUrl: SUPABASE_URL,
         supabaseAnonKey: SUPABASE_ANON_KEY,
+        backendMode: localStorage.getItem('SIGAP_BACKEND_MODE') || 'supabase',
+        sheetUrl: localStorage.getItem('SIGAP_SHEET_URL') || '',
         settings: getSettings(),
         roles: getDB('roles'),
         exportedAt: new Date().toISOString()
@@ -1719,6 +1704,8 @@ function importConfig(event){
             const cfg = JSON.parse(e.target.result);
             if(cfg.supabaseUrl) localStorage.setItem('SIGAP_SUPABASE_URL', cfg.supabaseUrl);
             if(cfg.supabaseAnonKey) localStorage.setItem('SIGAP_SUPABASE_ANON_KEY', cfg.supabaseAnonKey);
+            if(cfg.backendMode) localStorage.setItem('SIGAP_BACKEND_MODE', cfg.backendMode);
+            if(cfg.sheetUrl) localStorage.setItem('SIGAP_SHEET_URL', cfg.sheetUrl);
             if(cfg.settings) setSettings(cfg.settings);
             if(cfg.roles) setDB('roles', cfg.roles);
             showToast('success','Config diimport, reload...');
@@ -1735,7 +1722,6 @@ window.renderControlPanel = function(){
     if(_origRenderControlPanel) _origRenderControlPanel.call(this);
     setTimeout(loadSupabaseConfigForm, 100);
 };
-
 // Disable right click and devtools shortcuts
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.addEventListener('keydown', e => {
