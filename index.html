@@ -10,9 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>    
     <style>
         :root {
             --primary: #4f46e5; --primary-light: #818cf8; --primary-dark: #3730a3;
@@ -798,11 +796,20 @@
 <div class="modal-overlay" id="modalSuperAdmin"><div class="modal modal-sm"><div class="modal-header"><h3><i class="fas fa-crown"></i> SuperAdmin</h3><button class="modal-close" onclick="closeModal('modalSuperAdmin')"><i class="fas fa-times"></i></button></div><div class="modal-body"><form id="formSuperAdmin"><input type="hidden" id="saId"><div class="form-group"><label>Username <span class="required">*</span></label><input type="text" class="form-control" id="saUsername" required></div><div class="form-group"><label>Nama <span class="required">*</span></label><input type="text" class="form-control" id="saNama" required></div><div class="form-group"><label>Email</label><input type="email" class="form-control" id="saEmail"></div><div class="form-group"><label>Password</label><input type="password" class="form-control" id="saPassword" placeholder="Default: 123//"></div></form></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('modalSuperAdmin')">Batal</button><button class="btn btn-primary" onclick="saveSuperAdmin()"><i class="fas fa-save"></i> Simpan</button></div></div></div>
 
 <script>
+// --- TAMBAHAN: FUNGSI PEMBERSIH TEKS DARI XSS (ANTI HACKER) ---
+function escapeHTML(str) {
+    if (!str) return '-';
+    return str.toString().replace(/[&<>'"]/g, function(tag) {
+        const charsToReplace = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
+        return charsToReplace[tag] || tag;
+    });
+}
+
 // ==========================================
 // KONFIGURASI SUPABASE (GANTI DENGAN KODE ANDA)
 // ==========================================
 const SUPABASE_URL = 'https://eigywrzqdxalvmrsvrtr.supabase.co'; 
-const SUPABASE_ANON_KEY = 'sb_publishable_zGxgCOBJLoYLOxo41pCMbQ_lhEuI1KI'; 
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpZ3l3cnpxZHhhbHZtcnN2cnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzM0MTgsImV4cCI6MjA5NDUwOTQxOH0.qUPewnm4e3_FdktRlAQnhnUgZozUPepbSc0mFg_-CQ0'; 
 
 const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
@@ -812,7 +819,6 @@ const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SU
 const DB_KEYS={aduan:'sigap_aduan',penanganan:'sigap_penanganan',masterEtik:'sigap_master_etik',masterHukum:'sigap_master_hukum',masterPIC:'sigap_master_pic',masterEskalasi:'sigap_master_eskalasi',masterStatusPenanganan:'sigap_master_status',users:'sigap_users',superadmins:'sigap_superadmins',settings:'sigap_settings',roles:'sigap_roles',notifications:'sigap_notifications',logs:'sigap_logs'};
 const EXCLUDE_FROM_EXPORT=['users','superadmins'];
 
-// FUNGSI TARIK DATA DARI SUPABASE SAAT AWAL LOAD
 async function fetchFromSupabase() {
     if (!supabase || SUPABASE_URL.includes('XXXXXX')) return; 
     document.getElementById('loader').classList.remove('hide');
@@ -830,10 +836,8 @@ async function fetchFromSupabase() {
     }
 }
 
-// BACA LOKAL UNTUK KECEPATAN UI (SYNC)
 function getDB(k){try{return JSON.parse(localStorage.getItem(DB_KEYS[k]))||[];}catch{return[];}}
 
-// SIMPAN LOKAL & UPSERT KE SUPABASE DI BACKGROUND
 function setDB(k,d){
     localStorage.setItem(DB_KEYS[k],JSON.stringify(d));
     if (supabase && !SUPABASE_URL.includes('XXXXXX')) {
@@ -842,7 +846,6 @@ function setDB(k,d){
     }
 }
 
-// SAMA SEPERTI DI ATAS UNTUK SETTINGS & ROLES
 function getSettings(){try{return JSON.parse(localStorage.getItem(DB_KEYS.settings))||{};}catch{return{};}}
 function setSettings(d){
     localStorage.setItem(DB_KEYS.settings,JSON.stringify(d));
@@ -857,7 +860,7 @@ let currentUser=JSON.parse(localStorage.getItem('currentUser')) || null;
 let charts={},currentMasterGenericType=null,currentMasterGenericId=null;
 
 function addLog(type,msg){const logs=getDB('logs');logs.unshift({id:genId(),time:now(),type,msg,user:currentUser?.nama||'System'});if(logs.length>200)logs.length=200;setDB('logs',logs);}
-function renderLogs(){const logs=getDB('logs');const c=document.getElementById('logContainer');if(!logs.length){c.innerHTML='<div style="text-align:center;color:var(--gray);padding:20px">Belum ada log</div>';return;}const icMap={success:'check-circle',warning:'exclamation-triangle',danger:'times-circle',info:'info-circle',primary:'info-circle'};c.innerHTML=logs.map(l=>`<div class="log-entry log-${l.type}"><span class="log-time">${l.time}</span><span class="log-icon"><i class="fas fa-${icMap[l.type]||'circle'}"></i></span><span class="log-msg"><strong>${l.user}</strong>: ${l.msg}</span></div>`).join('');}
+function renderLogs(){const logs=getDB('logs');const c=document.getElementById('logContainer');if(!logs.length){c.innerHTML='<div style="text-align:center;color:var(--gray);padding:20px">Belum ada log</div>';return;}const icMap={success:'check-circle',warning:'exclamation-triangle',danger:'times-circle',info:'info-circle',primary:'info-circle'};c.innerHTML=logs.map(l=>`<div class="log-entry log-${l.type}"><span class="log-time">${l.time}</span><span class="log-icon"><i class="fas fa-${icMap[l.type]||'circle'}"></i></span><span class="log-msg"><strong>${escapeHTML(l.user)}</strong>: ${escapeHTML(l.msg)}</span></div>`).join('');}
 function clearLogs(){if(!confirm('Hapus semua log?'))return;setDB('logs',[]);renderLogs();showToast('success','Log dihapus');}
 
 function addNotification(from,msg,type,targetRole,targetUserId=null,penId=null){
@@ -875,7 +878,7 @@ function checkDraftNotifs() {
             if (!exists) {
                 n.unshift({
                     id: genId(), time: now(), from: 'Sistem',
-                    msg: `Anda memiliki laporan Draft. <a href="#" onclick="navigateTo('aduan', document.querySelector('[data-page=aduan]')); editAduan('${d.id}'); event.preventDefault();" style="color:var(--primary); font-weight:bold; text-decoration:underline;">Klik di sini untuk melanjutkan</a>`,
+                    msg: `Anda memiliki laporan Draft. Klik ID ${d.id.substring(0,8)} untuk melihat.`,
                     type: 'draft', targetRole: 'Pelapor', read: false, aduanId: d.id, targetUserId: currentUser.id
                 });
             }
@@ -913,7 +916,7 @@ function renderNotifications(){
     filtered.forEach((x,i)=>{
         h+=`<tr class="${!x.read?'notif-unread':''}">
             <td>${i+1}</td><td style="font-size:10px;white-space:nowrap">${x.time}</td>
-            <td>${x.from}</td><td>${x.msg}</td>
+            <td>${escapeHTML(x.from)}</td><td>${escapeHTML(x.msg)}</td>
             <td><span class="badge ${tc[x.type]||'badge-secondary'}">${x.type}</span></td>
             <td><span class="badge badge-primary">${x.targetRole}</span></td>
             <td>${x.read?'<span class="badge badge-secondary">Dibaca</span>':'<span class="badge badge-warning">Baru</span>'}</td>
@@ -934,7 +937,6 @@ function markAllRead(){let n=getDB('notifications');n=n.map(x=>{
     return x;
 });setDB('notifications',n);renderNotifications();updateNotifBadge();showToast('success','Semua dibaca');}
 
-// FUNGSI HAPUS NOTIFIKASI KHUSUS SUPERADMIN
 function clearNotifikasi() {
     if(!confirm('PERINGATAN: Anda yakin ingin menghapus SELURUH data notifikasi dari sistem?')) return;
     setDB('notifications', []);
@@ -988,11 +990,11 @@ function reqOtorisasi(penId) {
     addLog('info', `PIC mengirim request otorisasi untuk ID ${p.aduanId.substring(0,8)}`);
 }
 
-function getMasterOptions(key,valueField,labelField,placeholder){const data=getDB(key).filter(d=>d.status==='Aktif');let html=`<option value="">${placeholder}</option>`;data.forEach(d=>{html+=`<option value="${d[valueField]||d.nama}">${d[labelField]||d.nama}</option>`;});return html;}
+function getMasterOptions(key,valueField,labelField,placeholder){const data=getDB(key).filter(d=>d.status==='Aktif');let html=`<option value="">${placeholder}</option>`;data.forEach(d=>{html+=`<option value="${escapeHTML(d[valueField]||d.nama)}">${escapeHTML(d[labelField]||d.nama)}</option>`;});return html;}
 function populatePICSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;sel.innerHTML=getMasterOptions('masterPIC','nama','nama','Pilih PIC Tujuan');if(currentVal)sel.value=currentVal;}
 function populateEskalasiSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;sel.innerHTML=getMasterOptions('masterEskalasi','nama','nama','Pilih Eskalasi');if(currentVal)sel.value=currentVal;}
-function populateStatusSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;const data=getDB('masterStatusPenanganan').filter(d=>d.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));let html='';data.forEach(d=>{html+=`<option value="${d.nama}">${d.nama}</option>`;});if(!html)html='<option value="di Proses">di Proses</option><option value="Selesai">Selesai</option>';sel.innerHTML=html;if(currentVal)sel.value=currentVal;}
-function populateStatusFilter(){const sel=document.getElementById('filterStatusPenanganan');if(!sel)return;const data=getDB('masterStatusPenanganan').filter(d=>d.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));let html='<option value="">Semua Status</option>';data.forEach(d=>{html+=`<option value="${d.nama}">${d.nama}</option>`;});if(data.length===0){html+='<option value="di Proses">di Proses</option><option value="Selesai">Selesai</option><option value="Penetapan">Penetapan</option><option value="di Eskalasi">di Eskalasi</option>';}sel.innerHTML=html;}
+function populateStatusSelect(selId,currentVal){const sel=document.getElementById(selId);if(!sel)return;const data=getDB('masterStatusPenanganan').filter(d=>d.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));let html='';data.forEach(d=>{html+=`<option value="${escapeHTML(d.nama)}">${escapeHTML(d.nama)}</option>`;});if(!html)html='<option value="di Proses">di Proses</option><option value="Selesai">Selesai</option>';sel.innerHTML=html;if(currentVal)sel.value=currentVal;}
+function populateStatusFilter(){const sel=document.getElementById('filterStatusPenanganan');if(!sel)return;const data=getDB('masterStatusPenanganan').filter(d=>d.status==='Aktif').sort((a,b)=>(a.urutan||0)-(b.urutan||0));let html='<option value="">Semua Status</option>';data.forEach(d=>{html+=`<option value="${escapeHTML(d.nama)}">${escapeHTML(d.nama)}</option>`;});if(data.length===0){html+='<option value="di Proses">di Proses</option><option value="Selesai">Selesai</option><option value="Penetapan">Penetapan</option><option value="di Eskalasi">di Eskalasi</option>';}sel.innerHTML=html;}
 
 function initApp(){
     let sas=getDB('superadmins');
@@ -1038,10 +1040,10 @@ function initApp(){
 }
 
 function createParticles(){const c=document.getElementById('particles');for(let i=0;i<40;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*10+5)+'s';p.style.animationDelay=Math.random()*5+'s';p.style.width=p.style.height=(Math.random()*3+2)+'px';c.appendChild(p);}}
-function applySettings(){const s=getSettings();['landingAppName','footerAppName','sidebarAppName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=s.appName||'SIGAP';});['landingInstName','footerInstName','sidebarInstName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=s.instName||'';});document.title=(s.appName||'SIGAP')+' - '+(s.instName||'Sistem');}
+function applySettings(){const s=getSettings();['landingAppName','footerAppName','sidebarAppName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=escapeHTML(s.appName)||'SIGAP';});['landingInstName','footerInstName','sidebarInstName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=escapeHTML(s.instName)||'';});document.title=(escapeHTML(s.appName)||'SIGAP')+' - '+(escapeHTML(s.instName)||'Sistem');}
 function saveSettings(){setSettings({appName:document.getElementById('settAppName').value,instName:document.getElementById('settInstName').value,instLogo:document.getElementById('settInstLogo').value,appLogo:document.getElementById('settAppLogo').value,toastURL:document.getElementById('settToastURL').value});applySettings();showToast('success','Pengaturan disimpan');addLog('success','Pengaturan diperbarui');}
 function loadSettingsForm(){const s=getSettings();document.getElementById('settAppName').value=s.appName||'';document.getElementById('settInstName').value=s.instName||'';document.getElementById('settInstLogo').value=s.instLogo||'';document.getElementById('settAppLogo').value=s.appLogo||'';document.getElementById('settToastURL').value=s.toastURL||'';}
-function showToast(type,msg){const c=document.getElementById('toastContainer');const icons={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};const t=document.createElement('div');t.className=`toast toast-${type}`;t.innerHTML=`<i class="fas ${icons[type]}"></i><span class="toast-msg">${msg}</span>`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);}
+function showToast(type,msg){const c=document.getElementById('toastContainer');const icons={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};const t=document.createElement('div');t.className=`toast toast-${type}`;t.innerHTML=`<i class="fas ${icons[type]}"></i><span class="toast-msg">${escapeHTML(msg)}</span>`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);}
 
 function showAuth(t){document.getElementById(t==='login'?'authLogin':'authRegister').classList.add('active');}
 function closeAuth(id){document.getElementById(id).classList.remove('active');}
@@ -1076,10 +1078,10 @@ function handleLogout(){
 function enterApp(showWelcome = true){
     document.getElementById('landingPage').style.display='none';
     document.getElementById('appContainer').classList.add('active');
-    const ini=currentUser.nama.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const ini=escapeHTML(currentUser.nama).split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     ['sidebarAvatarText','headerAvatarText'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=ini;});
-    document.getElementById('sidebarUsername').textContent=currentUser.nama;
-    document.getElementById('sidebarRole').textContent=currentUser.role;
+    document.getElementById('sidebarUsername').textContent=escapeHTML(currentUser.nama);
+    document.getElementById('sidebarRole').textContent=escapeHTML(currentUser.role);
     
     applyPermissions();
     checkDraftNotifs(); 
@@ -1167,13 +1169,13 @@ function loadDashboard(){
     document.getElementById('aduanBadge').textContent=pen.filter(p=>p.status==='di Proses'||p.status==='Terkirim').length;
     const miniColors=['#4f46e5','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4'];
     let miniHtml='';
-    if(allStatuses.length>0){allStatuses.forEach((st,i)=>{const cnt=pen.filter(p=>p.status===st.nama).length;miniHtml+=`<div class="mini-stat" style="border-top-color:${miniColors[i%miniColors.length]}"><h4>${cnt}</h4><p>${st.nama}</p></div>`;});}
+    if(allStatuses.length>0){allStatuses.forEach((st,i)=>{const cnt=pen.filter(p=>p.status===st.nama).length;miniHtml+=`<div class="mini-stat" style="border-top-color:${miniColors[i%miniColors.length]}"><h4>${cnt}</h4><p>${escapeHTML(st.nama)}</p></div>`;});}
     else{const defStats=[{l:'di Proses',c:pen.filter(p=>p.status==='di Proses').length},{l:'Selesai',c:pen.filter(p=>p.status==='Selesai').length},{l:'Penetapan',c:pen.filter(p=>p.status==='Penetapan').length}];defStats.forEach((s,i)=>{miniHtml+=`<div class="mini-stat" style="border-top-color:${miniColors[i]}"><h4>${s.c}</h4><p>${s.l}</p></div>`;});}
     miniHtml+=`<div class="mini-stat" style="border-top-color:#94a3b8"><h4>${pen.filter(p=>p.skUploaded).length}</h4><p>SK Diupload</p></div>`;
     miniHtml+=`<div class="mini-stat" style="border-top-color:#f97316"><h4>${pen.filter(p=>p.status==='Penetapan'&&!p.skUploaded).length}</h4><p>Menunggu SK</p></div>`;
     document.getElementById('miniStatsGrid').innerHTML=miniHtml;
     destroyCharts();createBarChart();createPieChart();createLineChart();createDoughnutChart();
-    let h='';pen.slice(-8).reverse().forEach((p,i)=>{const ad=aduan.find(a=>a.id===p.aduanId);const ucl={Ringan:'badge-info',Sedang:'badge-warning',Berat:'badge-danger'};const stcl=p.status==='Penetapan'?'badge-purple':p.status==='Selesai'?'badge-success':p.status==='Ditunda'?'badge-secondary':p.status==='Dibatalkan'?'badge-danger':'badge-warning';h+=`<tr><td>${i+1}</td><td>${ad?.nama||'-'}</td><td><span class="badge badge-primary">${p.kategori||'-'}</span></td><td><span class="badge ${ucl[p.urgensi]||'badge-secondary'}">${p.urgensi||'-'}</span></td><td><span class="badge ${stcl}">${p.status||'-'}</span></td><td>${p.pic||'-'}</td><td>${p.eskalasi||'-'}</td><td>${p.estimasi||'-'}</td></tr>`;});
+    let h='';pen.slice(-8).reverse().forEach((p,i)=>{const ad=aduan.find(a=>a.id===p.aduanId);const ucl={Ringan:'badge-info',Sedang:'badge-warning',Berat:'badge-danger'};const stcl=p.status==='Penetapan'?'badge-purple':p.status==='Selesai'?'badge-success':p.status==='Ditunda'?'badge-secondary':p.status==='Dibatalkan'?'badge-danger':'badge-warning';h+=`<tr><td>${i+1}</td><td>${escapeHTML(ad?.nama)||'-'}</td><td><span class="badge badge-primary">${escapeHTML(p.kategori)||'-'}</span></td><td><span class="badge ${ucl[p.urgensi]||'badge-secondary'}">${escapeHTML(p.urgensi)||'-'}</span></td><td><span class="badge ${stcl}">${escapeHTML(p.status)||'-'}</span></td><td>${escapeHTML(p.pic)||'-'}</td><td>${escapeHTML(p.eskalasi)||'-'}</td><td>${escapeHTML(p.estimasi)||'-'}</td></tr>`;});
     document.getElementById('dashStatusBody').innerHTML=h||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:20px">Belum ada data</td></tr>';
     document.getElementById('dashPICBody').innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--gray);padding:16px">Belum ada data</td></tr>';
     document.getElementById('dashEskalasiBody').innerHTML='<tr><td colspan="3" style="text-align:center;color:var(--gray);padding:16px">Belum ada data</td></tr>';
@@ -1224,11 +1226,11 @@ function renderAduanTable(){
 
         h+=`<tr>
             <td>${count}</td><td style="font-size:10px;white-space:nowrap">${a.timestamp}</td>
-            <td>${a.email}</td><td class="sticky-col"><strong>${a.nama}</strong></td>
-            <td>${a.hp}</td><td>${a.tglKejadian}</td>
-            <td><div class="text-wrap-full">${a.deskripsi}</div></td>
-            <td>${a.namaDilaporkan}</td><td>${a.jabatan||'-'}</td><td>${a.unitKerja}</td>
-            <td>${a.lampiran?'<a href="'+a.lampiran+'" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-paperclip"></i></a>':'-'}</td>
+            <td>${escapeHTML(a.email)}</td><td class="sticky-col"><strong>${escapeHTML(a.nama)}</strong></td>
+            <td>${escapeHTML(a.hp)}</td><td>${escapeHTML(a.tglKejadian)}</td>
+            <td><div class="text-wrap-full">${escapeHTML(a.deskripsi)}</div></td>
+            <td>${escapeHTML(a.namaDilaporkan)}</td><td>${escapeHTML(a.jabatan)||'-'}</td><td>${escapeHTML(a.unitKerja)}</td>
+            <td>${a.lampiran?'<a href="'+escapeHTML(a.lampiran)+'" target="_blank" class="btn btn-info btn-xs"><i class="fas fa-paperclip"></i></a>':'-'}</td>
             <td><span class="badge ${badgeCls}">${stat}</span></td>
             <td class="sticky-col-right"><div class="actions-cell">${btnReqKirim}${btnEdit}${btnHapus}</div></td>
         </tr>`;
@@ -1314,9 +1316,9 @@ function loadPenSubKategori() {
     if(!sub) return;
     let html = '<option value="">Pilih Sub Kategori</option>';
     if (k === 'Etik') {
-        getDB('masterEtik').filter(x => x.status === 'Aktif').forEach(d => html += `<option value="${d.nama}">${d.nama}</option>`);
+        getDB('masterEtik').filter(x => x.status === 'Aktif').forEach(d => html += `<option value="${escapeHTML(d.nama)}">${escapeHTML(d.nama)}</option>`);
     } else if (k === 'Hukum') {
-        getDB('masterHukum').filter(x => x.status === 'Aktif').forEach(d => html += `<option value="${d.nama}">${d.nama}</option>`);
+        getDB('masterHukum').filter(x => x.status === 'Aktif').forEach(d => html += `<option value="${escapeHTML(d.nama)}">${escapeHTML(d.nama)}</option>`);
     }
     const currentVal = sub.value;
     sub.innerHTML = html;
@@ -1442,21 +1444,21 @@ function renderPenangananTable(){
         }
         
         let gabunganTanggapan = '';
-        if (p.tanggapanProses) gabunganTanggapan += `<div style="margin-bottom:6px"><strong>Proses:</strong><br>${p.tanggapanProses}</div>`;
-        if (p.tanggapanAkhir) gabunganTanggapan += `<div><strong>Akhir:</strong><br>${p.tanggapanAkhir}</div>`;
+        if (p.tanggapanProses) gabunganTanggapan += `<div style="margin-bottom:6px"><strong>Proses:</strong><br>${escapeHTML(p.tanggapanProses)}</div>`;
+        if (p.tanggapanAkhir) gabunganTanggapan += `<div><strong>Akhir:</strong><br>${escapeHTML(p.tanggapanAkhir)}</div>`;
         if (!gabunganTanggapan) gabunganTanggapan = '-';
 
         h+=`<tr>
             <td>${i+1}</td><td style="font-size:10px">${p.aduanId?.substring(0,8)||'-'}</td>
-            <td class="sticky-col"><strong>${ad?.nama||'-'}</strong></td><td>${p.tglVerif||'-'}</td>
-            <td><span class="badge badge-primary">${p.kategori||'-'}</span></td><td><span class="badge badge-secondary">${p.subKategori||'-'}</span></td>
-            <td><span class="badge ${ucl[p.urgensi]||'badge-secondary'}">${p.urgensi||'-'}</span></td>
-            <td><span class="badge ${sc}">${p.status}</span></td>
-            <td>${p.pic||'-'}</td><td>${p.eskalasi||'-'}</td><td>${p.estimasi||'-'}</td><td>${p.tglMulai||'-'}</td>
+            <td class="sticky-col"><strong>${escapeHTML(ad?.nama)||'-'}</strong></td><td>${p.tglVerif||'-'}</td>
+            <td><span class="badge badge-primary">${escapeHTML(p.kategori)||'-'}</span></td><td><span class="badge badge-secondary">${escapeHTML(p.subKategori)||'-'}</span></td>
+            <td><span class="badge ${ucl[p.urgensi]||'badge-secondary'}">${escapeHTML(p.urgensi)||'-'}</span></td>
+            <td><span class="badge ${sc}">${escapeHTML(p.status)}</span></td>
+            <td>${escapeHTML(p.pic)||'-'}</td><td>${escapeHTML(p.eskalasi)||'-'}</td><td>${escapeHTML(p.estimasi)||'-'}</td><td>${p.tglMulai||'-'}</td>
             <td><div class="text-wrap-full">${gabunganTanggapan}</div></td>
             <td>${p.tglSelesai||'-'}</td>
-            <td><div class="text-wrap-full" style="min-width:150px">${p.keputusan||'-'}</div></td>
-            <td><div class="text-wrap-full">${p.halKeputusan||'-'}</div></td>
+            <td><div class="text-wrap-full" style="min-width:150px">${escapeHTML(p.keputusan)||'-'}</div></td>
+            <td><div class="text-wrap-full">${escapeHTML(p.halKeputusan)||'-'}</div></td>
             <td>${buktiHtml}</td>
             <td>${uploadSKHtml}</td>
             <td class="sticky-col-right"><div class="actions-cell">
@@ -1482,8 +1484,8 @@ function editPenanganan(id){
     document.getElementById('penangananInfoPanel').innerHTML = `
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div><strong>ID Aduan:</strong> ${p.aduanId.substring(0,8)}</div>
-            <div><strong>Pelapor:</strong> ${ad.nama}</div>
-            <div style="grid-column: span 2;"><strong>Deskripsi Laporan:</strong> ${ad.deskripsi}</div>
+            <div><strong>Pelapor:</strong> ${escapeHTML(ad.nama)}</div>
+            <div style="grid-column: span 2;"><strong>Deskripsi Laporan:</strong> ${escapeHTML(ad.deskripsi)}</div>
         </div>
     `;
 
@@ -1617,18 +1619,18 @@ function renderOtorisasiTable() {
         const btn = `<button class="btn btn-success btn-xs" onclick="otorisasiSK('${p.id}')"><i class="fas fa-stamp"></i> Otorisasi Keputusan</button>`;
         
         let gabunganTanggapan = '';
-        if (p.tanggapanProses) gabunganTanggapan += `<div style="margin-bottom:6px"><strong>Proses:</strong><br>${p.tanggapanProses}</div>`;
-        if (p.tanggapanAkhir) gabunganTanggapan += `<div><strong>Akhir:</strong><br>${p.tanggapanAkhir}</div>`;
+        if (p.tanggapanProses) gabunganTanggapan += `<div style="margin-bottom:6px"><strong>Proses:</strong><br>${escapeHTML(p.tanggapanProses)}</div>`;
+        if (p.tanggapanAkhir) gabunganTanggapan += `<div><strong>Akhir:</strong><br>${escapeHTML(p.tanggapanAkhir)}</div>`;
 
         count++;
         h += `<tr>
             <td>${count}</td>
             <td>${p.aduanId.substring(0,8)}</td>
-            <td>${ad.nama || '-'}</td>
-            <td><span class="badge badge-primary">${p.kategori || '-'}</span></td>
-            <td><span class="badge ${p.urgensi==='Berat'?'badge-danger':(p.urgensi==='Sedang'?'badge-warning':'badge-info')}">${p.urgensi || '-'}</span></td>
+            <td>${escapeHTML(ad.nama) || '-'}</td>
+            <td><span class="badge badge-primary">${escapeHTML(p.kategori) || '-'}</span></td>
+            <td><span class="badge ${p.urgensi==='Berat'?'badge-danger':(p.urgensi==='Sedang'?'badge-warning':'badge-info')}">${escapeHTML(p.urgensi) || '-'}</span></td>
             <td><div class="text-wrap-full">${gabunganTanggapan}</div></td>
-            <td><span class="badge badge-warning">${p.status}</span></td>
+            <td><span class="badge badge-warning">${escapeHTML(p.status)}</span></td>
             <td>${btn}</td>
         </tr>`;
     });
@@ -1645,8 +1647,8 @@ function otorisasiSK(id, notifId) {
     document.getElementById('otorisasiInfoPanel').innerHTML = `
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <div><strong>ID Aduan:</strong> ${p.aduanId.substring(0,8)}</div>
-            <div><strong>Kategori:</strong> ${p.kategori}</div>
-            <div style="grid-column: span 2;"><strong>Tanggapan Akhir:</strong> ${p.tanggapanAkhir || '-'}</div>
+            <div><strong>Kategori:</strong> ${escapeHTML(p.kategori)}</div>
+            <div style="grid-column: span 2;"><strong>Tanggapan Akhir:</strong> ${escapeHTML(p.tanggapanAkhir) || '-'}</div>
         </div>
     `;
 
@@ -1705,7 +1707,7 @@ function saveOtorisasi() {
     addLog('success', `Keputusan untuk ID ${id.substring(0,8)} diotorisasi`);
 }
 
-function renderMasterTable(t){const k=t==='etik'?'masterEtik':'masterHukum',b=t==='etik'?'masterEtikBody':'masterHukumBody';const d=getDB(k);let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${m.kode}</strong></td><td>${m.nama}</td><td><div class="text-truncate">${m.desc||'-'}</div></td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMaster('${t}','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('${k}','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById(b).innerHTML=h||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
+function renderMasterTable(t){const k=t==='etik'?'masterEtik':'masterHukum',b=t==='etik'?'masterEtikBody':'masterHukumBody';const d=getDB(k);let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${escapeHTML(m.kode)}</strong></td><td>${escapeHTML(m.nama)}</td><td><div class="text-truncate">${escapeHTML(m.desc)||'-'}</div></td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMaster('${t}','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('${k}','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById(b).innerHTML=h||'<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
 function showModalMaster(t){document.getElementById('masterType').value=t;document.getElementById('masterId').value='';document.getElementById('formMaster').reset();document.getElementById('modalMasterTitle').innerHTML=`<i class="fas fa-tag"></i> Tambah ${t==='etik'?'Etik':'Hukum'}`;document.getElementById('modalMaster').classList.add('active');}
 function editMaster(t,id){const k=t==='etik'?'masterEtik':'masterHukum',d=getDB(k).find(m=>m.id===id);if(!d)return;document.getElementById('masterId').value=id;document.getElementById('masterType').value=t;document.getElementById('masterKode').value=d.kode;document.getElementById('masterNama').value=d.nama;document.getElementById('masterDesc').value=d.desc;document.getElementById('masterStatus').value=d.status;document.getElementById('modalMaster').classList.add('active');}
 function saveMaster(){const t=document.getElementById('masterType').value,k=t==='etik'?'masterEtik':'masterHukum',id=document.getElementById('masterId').value;const o={kode:document.getElementById('masterKode').value,nama:document.getElementById('masterNama').value,desc:document.getElementById('masterDesc').value,status:document.getElementById('masterStatus').value};if(!o.kode||!o.nama){showToast('error','Kode & Nama wajib!');return;}let d=getDB(k);if(id)d=d.map(m=>m.id===id?{...m,...o}:m);else{o.id=genId();d.push(o);}setDB(k,d);closeModal('modalMaster');renderMasterTable(t);showToast('success','Disimpan!');}
@@ -1715,11 +1717,11 @@ function showModalMasterGeneric(type){currentMasterGenericType=type;currentMaste
 function editMasterGeneric(type,id){currentMasterGenericType=type;currentMasterGenericId=id;const cfg=MASTER_CONFIGS[type];if(!cfg)return;const d=getDB(type).find(x=>x.id===id);if(!d)return;document.getElementById('modalMasterGenericTitle').innerHTML=`<i class="fas fa-tag"></i> Edit ${cfg.title}`;let body='';cfg.fields.forEach(f=>{const val=d[f.id]||'';const inp=f.type==='textarea'?`<textarea class="form-control" id="mgf_${f.id}" rows="2">${val}</textarea>`:f.type==='number'?`<input type="number" class="form-control" id="mgf_${f.id}" value="${val}" ${f.req?'required':''}>`:`<input type="text" class="form-control" id="mgf_${f.id}" value="${val}" ${f.req?'required':''}>`;body+=`<div class="form-group"><label>${f.label}${f.req?'<span class="required"> *</span>':''}</label>${inp}</div>`;});body+=`<div class="form-group"><label>Status</label><select class="form-control" id="mgf_status"><option value="Aktif" ${d.status==='Aktif'?'selected':''}>Aktif</option><option value="Nonaktif" ${d.status==='Nonaktif'?'selected':''}>Nonaktif</option></select></div>`;document.getElementById('modalMasterGenericBody').innerHTML=body;document.getElementById('modalMasterGeneric').classList.add('active');}
 function saveMasterGeneric(){const type=currentMasterGenericType,id=currentMasterGenericId,cfg=MASTER_CONFIGS[type];if(!cfg)return;const o={status:document.getElementById('mgf_status').value};cfg.fields.forEach(f=>{const el=document.getElementById(`mgf_${f.id}`);if(el)o[f.id]=el.value;});const req=cfg.fields.filter(f=>f.req);for(const f of req){if(!o[f.id]){showToast('error',`${f.label} wajib!`);return;}}let d=getDB(type);if(id)d=d.map(x=>x.id===id?{...x,...o}:x);else{o.id=genId();d.push(o);}setDB(type,d);closeModal('modalMasterGeneric');renderMasterByType(type);showToast('success','Disimpan!');}
 function renderMasterByType(type){switch(type){case'masterPIC':renderMasterPIC();break;case'masterEskalasi':renderMasterEskalasi();break;case'masterStatusPenanganan':renderMasterStatusPenanganan();break;}}
-function renderMasterPIC(){const d=getDB('masterPIC');let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${m.kode}</strong></td><td>${m.nama}</td><td>${m.jabatan||'-'}</td><td><div class="text-truncate">${m.desc||'-'}</div></td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMasterGeneric('masterPIC','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('masterPIC','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById('masterPICBody').innerHTML=h||'<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
-function renderMasterEskalasi(){const d=getDB('masterEskalasi');let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${m.kode}</strong></td><td>${m.nama}</td><td><div class="text-truncate">${m.desc||'-'}</div></td><td>${m.waktu||'-'}</td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMasterGeneric('masterEskalasi','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('masterEskalasi','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById('masterEskalasiBody').innerHTML=h||'<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
-function renderMasterStatusPenanganan(){const d=getDB('masterStatusPenanganan').sort((a,b)=>(a.urutan||0)-(b.urutan||0));const warnaCls={success:'badge-success',warning:'badge-warning',danger:'badge-danger',info:'badge-info',primary:'badge-primary',purple:'badge-purple',secondary:'badge-secondary'};let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${m.kode}</strong></td><td>${m.nama}</td><td><span class="badge ${warnaCls[m.warna]||'badge-secondary'}">${m.warna||'-'}</span></td><td>${m.urutan||'-'}</td><td><div class="text-truncate">${m.desc||'-'}</div></td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMasterGeneric('masterStatusPenanganan','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('masterStatusPenanganan','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById('masterStatusPenangananBody').innerHTML=h||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
+function renderMasterPIC(){const d=getDB('masterPIC');let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${escapeHTML(m.kode)}</strong></td><td>${escapeHTML(m.nama)}</td><td>${escapeHTML(m.jabatan)||'-'}</td><td><div class="text-truncate">${escapeHTML(m.desc)||'-'}</div></td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMasterGeneric('masterPIC','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('masterPIC','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById('masterPICBody').innerHTML=h||'<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
+function renderMasterEskalasi(){const d=getDB('masterEskalasi');let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${escapeHTML(m.kode)}</strong></td><td>${escapeHTML(m.nama)}</td><td><div class="text-truncate">${escapeHTML(m.desc)||'-'}</div></td><td>${escapeHTML(m.waktu)||'-'}</td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMasterGeneric('masterEskalasi','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('masterEskalasi','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById('masterEskalasiBody').innerHTML=h||'<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
+function renderMasterStatusPenanganan(){const d=getDB('masterStatusPenanganan').sort((a,b)=>(a.urutan||0)-(b.urutan||0));const warnaCls={success:'badge-success',warning:'badge-warning',danger:'badge-danger',info:'badge-info',primary:'badge-primary',purple:'badge-purple',secondary:'badge-secondary'};let h='';d.forEach((m,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${escapeHTML(m.kode)}</strong></td><td>${escapeHTML(m.nama)}</td><td><span class="badge ${warnaCls[m.warna]||'badge-secondary'}">${escapeHTML(m.warna)||'-'}</span></td><td>${escapeHTML(m.urutan)||'-'}</td><td><div class="text-truncate">${escapeHTML(m.desc)||'-'}</div></td><td><span class="badge ${m.status==='Aktif'?'badge-success':'badge-secondary'}">${m.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editMasterGeneric('masterStatusPenanganan','${m.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('masterStatusPenanganan','${m.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById('masterStatusPenangananBody').innerHTML=h||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
 
-function renderUsersTable(){const d=getDB('users');const rc={Admin:'badge-primary',Operator:'badge-info','Komite Etik':'badge-warning','Komite Profesi':'badge-warning',PIC:'badge-success',Otorisator:'badge-danger',Pelapor:'badge-secondary'};let h='';d.forEach((u,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${u.username}</strong></td><td>${u.nama}</td><td>${u.email}</td><td>${u.hp||'-'}</td><td><span class="badge ${rc[u.role]||'badge-secondary'}">${u.role}</span></td><td><span class="badge ${u.status==='Aktif'?'badge-success':'badge-secondary'}">${u.status}</span></td><td class="actions-cell"><button class="btn btn-info btn-xs" onclick="resetUserPassword('${u.id}')"><i class="fas fa-key"></i></button><button class="btn btn-warning btn-xs" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('users','${u.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById('usersTableBody').innerHTML=h||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
+function renderUsersTable(){const d=getDB('users');const rc={Admin:'badge-primary',Operator:'badge-info','Komite Etik':'badge-warning','Komite Profesi':'badge-warning',PIC:'badge-success',Otorisator:'badge-danger',Pelapor:'badge-secondary'};let h='';d.forEach((u,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${escapeHTML(u.username)}</strong></td><td>${escapeHTML(u.nama)}</td><td>${escapeHTML(u.email)}</td><td>${escapeHTML(u.hp)||'-'}</td><td><span class="badge ${rc[u.role]||'badge-secondary'}">${u.role}</span></td><td><span class="badge ${u.status==='Aktif'?'badge-success':'badge-secondary'}">${u.status}</span></td><td class="actions-cell"><button class="btn btn-info btn-xs" onclick="resetUserPassword('${u.id}')"><i class="fas fa-key"></i></button><button class="btn btn-warning btn-xs" onclick="editUser('${u.id}')"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-xs" onclick="deleteItem('users','${u.id}')"><i class="fas fa-trash"></i></button></td></tr>`;});document.getElementById('usersTableBody').innerHTML=h||'<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:24px">Belum ada data</td></tr>';}
 function showModalUser(e){document.getElementById('modalUserTitle').innerHTML=`<i class="fas fa-user-plus"></i> ${e?'Edit':'Tambah'} User`;if(!e){document.getElementById('formUser').reset();document.getElementById('userId').value='';}document.getElementById('modalUser').classList.add('active');}
 function editUser(id){const d=getDB('users').find(u=>u.id===id);if(!d)return;document.getElementById('userId').value=id;document.getElementById('userUsername').value=d.username;document.getElementById('userNama').value=d.nama;document.getElementById('userEmail').value=d.email;document.getElementById('userHP').value=d.hp;document.getElementById('userRole').value=d.role;document.getElementById('userStatus').value=d.status;document.getElementById('userPassword').value='';showModalUser(true);}
 function saveUser(){const id=document.getElementById('userId').value;const o={username:document.getElementById('userUsername').value,nama:document.getElementById('userNama').value,email:document.getElementById('userEmail').value,hp:document.getElementById('userHP').value,role:document.getElementById('userRole').value,status:document.getElementById('userStatus').value};const pass=document.getElementById('userPassword').value;if(!o.username||!o.nama||!o.email){showToast('error','Isi field wajib!');return;}let d=getDB('users');if(id)d=d.map(u=>{if(u.id===id){const up={...u,...o};if(pass)up.password=pass;return up;}return u;});else{o.id=genId();o.password=pass||'123';d.push(o);}setDB('users',d);closeModal('modalUser');renderUsersTable();showToast('success','User disimpan!');}
@@ -1761,7 +1763,7 @@ function togglePerm(r,m,v){
     }
 }
 
-function renderControlPanel(){const sas=getDB('superadmins');let h='';sas.forEach((sa,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${sa.username}</strong></td><td>${sa.nama}</td><td>${sa.email}</td><td><span class="badge badge-success">${sa.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editSuperAdmin('${sa.id}')"><i class="fas fa-edit"></i></button>${sas.length>1?`<button class="btn btn-danger btn-xs" onclick="deleteItem('superadmins','${sa.id}')"><i class="fas fa-trash"></i></button>`:''}</td></tr>`;});document.getElementById('superAdminBody').innerHTML=h;}
+function renderControlPanel(){const sas=getDB('superadmins');let h='';sas.forEach((sa,i)=>{h+=`<tr><td>${i+1}</td><td><strong>${escapeHTML(sa.username)}</strong></td><td>${escapeHTML(sa.nama)}</td><td>${escapeHTML(sa.email)}</td><td><span class="badge badge-success">${sa.status}</span></td><td class="actions-cell"><button class="btn btn-warning btn-xs" onclick="editSuperAdmin('${sa.id}')"><i class="fas fa-edit"></i></button>${sas.length>1?`<button class="btn btn-danger btn-xs" onclick="deleteItem('superadmins','${sa.id}')"><i class="fas fa-trash"></i></button>`:''}</td></tr>`;});document.getElementById('superAdminBody').innerHTML=h;}
 function showModalSuperAdmin(){document.getElementById('formSuperAdmin').reset();document.getElementById('saId').value='';document.getElementById('modalSuperAdmin').classList.add('active');}
 function editSuperAdmin(id){const d=getDB('superadmins').find(s=>s.id===id);if(!d)return;document.getElementById('saId').value=id;document.getElementById('saUsername').value=d.username;document.getElementById('saNama').value=d.nama;document.getElementById('saEmail').value=d.email;document.getElementById('saPassword').value='';document.getElementById('modalSuperAdmin').classList.add('active');}
 function saveSuperAdmin(){const id=document.getElementById('saId').value;const o={username:document.getElementById('saUsername').value,nama:document.getElementById('saNama').value,email:document.getElementById('saEmail').value};const pass=document.getElementById('saPassword').value;if(!o.username||!o.nama){showToast('error','Wajib!');return;}let d=getDB('superadmins');if(id)d=d.map(s=>{if(s.id===id){const up={...s,...o};if(pass)up.password=pass;return up;}return s;});else{o.id=genId();o.password=pass||'123//';o.status='Aktif';d.push(o);}setDB('superadmins',d);closeModal('modalSuperAdmin');renderControlPanel();showToast('success','SuperAdmin disimpan!');}
@@ -2008,6 +2010,7 @@ function downloadLandingContent(key, type) {
     }
 }
 
+// PERBAIKAN: Fungsi FETCH WEBHOOK telah dihapus 'mode: no-cors'-nya agar berhasil terhubung
 async function syncToCloud() {
     const s = getSettings();
     const url = s.toastURL;
@@ -2031,7 +2034,7 @@ async function syncToCloud() {
     try {
         const response = await fetch(url, {
             method: 'POST',
-            mode: 'no-cors', 
+            // mode: 'no-cors' -> DIHAPUS agar response HTTP bisa dibaca untuk status OK
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(allData)
         });
@@ -2044,13 +2047,19 @@ async function syncToCloud() {
     }
 }
 
-document.addEventListener('contextmenu', event => event.preventDefault());
-
-// MULA KETIKA WINDOW LOADED
 window.addEventListener('load', async () => {
-    // Sinkronkan data dari Supabase terlebih dahulu
-    await fetchFromSupabase();
-    // Lalu jalankan inisiasi lokal
+    try {
+        await Promise.race([
+            fetchFromSupabase(),
+            new Promise((resolve) => setTimeout(resolve, 4000))
+        ]);
+    } catch (err) {
+        console.error("Gagal koneksi cloud:", err);
+    }
+    
+    const loader = document.getElementById('loader');
+    if(loader) loader.classList.add('hide');
+    
     initApp();
 });
 </script>
