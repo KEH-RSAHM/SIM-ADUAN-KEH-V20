@@ -628,6 +628,10 @@
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-server"></i> Control Panel (SuperAdmin Only)</h3></div>
                     <div class="card-body">
+                        <div style="margin-bottom:24px">
+                            <button class="btn btn-primary" onclick="openSupabaseModal()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-cog"></i> Buka Konfigurasi Supabase</button>
+                        </div>
+
                         <div class="stats-grid">
                             <div class="stat-card" style="cursor:pointer" onclick="resetAllData()"><div class="stat-info"><h3 style="font-size:16px"><i class="fas fa-trash-alt" style="color:var(--danger)"></i></h3><p>Reset DB</p></div></div>
                             <div class="stat-card" style="cursor:pointer" onclick="downloadAllDB()"><div class="stat-info"><h3 style="font-size:16px"><i class="fas fa-download" style="color:var(--success)"></i></h3><p>Backup XLSX</p></div></div>
@@ -802,14 +806,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 let supabaseClient = null;
 if (typeof supabase !== 'undefined' && typeof SUPABASE_URL !== 'undefined' && SUPABASE_URL.startsWith('http')) {
     try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e) { console.error('Supabase init error', e); }
-    // Auto fallback
-    const backendMode = localStorage.getItem('SIGAP_BACKEND_MODE') || 'supabase';
-    if(backendMode === 'supabase' && !supabaseClient){
-        console.warn('Supabase init failed, falling back to local');
-        localStorage.setItem('SIGAP_BACKEND_MODE', 'local');
-        showToast('warning','Supabase gagal, fallback ke LocalStorage');
-    }
-
 }
 
 const DB_KEYS={aduan:'sigap_aduan',penanganan:'sigap_penanganan',masterEtik:'sigap_master_etik',masterHukum:'sigap_master_hukum',masterPIC:'sigap_master_pic',masterEskalasi:'sigap_master_eskalasi',masterStatusPenanganan:'sigap_master_status',users:'sigap_users',superadmins:'sigap_superadmins',settings:'sigap_settings',roles:'sigap_roles',notifications:'sigap_notifications',logs:'sigap_logs'};
@@ -1619,118 +1615,92 @@ async function syncToCloud() {
 setTimeout(() => {
     try { initApp(); } catch(e) { console.error(e); }
 }, 100);
+</script>
 
-// Supabase Config Management
-function loadSupabaseConfigForm(){
-    const urlEl = document.getElementById('cfgSupabaseUrl');
-    const keyEl = document.getElementById('cfgSupabaseKey');
-    if(urlEl) urlEl.value = SUPABASE_URL;
-    if(keyEl) keyEl.value = SUPABASE_ANON_KEY;
-    updateSupabaseStatusDot();
-    const modeEl = document.getElementById('cfgBackendMode');
-    const sheetEl = document.getElementById('cfgSheetUrl');
-    if(modeEl) modeEl.value = localStorage.getItem('SIGAP_BACKEND_MODE') || 'supabase';
-    if(sheetEl) sheetEl.value = localStorage.getItem('SIGAP_SHEET_URL') || '';
+<div id="supabaseModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center">
+    <div style="background:var(--card);border-radius:20px;max-width:700px;width:90%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);border:1px solid var(--border)">
+        <div style="padding:24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+            <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-database" style="color:white;font-size:20px"></i>
+            </div>
+            <div style="flex:1">
+                <h3 style="margin:0;font-size:20px">Konfigurasi Supabase</h3>
+                <p style="margin:2px 0 0 0;font-size:13px;color:var(--text-secondary)">Koneksi database cloud • disimpan lokal</p>
+            </div>
+            <button onclick="closeSupabaseModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--text-secondary)">&times;</button>
+        </div>
+        <div style="padding:24px">
+            <div style="display:grid;gap:14px">
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px">Supabase URL</label>
+                    <input type="text" id="modalCfgSupabaseUrl" placeholder="https://xxx.supabase.co" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-family:monospace;font-size:13px">
+                </div>
+                <div>
+                    <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px">Anon Public Key</label>
+                    <textarea id="modalCfgSupabaseKey" rows="3" placeholder="eyJhbGci..." style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-family:monospace;font-size:12px;resize:vertical"></textarea>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px">Mode Backend</label>
+                        <select id="modalCfgBackendMode" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-size:13px">
+                            <option value="supabase">Supabase (Cloud)</option>
+                            <option value="spreadsheet">Google Spreadsheet</option>
+                            <option value="local">LocalStorage Only</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:6px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px">Spreadsheet Web App URL</label>
+                        <input type="text" id="modalCfgSheetUrl" placeholder="https://script.google.com/..." style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-family:monospace;font-size:12px">
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px">
+                <button class="btn btn-primary" onclick="saveSupabaseConfigModal()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-save"></i> Simpan & Reload</button>
+                <button class="btn btn-secondary" onclick="testSupabaseConfigModal()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-plug"></i> Test</button>
+                <button class="btn btn-secondary" onclick="resetSupabaseConfig()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-undo"></i> Reset</button>
+                <button class="btn btn-secondary" onclick="exportConfig()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-download"></i> Export</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('importConfigFileModal').click()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-upload"></i> Import</button>
+                <input type="file" id="importConfigFileModal" accept=".json" style="display:none" onchange="importConfig(event)">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function openSupabaseModal(){
+    document.getElementById('supabaseModal').style.display='flex';
+    document.getElementById('modalCfgSupabaseUrl').value = SUPABASE_URL;
+    document.getElementById('modalCfgSupabaseKey').value = SUPABASE_ANON_KEY;
+    document.getElementById('modalCfgBackendMode').value = localStorage.getItem('SIGAP_BACKEND_MODE') || 'supabase';
+    document.getElementById('modalCfgSheetUrl').value = localStorage.getItem('SIGAP_SHEET_URL') || '';
 }
-function saveSupabaseConfig(){
-    const url = document.getElementById('cfgSupabaseUrl').value.trim();
-    const key = document.getElementById('cfgSupabaseKey').value.trim();
+function closeSupabaseModal(){
+    document.getElementById('supabaseModal').style.display='none';
+}
+function saveSupabaseConfigModal(){
+    const url = document.getElementById('modalCfgSupabaseUrl').value.trim();
+    const key = document.getElementById('modalCfgSupabaseKey').value.trim();
     if(!url.startsWith('http')){ showToast('error','URL tidak valid'); return; }
     if(key.length < 20){ showToast('error','Anon Key tidak valid'); return; }
     localStorage.setItem('SIGAP_SUPABASE_URL', url);
     localStorage.setItem('SIGAP_SUPABASE_ANON_KEY', key);
-    const mode = document.getElementById('cfgBackendMode')?.value || 'supabase';
-    const sheetUrl = document.getElementById('cfgSheetUrl')?.value.trim() || '';
-    localStorage.setItem('SIGAP_BACKEND_MODE', mode);
-    localStorage.setItem('SIGAP_SHEET_URL', sheetUrl);
+    localStorage.setItem('SIGAP_BACKEND_MODE', document.getElementById('modalCfgBackendMode').value);
+    localStorage.setItem('SIGAP_SHEET_URL', document.getElementById('modalCfgSheetUrl').value.trim());
     showToast('success','Config disimpan, reload...');
     setTimeout(()=> location.reload(), 800);
 }
-function resetSupabaseConfig(){
-    localStorage.removeItem('SIGAP_SUPABASE_URL');
-    localStorage.removeItem('SIGAP_SUPABASE_ANON_KEY');
-    localStorage.removeItem('SIGAP_BACKEND_MODE');
-    localStorage.removeItem('SIGAP_SHEET_URL');
-    showToast('info','Reset ke default, reload...');
-    setTimeout(()=> location.reload(), 800);
-}
-async function testSupabaseConfig(){
-    const url = document.getElementById('cfgSupabaseUrl').value.trim();
-    const key = document.getElementById('cfgSupabaseKey').value.trim();
+async function testSupabaseConfigModal(){
+    const url = document.getElementById('modalCfgSupabaseUrl').value.trim();
+    const key = document.getElementById('modalCfgSupabaseKey').value.trim();
     try{
         const client = supabase.createClient(url, key);
         const { error } = await client.from('aduan').select('id').limit(1);
         if(error) throw error;
         showToast('success','Koneksi berhasil!');
-        const dot = document.getElementById('supabaseStatusDot');
-        if(dot){ dot.style.background='#10b981'; dot.style.boxShadow='0 0 8px #10b981'; }
     }catch(e){
         showToast('error','Gagal: '+(e.message||e));
-        const dot = document.getElementById('supabaseStatusDot');
-        if(dot){ dot.style.background='#ef4444'; dot.style.boxShadow='0 0 8px #ef4444'; }
     }
 }
-function updateSupabaseStatusDot(){
-    const dot = document.getElementById('supabaseStatusDot');
-    if(!dot) return;
-    if(supabaseClient){ dot.style.background='#10b981'; dot.style.boxShadow='0 0 8px #10b981'; }
-    else { dot.style.background='#ef4444'; dot.style.boxShadow='0 0 8px #ef4444'; }
-}
-function exportConfig(){
-    const config = {
-        supabaseUrl: SUPABASE_URL,
-        supabaseAnonKey: SUPABASE_ANON_KEY,
-        backendMode: localStorage.getItem('SIGAP_BACKEND_MODE') || 'supabase',
-        sheetUrl: localStorage.getItem('SIGAP_SHEET_URL') || '',
-        settings: getSettings(),
-        roles: getDB('roles'),
-        exportedAt: new Date().toISOString()
-    };
-    const blob = new Blob([JSON.stringify(config,null,2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'sigap-config-'+new Date().toISOString().slice(0,10)+'.json';
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('success','Config diexport');
-}
-function importConfig(event){
-    const file = event.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-        try{
-            const cfg = JSON.parse(e.target.result);
-            if(cfg.supabaseUrl) localStorage.setItem('SIGAP_SUPABASE_URL', cfg.supabaseUrl);
-            if(cfg.supabaseAnonKey) localStorage.setItem('SIGAP_SUPABASE_ANON_KEY', cfg.supabaseAnonKey);
-            if(cfg.backendMode) localStorage.setItem('SIGAP_BACKEND_MODE', cfg.backendMode);
-            if(cfg.sheetUrl) localStorage.setItem('SIGAP_SHEET_URL', cfg.sheetUrl);
-            if(cfg.settings) setSettings(cfg.settings);
-            if(cfg.roles) setDB('roles', cfg.roles);
-            showToast('success','Config diimport, reload...');
-            setTimeout(()=> location.reload(), 800);
-        }catch(err){
-            showToast('error','File tidak valid');
-        }
-    };
-    reader.readAsText(file);
-}
-// Hook into renderControlPanel
-const _origRenderControlPanel = window.renderControlPanel;
-window.renderControlPanel = function(){
-    if(_origRenderControlPanel) _origRenderControlPanel.call(this);
-    setTimeout(loadSupabaseConfigForm, 100);
-};
-// Disable right click and devtools shortcuts
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-    if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U')){
-        e.preventDefault();
-        showToast('warning','Akses developer dinonaktifkan');
-    }
-});
-
 </script>
+
 </body>
 </html>
