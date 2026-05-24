@@ -294,7 +294,16 @@
         @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; } .hero-buttons { flex-direction: column; align-items: center; } .btn-hero { width: 100%; justify-content: center; } }
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; }
         .sidebar-overlay.active { display: block; }
-    </style>
+    
+        /* Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 28px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+</style>
 </head>
 <body>
 <div class="toast-container" id="toastContainer"></div>
@@ -631,6 +640,16 @@
                         <div style="margin-bottom:24px">
                             <button class="btn btn-primary" onclick="openSupabaseModal()" style="display:flex;align-items:center;gap:8px"><i class="fas fa-cog"></i> Buka Konfigurasi Supabase</button>
                         </div>
+                        <div style="margin-bottom:24px; padding:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; display:flex; justify-content:space-between; align-items:center">
+                            <div>
+                                <strong>Sinkronisasi Supabase</strong>
+                                <p style="margin:4px 0 0; color:#64748b; font-size:13px">Aktifkan untuk sinkron data ke cloud Supabase</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="toggleSupabaseSync" onchange="toggleSupabaseSync(this.checked)">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
 
                         <div class="stats-grid">
                             <div class="stat-card" style="cursor:pointer" onclick="resetAllData()"><div class="stat-info"><h3 style="font-size:16px"><i class="fas fa-trash-alt" style="color:var(--danger)"></i></h3><p>Reset DB</p></div></div>
@@ -812,6 +831,7 @@ const DB_KEYS={aduan:'sigap_aduan',penanganan:'sigap_penanganan',masterEtik:'sig
 const EXCLUDE_FROM_EXPORT=['users','superadmins'];
 
 async function fetchFromSupabase() {
+    if (!isSupabaseSyncEnabled()) return;
     if (!supabaseClient || !SUPABASE_URL.startsWith('http')) return;
     try {
         const tabelUtama = ['aduan', 'penanganan', 'users', 'superadmins', 'masterEtik', 'masterHukum', 'masterPIC', 'masterEskalasi', 'masterStatusPenanganan'];
@@ -831,6 +851,7 @@ function getDB(k){try{return JSON.parse(localStorage.getItem(DB_KEYS[k]))||[];}c
 
 function setDB(k, d) {
     localStorage.setItem(DB_KEYS[k], JSON.stringify(d));
+    if (!isSupabaseSyncEnabled()) return;
     if (supabaseClient && SUPABASE_URL.startsWith('http')) {
         const tableName = k === 'superadmins' ? 'superadmins' : k;
         if (['aduan', 'penanganan', 'users', 'superadmins', 'masterEtik', 'masterHukum', 'masterPIC', 'masterEskalasi', 'masterStatusPenanganan'].includes(tableName)) {
@@ -994,35 +1015,16 @@ function initApp(){
         sas.push({id:genId(),username:'superadmin',nama:'Super Administrator',email:'superadmin@sigap.com',password:'123//',status:'Aktif'});
         setDB('superadmins',sas);
     }
-    if(!getDB('masterEtik').length) setDB('masterEtik', [
-        {id:'etik_1', kode:'ETK-001', nama:'Pelanggaran Ringan', "desc":'Pelanggaran etika ringan seperti keterlambatan laporan', status:'Aktif'},
-        {id:'etik_2', kode:'ETK-002', nama:'Pelanggaran Sedang', "desc":'Penyalahgunaan wewenang terbatas', status:'Aktif'},
-        {id:'etik_3', kode:'ETK-003', nama:'Pelanggaran Berat', "desc":'Korupsi, kolusi, nepotisme', status:'Aktif'}
-    ]);
-    if(!getDB('masterHukum').length) setDB('masterHukum', [
-        {id:'hukum_1', kode:'HKM-001', nama:'UU ITE', "desc":'Undang-Undang Informasi dan Transaksi Elektronik', status:'Aktif'},
-        {id:'hukum_2', kode:'HKM-002', nama:'KUHP', "desc":'Kitab Undang-Undang Hukum Pidana', status:'Aktif'},
-        {id:'hukum_3', kode:'HKM-003', nama:'Perda No.5/2023', "desc":'Peraturan Daerah tentang Pelayanan Publik', status:'Aktif'}
-    ]);
-    if(!getDB('masterPIC').length) setDB('masterPIC', [
-        {id:'pic_1', nama:'Budi Santoso', jabatan:'Kepala Seksi Pengaduan', email:'budi@sigap.go.id', telp:'081234567890', status:'Aktif'},
-        {id:'pic_2', nama:'Siti Aminah', jabatan:'Analis Hukum', email:'siti@sigap.go.id', telp:'081234567891', status:'Aktif'},
-        {id:'pic_3', nama:'Agus Prasetyo', jabatan:'Koordinator Eskalasi', email:'agus@sigap.go.id', telp:'081234567892', status:'Aktif'}
-    ]);
-    if(!getDB('masterEskalasi').length) setDB('masterEskalasi', [
-        {id:'esk_1', level:'1', nama:'Verifikasi Awal', durasi:'2 Hari', pic:'Budi Santoso', status:'Aktif'},
-        {id:'esk_2', level:'2', nama:'Investigasi', durasi:'5 Hari', pic:'Siti Aminah', status:'Aktif'},
-        {id:'esk_3', level:'3', nama:'Putusan', durasi:'3 Hari', pic:'Agus Prasetyo', status:'Aktif'}
-    ]);
-    if(!getDB('masterStatusPenanganan').length) setDB('masterStatusPenanganan', [
-        {id:'st_1', kode:'ST-001', nama:'Diterima', warna:'#3b82f6', status:'Aktif'},
-        {id:'st_2', kode:'ST-002', nama:'Diproses', warna:'#f59e0b', status:'Aktif'},
-        {id:'st_3', kode:'ST-003', nama:'Selesai', warna:'#10b981', status:'Aktif'},
-        {id:'st_4', kode:'ST-004', nama:'Ditolak', warna:'#ef4444', status:'Aktif'}
-    ]);
+    if(!getDB('masterEtik').length) setDB('masterEtik', [{"id":"mp6u2qxz885ln","kode":"ET-01","nama":"Pelanggaran Kode Etik Profesi","desc":"Pelanggaran kode etik profesi yang berlaku","status":"Aktif"},{"id":"mp6u2qxz2xh0c","kode":"ET-02","nama":"Konflik Kepentingan","desc":"Konflik kepentingan dalam pelaksanaan tugas","status":"Aktif"},{"id":"mp6u2qxzezrni","kode":"ET-03","nama":"Penyalahgunaan Wewenang","desc":"Penyalahgunaan wewenang jabatan","status":"Aktif"},{"id":"mp6u2qxzn06dq","kode":"ET-04","nama":"Diskriminasi / Pelecehan","desc":"Diskriminasi atau pelecehan di lingkungan kerja","status":"Aktif"},{"id":"mp6u2qxzwhc4y","kode":"ET-05","nama":"Pelanggaran Disiplin","desc":"Pelanggaran aturan disiplin kerja","status":"Aktif"}]);
+    if(!getDB('masterHukum').length) setDB('masterHukum', [{"id":"mp6u2qxzp4q6b","kode":"HK-01","nama":"Tindak Pidana Korupsi","desc":"Dugaan tindak pidana korupsi","status":"Aktif"},{"id":"mp6u2qxz42i2t","kode":"HK-02","nama":"Penipuan / Fraud","desc":"Dugaan penipuan atau fraud","status":"Aktif"},{"id":"mp6u2qxzcxekg","kode":"HK-03","nama":"Penggelapan","desc":"Dugaan penggelapan aset/dana","status":"Aktif"},{"id":"mp6u2qxza41rx","kode":"HK-04","nama":"Pelanggaran Kontrak","desc":"Pelanggaran perjanjian/kontrak","status":"Aktif"},{"id":"mp6u2qxzhs8w8","kode":"HK-05","nama":"Tindak Kekerasan","desc":"Dugaan tindak kekerasan","status":"Aktif"}]);
+    if(!getDB('masterPIC').length) setDB('masterPIC', [{"id":"mp6u2qxzr4u25","kode":"PIC-01","nama":"Ns. Thoha Ma'ruf, S.Kep - Komite Etik & Hukum","jabatan":"Komite Etik & Hukum","desc":"Penanganan oleh komite Etik internal","status":"Aktif"},{"id":"mp6u2qxz4vy3p","kode":"PIC-02","nama":"Direksi","jabatan":"Dewan Direksi","desc":"Penanganan level direksi","status":"Aktif"},{"id":"mp6u2qxzypzjr","kode":"PIC-03","nama":"APH/Litigator","jabatan":"Aparat Penegak Hukum","desc":"Penanganan hukum eksternal","status":"Aktif"},{"id":"mp6u2qxzatzx6","kode":"PIC-04","nama":"HRD","jabatan":"Human Resources - Wadir Umum dan Keuangan","desc":"Penanganan HR","status":"Aktif"},{"id":"mp7qk279an6fg","kode":"PIC=05","nama":"dr. Indah Puspitasari, MARS - Direktur","jabatan":"Direktur","desc":"Otorisator dan Pejabat pengesahan hasil penanganan aduan etik dan hukum","status":"Aktif"},{"id":"mp7qmlklezit9","kode":"PIC-02A","nama":"Ns. Susi Indaryanti, S.Kep - Komite Keperawatan","jabatan":"Komite Keperawatan","desc":"Penanganan Masalah Etik Keperawatan","status":"Aktif"},{"id":"mp7qo04vk75x7","kode":"PIC-02B","nama":"dr. Eka Yuni Nugrahayu, Sp.KJ - Komite Medik","jabatan":"Komite Medik","desc":"Penanganan Masalah Etik Medik","status":"Aktif"},{"id":"mp7qpdferrav4","kode":"PIC-02C","nama":"Devi Ester Yuantris, S.Gz - Komite Nakes Lainnya","jabatan":"Komite Nakes Lainnya","desc":"Penaganan Masalah Etik Lain","status":"Aktif"}]);
+    if(!getDB('masterEskalasi').length) setDB('masterEskalasi', [{"id":"mp6u2qxzfer7x","kode":"ESK-01","nama":"Level 1 - Internal","desc":"Penanganan internal unit","waktu":3,"status":"Aktif"},{"id":"mp6u2qxzjyvzp","kode":"ESK-02","nama":"Level 2 - Komite","desc":"Eskalasi ke komite etik dan komite profesi","waktu":7,"status":"Aktif"},{"id":"mp6u2qxz6xcgd","kode":"ESK-03","nama":"Level 3 - Direksi","desc":"Eskalasi ke direksi","waktu":14,"status":"Aktif"},{"id":"mp6u2qxzof57f","kode":"ESK-04","nama":"Level 4 - Eksternal","desc":"Eskalasi ke pihak eksternal/APH","waktu":30,"status":"Aktif"}]);
+    if(!getDB('masterStatusPenanganan').length) setDB('masterStatusPenanganan', [{"id":"mp6u2qxz8pmld","kode":"ST-02","nama":"Proses","warna":"warning","urutan":2,"desc":"Sedang dalam proses penanganan","status":"Aktif"},{"id":"mp6u2qxz6ax3v","kode":"ST-05","nama":"Selesai","warna":"success","urutan":5,"desc":"Penanganan selesai","status":"Aktif"},{"id":"mp6u2qxz9vxrr","kode":"ST-04","nama":"Diotorisasi","warna":"purple","urutan":4,"desc":"Telah diotorisasi","status":"Aktif"},{"id":"mp6u2qxz8o227","kode":"ST-06","nama":"Ditunda","warna":"secondary","urutan":6,"desc":"Penanganan ditunda","status":"Aktif"},{"id":"mp6u2qxzp8iec","kode":"ST-07","nama":"Dibatalkan","warna":"danger","urutan":7,"desc":"Aduan dibatalkan","status":"Aktif"},{"id":"mp7qwpor00xe5","kode":"ST-01","nama":"diverifikasi","warna":"verifikasi","urutan":1,"desc":"Aduan sedang di verifikasi","status":"Aktif"},{"id":"mp7wzyy8ii58p","kode":"ST-03","nama":"Eskalasi","warna":"warning","urutan":3,"desc":"Penanganan sedang di transfer ke PIC/Komite terkait","status":"Aktif"}]);
     if(!getDB('aduan').length) setDB('aduan', []);
     if(!getDB('penanganan').length) setDB('penanganan', []);
     if(!getDB('users').length) setDB('users', []);
+    if(!getDB('notifications').length) setDB('notifications', []);
+    if(!getDB('logs').length) setDB('logs', []);
     if(!getSettings().appName) setSettings({appName:'SIGAP',instName:'Sistem Informasi Pengelolaan Aduan dan Pelaporan',instLogo:'',appLogo:'',toastURL:''});
     
     if(!localStorage.getItem(DB_KEYS.roles)) {
@@ -1214,7 +1216,35 @@ function renderAduanTable(){
 
 function showModalAduan(e){
     document.getElementById('modalAduanTitle').innerHTML=`<i class="fas fa-bullhorn"></i> ${e?'Edit':'Tambah'} Aduan`;
-    if(!e){document.getElementById('formAduan').reset();document.getElementById('aduanId').value='';}
+    
+    const elEmail = document.getElementById('aduanEmail');
+    const elNama = document.getElementById('aduanNama');
+    const elHp = document.getElementById('aduanHP');
+    
+    if(!e){
+        document.getElementById('formAduan').reset();
+        document.getElementById('aduanId').value='';
+        
+        // FITUR BARU: AUTO-FILL DATA PELAPOR DARI AKUN
+        if(currentUser) {
+            elEmail.value = currentUser.email || '';
+            elNama.value = currentUser.nama || '';
+            elHp.value = currentUser.hp || '';
+        }
+    }
+
+    // Kunci kolom jika rolenya adalah Pelapor
+    if(currentUser && currentUser.role === 'Pelapor') {
+        elEmail.readOnly = true; elEmail.style.backgroundColor = '#f1f5f9';
+        elNama.readOnly = true; elNama.style.backgroundColor = '#f1f5f9';
+        elHp.readOnly = true; elHp.style.backgroundColor = '#f1f5f9';
+    } else {
+        // Buka kunci jika yang login Admin / Operator (bisa input untuk orang lain)
+        elEmail.readOnly = false; elEmail.style.backgroundColor = '#fff';
+        elNama.readOnly = false; elNama.style.backgroundColor = '#fff';
+        elHp.readOnly = false; elHp.style.backgroundColor = '#fff';
+    }
+    
     document.getElementById('modalAduan').classList.add('active');
 }
 function editAduan(id) {
@@ -1341,7 +1371,22 @@ function editPenanganan(id){
     const ad = getDB('aduan').find(a => a.id === p.aduanId); if(!ad) return;
 
     document.getElementById('penPenangananId').value = id;
-    document.getElementById('penangananInfoPanel').innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div><strong>ID Aduan:</strong> ${p.aduanId.substring(0,8)}</div><div><strong>Pelapor:</strong> ${escapeHTML(ad.nama)}</div><div style="grid-column: span 2;"><strong>Deskripsi Laporan:</strong> ${escapeHTML(ad.deskripsi)}</div></div>`;
+    
+    // HEADER FORM UPDATE: Menampilkan Tanggal Aduan, Nama Terlapor, Jabatan, Pelapor & Deskripsi (Read Only)
+    document.getElementById('penangananInfoPanel').innerHTML = `
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; border-bottom:1px solid var(--gray-light); padding-bottom:12px; margin-bottom:12px; font-size:12px; line-height:1.5;">
+            <div><strong>ID Aduan:</strong> <span style="color:var(--primary); font-weight:700;">${p.aduanId.substring(0,8)}</span></div>
+            <div><strong>Tanggal Aduan:</strong> ${escapeHTML(ad.timestamp || ad.tglKejadian)}</div>
+            <div><strong>Nama Pelapor:</strong> ${escapeHTML(ad.nama)}</div>
+            <div><strong>Nama Terlapor (Dilaporkan):</strong> <span style="color:var(--danger); font-weight:600;">${escapeHTML(ad.namaDilaporkan || '-')}</span></div>
+            <div><strong>Jabatan Terlapor:</strong> ${escapeHTML(ad.jabatan || '-')}</div>
+            <div><strong>Unit Kerja / Lokasi:</strong> ${escapeHTML(ad.unitKerja || '-')}</div>
+            <div style="grid-column: span 2; background:#fff; padding:8px; border-radius:6px; border:1px solid #e2e8f0; margin-top:4px;">
+                <strong>Deskripsi Laporan:</strong><br><span style="color:var(--gray); white-space:pre-wrap;">${escapeHTML(ad.deskripsi)}</span>
+            </div>
+        </div>
+    `;
+
     document.getElementById('penKategori').value = p.kategori || '';
     loadPenSubKategori(); setTimeout(() => document.getElementById('penSubKategori').value = p.subKategori || '', 50);
     document.getElementById('penUrgensi').value = p.urgensi || '';
@@ -1349,19 +1394,63 @@ function editPenanganan(id){
     document.getElementById('penEstimasi').value = p.estimasi || ''; document.getElementById('penTglMulai').value = p.tglMulai || ''; document.getElementById('penTglSelesai').value = p.tglSelesai || ''; document.getElementById('penTanggapanProses').value = p.tanggapanProses || ''; document.getElementById('penTanggapanAkhir').value = p.tanggapanAkhir || '';
     document.getElementById('penNoSK').value = p.keputusan || ''; document.getElementById('penSKData').value = p.skFile || ''; document.getElementById('penFileSK').value = ''; document.getElementById('penSKName').textContent = p.skUploaded ? 'File SK Terlampir' : '';
     populateStatusSelect('penStatus', p.status);
-    document.getElementById('penBukti').value = p.bukti || ''; document.getElementById('penBuktiFile').value = ''; document.getElementById('penBuktiName').textContent = p.bukti ? 'File PDF Dokumentasi sudah terlampir' : '';
+    document.getElementById('penBukti').value = p.bukti || ''; document.getElementById('penBuktiFile').value = ''; document.getElementById('penBuktiName').textContent = p.bukti ? 'File PDF Dokumentasi terlampir' : '';
 
-    const role = currentUser?.role, isSA = role === 'SuperAdmin', isOp = role === 'Operator', isPIC = role === 'PIC', isKE = role === 'Komite Etik', isAdmin = role === 'Admin', isOto = role === 'Otorisator';
-    const isGlobalLocked = (p.status === 'Selesai' && !isSA && !isAdmin); 
-    const lockCore = isGlobalLocked || isOp || isAdmin || (isKE && p.status !== 'Verifikasi') || (isPIC && p.status === 'di Proses') || isOto;
+    const role = currentUser?.role;
+    const isSA = role === 'SuperAdmin';
+    const isAdmin = role === 'Admin';
+    const isVerifikator = (role === 'Operator' || role === 'Komite Etik');
+    const isEksekutor = (role === 'PIC' || role === 'Komite Profesi');
     
-    ['penKategori', 'penSubKategori', 'penUrgensi', 'penEstimasi', 'penTglMulai', 'penTglSelesai', 'penTanggapanProses', 'penTanggapanAkhir', 'penBuktiFile'].forEach(id => { document.getElementById(id).disabled = lockCore; });
-    ['penPIC', 'penEskalasi'].forEach(id => { document.getElementById(id).disabled = isGlobalLocked || isOp || isPIC || isAdmin || (isKE && p.status !== 'Verifikasi') || isOto; });
+    const isGlobalLocked = (p.status === 'Selesai' && !isSA && !isAdmin);
 
-    const canEditSK = isSA || (isAdmin && (p.status === 'Penetapan' || p.status === 'Selesai')) || (isKE && p.status === 'Penetapan');
-    document.getElementById('penNoSK').disabled = !canEditSK; document.getElementById('penFileSK').disabled = !canEditSK;
+    let lockGrup1 = true; 
+    let lockGrup2 = true; 
+    let canEditSK = false; 
+
+    if (!isGlobalLocked) {
+        if (isSA) {
+            lockGrup1 = false; lockGrup2 = false; canEditSK = true;
+        } else if (isAdmin) {
+            lockGrup1 = true; lockGrup2 = true; canEditSK = true;
+        } else if (isVerifikator && p.status === 'Verifikasi') {
+            lockGrup1 = false; lockGrup2 = true; canEditSK = false;
+        } else if (isEksekutor && (p.status === 'di Eskalasi' || p.status === 'di Proses')) {
+            lockGrup1 = true; lockGrup2 = false; canEditSK = false;
+        }
+    } else {
+        if (isSA || isAdmin) { canEditSK = true; }
+    }
+
+    if (role === 'Komite Etik' && p.status === 'Penetapan') { canEditSK = true; }
+
+    ['penKategori', 'penSubKategori', 'penUrgensi', 'penEstimasi', 'penPIC', 'penEskalasi'].forEach(id => { document.getElementById(id).disabled = lockGrup1; });
+    ['penTglMulai', 'penTglSelesai', 'penTanggapanProses', 'penTanggapanAkhir', 'penBuktiFile'].forEach(id => { document.getElementById(id).disabled = lockGrup2; });
+
+    document.getElementById('penNoSK').disabled = !canEditSK;
+    document.getElementById('penFileSK').disabled = !canEditSK;
     document.getElementById('penStatus').disabled = true; 
-    document.getElementById('btnSavePenanganan').style.display = (isOp || isOto || (!canEditSK && lockCore)) && !isSA ? 'none' : 'inline-flex';
+
+    document.getElementById('btnSavePenanganan').style.display = (lockGrup1 && lockGrup2 && !canEditSK) ? 'none' : 'inline-flex';
+    
+    // ATUR TOMBOL PREVIEW SECARA DINAMIS DI MODAL FOOTER
+    let footer = document.querySelector('#modalPenanganan .modal-footer');
+    if (footer) {
+        let btnPre = document.getElementById('btnPreviewSK');
+        if (!btnPre) {
+            btnPre = document.createElement('button');
+            btnPre.id = 'btnPreviewSK';
+            btnPre.className = 'btn btn-info';
+            btnPre.type = 'button';
+            btnPre.style.marginRight = 'auto'; // Letakkan di paling kiri footer
+            btnPre.onclick = () => previewSuratPenetapan(id);
+            footer.insertBefore(btnPre, footer.firstChild);
+        }
+        btnPre.innerHTML = '<i class="fas fa-file-alt"></i> Preview Surat Penetapan';
+        // Hanya tampilkan jika No. SK bisa diakses/diedit oleh role tersebut
+        btnPre.style.display = (isSA || isAdmin || role === 'Komite Etik' || p.status === 'Penetapan' || p.status === 'Selesai') ? 'inline-flex' : 'none';
+    }
+
     document.getElementById('modalPenanganan').classList.add('active');
 }
 
@@ -1700,6 +1789,209 @@ async function testSupabaseConfigModal(){
         showToast('error','Gagal: '+(e.message||e));
     }
 }
+function previewSuratPenetapan(penId) {
+    const p = getDB('penanganan').find(x => x.id === penId); if(!p) return;
+    const ad = getDB('aduan').find(a => a.id === p.aduanId); if(!ad) return;
+    const s = getSettings();
+
+    // Ambil nilai secara live dari form (bukan dari database agar dinamis mengikuti ketikan user)
+    const noSKLive = document.getElementById('penNoSK').value || '[NOMOR SURAT BELUM DIISI]';
+    const tanggapanAkhirLive = document.getElementById('penTanggapanAkhir').value || '[Isi keputusan/tanggapan akhir penanganan aduan belum diisi di form]';
+    const tglSelesaiLive = document.getElementById('penTglSelesai').value ? new Date(document.getElementById('penTglSelesai').value).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}) : new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+
+    // Buat element modal cetak/preview jika belum ada di HTML
+    let modalPre = document.getElementById('modalPreviewSurat');
+    if (!modalPre) {
+        modalPre = document.createElement('div');
+        modalPre.id = 'modalPreviewSurat';
+        modalPre.className = 'modal-overlay';
+        modalPre.style.background = 'rgba(0,0,0,0.6)';
+        modalPre.style.zIndex = '100001'; // Di atas modal penanganan
+        document.body.appendChild(modalPre);
+    }
+
+    // Suntikkan Layout Surat Berformat Kertas Formal (Times New Roman, Standar Hukum/Etik Indonesia)
+    modalPre.innerHTML = `
+        <div class="modal modal-lg" style="background:#fff; border-radius:8px; box-shadow: var(--shadow-xl); overflow:hidden; max-width:850px; margin:20px auto;">
+            <div class="modal-header" style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+                <h3 style="color:var(--dark); font-size:14px;"><i class="fas fa-eye"></i> Preview Layout Lembar Surat Penetapan</h3>
+                <button class="modal-close" onclick="document.getElementById('modalPreviewSurat').classList.remove('active')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="background:#cbd5e1; padding:30px; max-height:75vh; overflow-y:auto; text-align:center;">
+                
+                <div id="printPaperArea" style="background:#fff; width:100%; max-width:700px; min-height:850px; margin:0 auto; padding:50px 60px; box-shadow:0 4px 10px rgba(0,0,0,0.15); text-align:left; font-family:'Times New Roman', Times, serif; color:#000; line-height:1.6; font-size:14px;">
+                    
+                    <div style="text-align:center; border-bottom:3px double #000; padding-bottom:12px; margin-bottom:25px;">
+                        <h2 style="font-size:18px; font-weight:bold; text-transform:uppercase; margin-bottom:2px; letter-spacing:0.5px;">${escapeHTML(s.instName || 'NAMA INSTANSI ORGANISASI')}</h2>
+                        <h3 style="font-size:14px; font-weight:bold; text-transform:uppercase; margin-bottom:4px; color:#333;">KOMITE PENEGAKAN DISIPLIN, ETIK & HUKUM</h3>
+                        <p style="font-size:11px; font-style:italic; margin:0; color:#444;">Sistem Aplikasi Perlindungan Integrasi & Pengelolaan Aduan (${s.appName || 'SIGAP'})</p>
+                    </div>
+
+                    <div style="text-align:center; margin-bottom:25px;">
+                        <h4 style="font-size:15px; font-weight:bold; text-transform:uppercase; margin:0; text-decoration:underline;">SURAT KEPUTUSAN PENETAPAN</h4>
+                        <p style="margin:2px 0 0 0; font-size:13px; font-weight:bold;">Nomor: ${escapeHTML(noSKLive)}</p>
+                    </div>
+
+                    <table style="width:100%; font-family:inherit; font-size:inherit; border-collapse:collapse; margin-bottom:15px;">
+                        <tr style="vertical-align:top;">
+                            <td style="width:100px; font-weight:bold; padding:4px 0;">MENIMBANG</td>
+                            <td style="width:20px; text-align:center; padding:4px 0;">:</td>
+                            <td style="padding:4px 0; text-align:justify;">
+                                <ol style="margin:0; padding-left:18px;">
+                                    <li style="margin-bottom:6px;">Bahwa berdasarkan data aduan masuk pada sistem aplikasi tanggal <strong>${escapeHTML(ad.timestamp || ad.tglKejadian)}</strong> terkait dugaan pelanggaran disiplin/etik.</li>
+                                    <li style="margin-bottom:6px;">Bahwa setelah dilakukan proses verifikasi serta rangkaian penanganan aduan, dipandang perlu menetapkan keputusan sanksi atau rekomendasi akhir terhadap pihak terlapor demi menjaga marwah instansi.</li>
+                                </ol>
+                            </td>
+                        </tr>
+                        <tr style="vertical-align:top;">
+                            <td style="font-weight:bold; padding:4px 0; border-top:10px solid transparent;">MENGINGAT</td>
+                            <td style="text-align:center; padding:4px 0; border-top:10px solid transparent;">:</td>
+                            <td style="padding:4px 0; text-align:justify; border-top:10px solid transparent;">
+                                <ol style="margin:0; padding-left:18px;">
+                                    <li style="margin-bottom:6px;">Peraturan internal Organisasi/Instansi mengenai Kode Etik, Tata Tertib dan Disiplin kerja Pegawai.</li>
+                                    <li style="margin-bottom:6px;">Panduan standardisasi operasional penanganan aduan dan perlindungan pelapor pada aplikasi ${escapeHTML(s.appName || 'SIGAP')}.</li>
+                                </ol>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div style="text-align:center; margin:20px 0 15px 0; font-weight:bold; text-transform:uppercase; font-size:14px; letter-spacing:1px;">
+                        MEMUTUSKAN:
+                    </div>
+
+                    <table style="width:100%; font-family:inherit; font-size:inherit; border-collapse:collapse;">
+                        <tr style="vertical-align:top;">
+                            <td style="width:100px; font-weight:bold; padding:4px 0;">MENETAPKAN</td>
+                            <td style="width:20px; text-align:center; padding:4px 0;">:</td>
+                            <td style="padding:4px 0; text-align:justify; font-weight:bold; text-transform:uppercase;">KEPUTUSAN HASIL PENANGANAN PERKARA ADUAN NOMOR ID ${p.aduanId.substring(0,8)}.</td>
+                        </tr>
+                        <tr style="vertical-align:top;">
+                            <td style="font-weight:bold; padding:4px 0; border-top:8px solid transparent;">PERTAMA</td>
+                            <td style="text-align:center; padding:4px 0; border-top:8px solid transparent;">:</td>
+                            <td style="padding:4px 0; text-align:justify; border-top:8px solid transparent;">
+                                Menyatakan bahwa Terlapor di bawah ini:
+                                <table style="margin:6px 0 6px 12px; font-size:13px; width:100%;">
+                                    <tr><td style="width:120px;">Nama Terlapor</td><td>: <strong>${escapeHTML(ad.namaDilaporkan || '-')}</strong></td></tr>
+                                    <tr><td>Jabatan</td><td>: ${escapeHTML(ad.jabatan || '-')}</td></tr>
+                                    <tr><td>Unit Kerja</td><td>: ${escapeHTML(ad.unitKerja || '-')}</td></tr>
+                                </table>
+                                Dinyatakan terbukti secara sah dan meyakinkan melakukan pemenuhan unsur kategori perkara pelanggaran <strong>${escapeHTML(p.kategori || 'Etik/Hukum')} (${escapeHTML(p.subKategori || '-')})</strong> dengan tingkat urgensi penanganan <strong>${escapeHTML(p.urgensi || '-')}</strong> berdasarkan aduan dari pihak Pelapor (Sdr/i ${escapeHTML(ad.nama)}).
+                            </td>
+                        </tr>
+                        <tr style="vertical-align:top;">
+                            <td style="font-weight:bold; padding:4px 0; border-top:12px solid transparent;">KEDUA</td>
+                            <td style="text-align:center; padding:4px 0; border-top:12px solid transparent;">:</td>
+                            <td style="padding:4px 0; text-align:justify; border-top:12px solid transparent; background:#fafafa; border:1px dashed #94a3b8; padding:10px; font-style:italic;">
+                                <strong>Hasil Ketetapan Eksekusi / Tindak Lanjut:</strong><br>
+                                "${escapeHTML(tanggapanAkhirLive)}"
+                            </td>
+                        </tr>
+                        <tr style="vertical-align:top;">
+                            <td style="font-weight:bold; padding:4px 0; border-top:12px solid transparent;">KETIGA</td>
+                            <td style="text-align:center; padding:4px 0; border-top:12px solid transparent;">:</td>
+                            <td style="padding:4px 0; text-align:justify; border-top:12px solid transparent;">
+                                Keputusan penetapan ini bersifat mutlak mengikat, diterbitkan secara resmi melalui otorisasi kelembagaan, serta mulai berlaku terhitung sejak tanggal ditetapkan.
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top:40px; float:right; width:260px; text-align:left;">
+                        <p style="margin:0;">Ditetapkan di : Samarinda,</p>
+                        <p style="margin:2px 0 15px 0;">Pada Tanggal : <strong>${tglSelesaiLive}</strong></p>
+                        <p style="font-weight:bold; margin-bottom:55px; text-transform:propper;">Direktur,</p>
+                        <p style="font-weight:bold; text-decoration:underline; margin:0;">${escapeHTML(p.otorisasiOleh || currentUser.nama)}</p>
+                        <p style="font-size:12px; color:#555; margin:0;">NIP.196705301998032003</p>
+                    </div>
+                    <div style="clear:both;"></div>
+
+                </div>
+            </div>
+            <div class="modal-footer" style="background:#f8fafc; border-top:1px solid #e2e8f0;">
+                <button class="btn btn-secondary" onclick="document.getElementById('modalPreviewSurat').classList.remove('active')">Tutup Preview</button>
+                <button class="btn btn-success" onclick="window.print()"><i class="fas fa-print"></i> Cetak / Simpan ke PDF</button>
+            </div>
+        </div>
+    `;
+
+    modalPre.classList.add('active');
+}
+</script>
+<script>
+    // 1. Deklarasikan kredensial Supabase
+    const supabaseUrl = 'https://eigywrzqdxalvmrsvrtr.supabase.co';
+    const supabaseAnonKey = 'AeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpZ3l3cnpxZHhhbHZtcnN2cnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzM0MTgsImV4cCI6MjA5NDUwOTQxOH0.qUPewnm4e3_FdktRlAQnhnUgZozUPepbSc0mFg_-CQ0';
+
+    // 2. Inisialisasi Supabase Client
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+    // 3. Fungsi untuk Mengetes Koneksi (Opsional tapi disarankan)
+    async function testSupabaseConnection() {
+        try {
+            // Kita coba mengecek status user/auth sebagai tes koneksi ringan
+            const { data, error } = await supabase.auth.getSession();
+            
+            if (error) {
+                console.error("Gagal terhubung ke Supabase:", error.message);
+                alert("Gagal terhubung ke Supabase. Cek console untuk detailnya.");
+            } else {
+                console.log("✅ Berhasil terhubung ke Supabase!");
+                console.log("Status Sesi:", data);
+                // alert("Supabase berhasil terhubung!"); // Hapus komentar ini jika ingin ada popup sukses
+            }
+        } catch (err) {
+            console.error("Terjadi kesalahan:", err);
+        }
+    }
+
+   document.addEventListener('DOMContentLoaded', () => {
+        testSupabaseConnection();
+    });
+</script>
+
+<script>
+// Supabase Sync Toggle
+function isSupabaseSyncEnabled(){
+    try {
+        const s = JSON.parse(localStorage.getItem('sigap_settings')||'{}');
+        return s.syncSupabase === true;
+    } catch { return false; }
+}
+function toggleSupabaseSync(enabled){
+    const s = getSettings();
+    s.syncSupabase = enabled;
+    setSettings(s);
+    showToast(enabled ? 'success' : 'info', enabled ? 'Sinkronisasi Supabase diaktifkan' : 'Sinkronisasi Supabase dinonaktifkan');
+    const cb = document.getElementById('toggleSupabaseSync');
+    if (cb) cb.checked = enabled;
+}
+// Init toggle state saat halaman control panel dibuka
+function initSupabaseToggle(){
+    const cb = document.getElementById('toggleSupabaseSync');
+    if (cb) cb.checked = isSupabaseSyncEnabled();
+}
+// Panggil saat navigasi ke control panel
+const _origNavigateTo = window.navigateTo;
+window.navigateTo = function(page, el){
+    if (typeof _origNavigateTo === 'function') _origNavigateTo(page, el);
+    if (page === 'controlPanel') setTimeout(initSupabaseToggle, 100);
+};
+
+// Blokir inspeksi
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+    const k = e.key.toUpperCase();
+    if (k === 'F12' || (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(k)) || (e.ctrlKey && k === 'U')) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+});
+// Deteksi devtools terbuka (sederhana)
+setInterval(()=>{
+    const threshold = 160;
+    if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold){
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0f172a;color:#fff"><div style="text-align:center"><h1 style="font-size:48px;margin:0">⛔</h1><p>Akses inspeksi tidak diizinkan</p></div></div>';
+    }
+}, 1000);
 </script>
 
 </body>
