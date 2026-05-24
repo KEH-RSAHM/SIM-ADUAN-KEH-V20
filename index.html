@@ -195,7 +195,7 @@
                             <input type="file" id="importPenanganan" accept=".xlsx" style="display:none" onchange="processImport(event,'penanganan')">
                         </div>
                     </div>
-                    <div class="card-body" style="padding-bottom:8px"><div class="filter-bar"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Cari..." oninput="filterTable('penangananTableBody',this.value)"></div><select class="form-control form-control-sm" style="width:auto;min-width:130px" onchange="filterByStatus('penangananTableBody',this.value)" id="filterStatusPenanganan"><option value="">Semua Status</option></select></div></div>
+                    <div class="card-body" style="padding-bottom:8px"><div class="filter-bar"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Cari..." oninput="filterTable('penangananTableBody',this.value)"></div><select class="form-control form-control-sm" style="width:auto;min-width:130px" onchange="renderPenangananTable()" id="filterStatusPenanganan"><option value="">Semua Status</option></select><select class="form-control form-control-sm" style="width:auto;min-width:150px" onchange="renderPenangananTable()" id="filterPicPenanganan"><option value="">Semua PIC</option></select></div></div>
                     <div class="card-body p-0"><div class="table-wrapper" style="max-height:65vh"><table class="data-table"><thead><tr><th style="min-width:40px">No</th><th style="min-width:80px">ID Aduan</th><th class="sticky-col" style="min-width:120px">Pelapor</th><th style="min-width:110px">Diverifikasi</th><th style="min-width:80px">Kategori</th><th style="min-width:150px">Sub Kategori</th><th style="min-width:80px">Urgensi</th><th style="min-width:90px">Status</th><th style="min-width:110px">PIC</th><th style="min-width:110px">Eskalasi</th><th style="min-width:80px">Estimasi</th><th style="min-width:100px">Tgl Mulai</th><th style="min-width:240px">Tanggapan (Proses & Akhir)</th><th style="min-width:100px">Tgl Selesai</th><th style="min-width:180px">No. SK</th><th style="min-width:240px">Hal Keputusan</th><th style="min-width:80px">Dokumentasi</th><th style="min-width:100px">Upload SK</th><th class="sticky-col-right" style="min-width:140px">Aksi</th></tr></thead><tbody id="penangananTableBody"></tbody></table></div></div>
                     <div class="table-footer"><div class="table-info" id="penangananInfo">0 data</div></div>
                 </div>
@@ -378,6 +378,11 @@
                                     <input type="text" class="form-control" id="settSkNip" placeholder="Contoh: 198503122010011002">
                                 </div>
                             </div>
+                        </div>
+                        <div class="form-group" style="margin-top:12px;">
+                            <label>Upload Kop Surat (Image/PDF)</label>
+                            <input type="file" class="form-control" id="settSkKopSuratFile" accept="image/*,.pdf">
+                            <div id="settSkKopSuratPreview" style="margin-top:8px;font-size:12px;color:var(--gray);"></div>
                         </div>
 
                         <div style="display: flex; gap: 10px;">
@@ -693,19 +698,25 @@ function initApp(){
 
 function applySettings(){const s=getSettings();['landingAppName','footerAppName','sidebarAppName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=escapeHTML(s.appName)||'SIGAP';});['landingInstName','footerInstName','sidebarInstName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=escapeHTML(s.instName)||'';});document.title=(escapeHTML(s.appName)||'SIGAP')+' - '+(escapeHTML(s.instName)||'Sistem');}
 function saveSettings(){
-    setSettings({
-        appName: document.getElementById('settAppName').value,
-        instName: document.getElementById('settInstName').value,
-        instLogo: document.getElementById('settInstLogo').value,
-        appLogo: document.getElementById('settAppLogo').value,
-        toastURL: document.getElementById('settToastURL').value,
-        skNama: document.getElementById('settSkNama').value,
-        skJabatan: document.getElementById('settSkJabatan').value,
-        skNip: document.getElementById('settSkNip').value
+    const fileInput = document.getElementById('settSkKopSuratFile');
+    const file = fileInput && fileInput.files[0];
+    const readFile = file ? new Promise((resolve)=>{const r=new FileReader();r.onload=e=>resolve(e.target.result);r.readAsDataURL(file);}) : Promise.resolve(getSettings().skKopSurat||'');
+    readFile.then(kopData=>{
+        setSettings({
+            appName: document.getElementById('settAppName').value,
+            instName: document.getElementById('settInstName').value,
+            instLogo: document.getElementById('settInstLogo').value,
+            appLogo: document.getElementById('settAppLogo').value,
+            toastURL: document.getElementById('settToastURL').value,
+            skNama: document.getElementById('settSkNama').value,
+            skJabatan: document.getElementById('settSkJabatan').value,
+            skNip: document.getElementById('settSkNip').value,
+            skKopSurat: kopData
+        });
+        applySettings();
+        showToast('success','Pengaturan disimpan');
+        addLog('success','Pengaturan diperbarui');
     });
-    applySettings();
-    showToast('success','Pengaturan disimpan');
-    addLog('success','Pengaturan diperbarui');
 }
 function loadSettingsForm(){
     const s=getSettings();
@@ -717,6 +728,15 @@ function loadSettingsForm(){
     document.getElementById('settSkNama').value=s.skNama||'';
     document.getElementById('settSkJabatan').value=s.skJabatan||'';
     document.getElementById('settSkNip').value=s.skNip||'';
+    const prev=document.getElementById('settSkKopSuratPreview');
+    if(prev){
+        if(s.skKopSurat){
+            const isPdf = s.skKopSurat.startsWith('data:application/pdf');
+            prev.innerHTML = isPdf ? '<i class="fas fa-file-pdf"></i> Kop Surat PDF tersimpan' : '<img src="'+s.skKopSurat+'" style="max-height:60px;border:1px solid #ddd;border-radius:4px;">';
+        } else {
+            prev.innerHTML = '<span style="color:#94a3b8;">Belum ada file</span>';
+        }
+    }
 }
 function showToast(type,msg){const c=document.getElementById('toastContainer');const icons={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-triangle',info:'fa-info-circle'};const t=document.createElement('div');t.className=`toast toast-${type}`;t.innerHTML=`<i class="fas ${icons[type]}"></i><span class="toast-msg">${escapeHTML(msg)}</span>`;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},3000);}
 
@@ -949,7 +969,20 @@ function renderPenangananTable(){
         }
     }
 
-    const statusColors={'Terkirim':'badge-secondary','Verifikasi':'badge-info','di Eskalasi':'badge-primary','di Proses':'badge-warning','Penetapan':'badge-purple','Selesai':'badge-success','Ditunda':'badge-secondary','Dibatalkan':'badge-danger'};
+    
+    // Populate PIC filter dropdown
+    const picSel = document.getElementById('filterPicPenanganan');
+    if(picSel && picSel.options.length<=1){
+        const picData = getDB('masterPIC').filter(d=>d.status==='Aktif');
+        picData.forEach(d=>{const opt=document.createElement('option');opt.value=d.nama;opt.textContent=d.nama;picSel.appendChild(opt);});
+    }
+    // Apply UI filters
+    const statusFilter = document.getElementById('filterStatusPenanganan')?.value;
+    const picFilter = document.getElementById('filterPicPenanganan')?.value;
+    if(statusFilter){ data = data.filter(p=>p.status===statusFilter); }
+    if(picFilter){ data = data.filter(p=>p.pic===picFilter); }
+    // For status di Eskalasi, enforce PIC filter if selected
+const statusColors={'Terkirim':'badge-secondary','Verifikasi':'badge-info','di Eskalasi':'badge-primary','di Proses':'badge-warning','Penetapan':'badge-purple','Selesai':'badge-success','Ditunda':'badge-secondary','Dibatalkan':'badge-danger'};
     let h='';
     
     data.forEach((p,i)=>{
@@ -1338,7 +1371,7 @@ function previewSuratPenetapan(penId) {
     modalPre.innerHTML = `
         <div class="modal modal-lg" style="background:#fff; border-radius:8px; box-shadow: var(--shadow-xl); overflow:hidden; max-width:850px; margin:20px auto;">
             <div class="modal-header" style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
-                <h3 style="color:var(--dark); font-size:14px;"><i class="fas fa-eye"></i> Preview Layout Lembar Surat Penetapan</h3>
+                <h3 style="color:var(--dark); font-size:14px;"><i class="fas fa-eye"></i> Salinan Lembar Surat Penetapan</h3>
                 <button class="modal-close" onclick="document.getElementById('modalPreviewSurat').classList.remove('active')"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="background:#cbd5e1; padding:30px; max-height:75vh; overflow-y:auto; text-align:center;">
@@ -1422,7 +1455,7 @@ function previewSuratPenetapan(penId) {
                     <div style="margin-top:40px; float:right; width:280px; text-align:left;">
                         <p style="margin:0;">Ditetapkan di : Kantor Pusat / Wilayah</p>
                         <p style="margin:2px 0 15px 0;">Pada Tanggal : <strong>${tglSelesaiLive}</strong></p>
-                        <p style="font-weight:bold; margin-bottom:55px; text-transform:uppercase;">${escapeHTML(s.skJabatan || 'KOMITE ETIK & DISIPLIN ANGGOTA')},</p>
+                        <p style="font-weight:bold; margin-bottom:55px; text-transform:uppercase;">${escapeHTML(s.skJabatan || 'KOMITE ETIK & HUKUM RSJD AHM')},</p>
                         <p style="font-weight:bold; text-decoration:underline; margin:0;">${escapeHTML(s.skNama || p.otorisasiOleh || currentUser.nama)}</p>
                         <p style="font-size:12px; color:#444; margin:0;">${s.skNip ? 'NIP. ' + escapeHTML(s.skNip) : 'Otorisator Penandatangan Dokumen'}</p>
                     </div>
