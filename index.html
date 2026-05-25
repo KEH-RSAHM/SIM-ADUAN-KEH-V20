@@ -585,6 +585,8 @@ let SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 })();
 
 let supabase = null;
+function createParticles(){} // stub to prevent ReferenceError
+
 try {
     if (typeof window.supabase !== 'undefined' && SUPABASE_URL.startsWith('http')) {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -603,10 +605,7 @@ async function fetchFromSupabase() {
             if (error) { console.warn('Fetch error', tabel, error.message); continue; }
             if (data && data.length > 0) localStorage.setItem(DB_KEYS[tabel], JSON.stringify(data));
         }
-        const { data: roleData, error: roleErr } = await supabase.from('settings').select('value').eq('id','role_perms').maybeSingle();
-        if(!roleErr && roleData && roleData.value){
-            try{ localStorage.setItem(DB_KEYS.roles, roleData.value); }catch(e){}
-        }
+        // settings fetch disabled
     } catch (error) { console.error(error); }
 }
 
@@ -1264,15 +1263,21 @@ function togglePerm(r,m,v){
     const perms=JSON.parse(localStorage.getItem(DB_KEYS.roles))||{}
 
 function resetPermissionsToDefault(){
-  if(!confirm('Yakin reset semua hak akses ke default? Perubahan custom akan hilang.')) return;
-  const defaults = {"Admin":{"dashboard":true,"aduan":true,"verifikasi":true,"penanganan":true,"otorisasi":true,"cetakLaporan":true,"notifikasi":true,"logActivity":true,"masterPIC":true,"masterEskalasi":true,"masterEtik":true,"masterHukum":true,"masterStatusPenanganan":true,"users":true,"roles":false,"settings":true,"exportImport":true,"settings-landing":false},"Operator":{"dashboard":true,"aduan":true,"verifikasi":true,"penanganan":true,"otorisasi":false,"cetakLaporan":false,"notifikasi":true,"logActivity":false,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"Komite Etik":{"dashboard":true,"aduan":false,"verifikasi":true,"penanganan":true,"otorisasi":false,"cetakLaporan":true,"notifikasi":true,"logActivity":true,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"Komite Profesi":{"dashboard":true,"aduan":false,"verifikasi":false,"penanganan":true,"otorisasi":false,"cetakLaporan":true,"notifikasi":true,"logActivity":true,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"PIC":{"dashboard":true,"aduan":false,"verifikasi":false,"penanganan":true,"otorisasi":false,"cetakLaporan":false,"notifikasi":true,"logActivity":false,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"Otorisator":{"dashboard":true,"aduan":false,"verifikasi":false,"penanganan":true,"otorisasi":true,"cetakLaporan":true,"notifikasi":true,"logActivity":true,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"Pelapor":{"dashboard":false,"aduan":true,"verifikasi":false,"penanganan":false,"otorisasi":false,"cetakLaporan":false,"notifikasi":true,"logActivity":false,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false}};
-  localStorage.setItem(DB_KEYS.roles, JSON.stringify(defaults));
-  if(isSupabaseSyncEnabled() && supabase){
-    const payload = {id:'role_perms', key:'role_permissions', value: JSON.stringify(defaults), updated_at: new Date().toISOString()};
-    supabase.from('settings').upsert(payload);
+  try{
+    if(!confirm('Yakin reset semua hak akses ke default? Perubahan custom akan hilang.')) return;
+    const defaults = {"Admin":{"dashboard":true,"aduan":true,"verifikasi":true,"penanganan":true,"otorisasi":true,"cetakLaporan":true,"notifikasi":true,"logActivity":true,"masterPIC":true,"masterEskalasi":true,"masterEtik":true,"masterHukum":true,"masterStatusPenanganan":true,"users":true,"roles":false,"settings":true,"exportImport":true,"settings-landing":false},"Operator":{"dashboard":true,"aduan":true,"verifikasi":true,"penanganan":true,"otorisasi":false,"cetakLaporan":false,"notifikasi":true,"logActivity":false,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"Komite Etik":{"dashboard":true,"aduan":false,"verifikasi":true,"penanganan":true,"otorisasi":false,"cetakLaporan":true,"notifikasi":true,"logActivity":true,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"Komite Profesi":{"dashboard":true,"aduan":false,"verifikasi":false,"penanganan":true,"otorisasi":false,"cetakLaporan":true,"notifikasi":true,"logActivity":true,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"PIC":{"dashboard":true,"aduan":false,"verifikasi":false,"penanganan":true,"otorisasi":false,"cetakLaporan":false,"notifikasi":true,"logActivity":false,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"Otorisator":{"dashboard":true,"aduan":false,"verifikasi":false,"penanganan":true,"otorisasi":true,"cetakLaporan":true,"notifikasi":true,"logActivity":true,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false},"Pelapor":{"dashboard":false,"aduan":true,"verifikasi":false,"penanganan":false,"otorisasi":false,"cetakLaporan":false,"notifikasi":true,"logActivity":false,"masterPIC":false,"masterEskalasi":false,"masterEtik":false,"masterHukum":false,"masterStatusPenanganan":false,"users":false,"roles":false,"settings":false,"exportImport":false,"settings-landing":false}};
+    localStorage.setItem(DB_KEYS.roles, JSON.stringify(defaults));
+    if(isSupabaseSyncEnabled() && supabase){
+      const payload = {id:'role_perms', key:'role_permissions', value: JSON.stringify(defaults), updated_at: new Date().toISOString()};
+      // settings sync disabled
+    }
+    renderRolesPage();
+    showToast('success','Hak akses direset ke default');
+    console.log('Permissions reset to default');
+  }catch(e){
+    console.error('Reset error', e);
+    alert('Gagal reset: '+e.message);
   }
-  renderRolesPage();
-  showToast('success','Hak akses direset ke default');
 }
 ;
     if(!perms[r]) perms[r]={}; perms[r][m]=v; localStorage.setItem(DB_KEYS.roles,JSON.stringify(perms));
