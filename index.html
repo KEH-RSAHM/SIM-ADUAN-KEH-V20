@@ -195,7 +195,7 @@
                             <input type="file" id="importPenanganan" accept=".xlsx" style="display:none" onchange="processImport(event,'penanganan')">
                         </div>
                     </div>
-                    <div class="card-body" style="padding-bottom:8px"><div class="filter-bar"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Cari..." oninput="filterTable('penangananTableBody',this.value)"></div><select class="form-control form-control-sm" style="width:auto;min-width:130px" onchange="renderPenangananTable()" id="filterStatusPenanganan"><option value="">Semua Status</option></select><select class="form-control form-control-sm" style="width:auto;min-width:150px" onchange="renderPenangananTable()" id="filterPicPenanganan"><option value="">Semua PIC</option></select></div></div>
+                    <div class="card-body" style="padding-bottom:8px"><div class="filter-bar"><div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="Cari..." oninput="filterTable('penangananTableBody',this.value)"></div><select class="form-control form-control-sm" style="width:auto;min-width:130px" onchange="filterByStatus('penangananTableBody',this.value)" id="filterStatusPenanganan"><option value="">Semua Status</option></select><select class="form-control form-control-sm" style="width:auto;min-width:150px" onchange="renderPenangananTable()" id="filterPicPenanganan"><option value="">Semua PIC</option></select></div></div>
                     <div class="card-body p-0"><div class="table-wrapper" style="max-height:65vh"><table class="data-table"><thead><tr><th style="min-width:40px">No</th><th style="min-width:80px">ID Aduan</th><th class="sticky-col" style="min-width:120px">Pelapor</th><th style="min-width:110px">Diverifikasi</th><th style="min-width:80px">Kategori</th><th style="min-width:150px">Sub Kategori</th><th style="min-width:80px">Urgensi</th><th style="min-width:90px">Status</th><th style="min-width:110px">PIC</th><th style="min-width:110px">Eskalasi</th><th style="min-width:80px">Estimasi</th><th style="min-width:100px">Tgl Mulai</th><th style="min-width:240px">Tanggapan (Proses & Akhir)</th><th style="min-width:100px">Tgl Selesai</th><th style="min-width:180px">No. SK</th><th style="min-width:240px">Hal Keputusan</th><th style="min-width:80px">Dokumentasi</th><th style="min-width:100px">Upload SK</th><th class="sticky-col-right" style="min-width:140px">Aksi</th></tr></thead><tbody id="penangananTableBody"></tbody></table></div></div>
                     <div class="table-footer"><div class="table-info" id="penangananInfo">0 data</div></div>
                 </div>
@@ -572,8 +572,17 @@ function escapeHTML(str) {
 // ==============================================================
 // MASUKKAN URL & KEY SUPABASE DI SINI (JANGAN LUPA TANDA KUTIP)
 // ==============================================================
-const SUPABASE_URL = 'PASTE_URL_SUPABASE_ANDA_DISINI'; 
-const SUPABASE_ANON_KEY = 'PASTE_KEY_SUPABASE_ANDA_DISINI'; 
+let SUPABASE_URL = 'https://eigywrzqdxalvmrsvrtr.supabase.co'; 
+let SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpZ3l3cnpxZHhhbHZtcnN2cnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzM0MTgsImV4cCI6MjA5NDUwOTQxOH0.qUPewnm4e3_FdktRlAQnhnUgZozUPepbSc0mFg_-CQ0'; 
+
+// Load Supabase config from localStorage if exists
+(function(){
+  try{
+    const cfg = JSON.parse(localStorage.getItem('sigap_supabase_config')||'{}');
+    if(cfg.url) SUPABASE_URL = cfg.url;
+    if(cfg.key) SUPABASE_ANON_KEY = cfg.key;
+  }catch(e){}
+})();
 
 let supabase = null;
 try {
@@ -1371,7 +1380,7 @@ function previewSuratPenetapan(penId) {
     modalPre.innerHTML = `
         <div class="modal modal-lg" style="background:#fff; border-radius:8px; box-shadow: var(--shadow-xl); overflow:hidden; max-width:850px; margin:20px auto;">
             <div class="modal-header" style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
-                <h3 style="color:var(--dark); font-size:14px;"><i class="fas fa-eye"></i> Salinan Lembar Surat Penetapan</h3>
+                <h3 style="color:var(--dark); font-size:14px;"><i class="fas fa-eye"></i> Preview Layout Lembar Surat Penetapan</h3>
                 <button class="modal-close" onclick="document.getElementById('modalPreviewSurat').classList.remove('active')"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" style="background:#cbd5e1; padding:30px; max-height:75vh; overflow-y:auto; text-align:center;">
@@ -1455,7 +1464,7 @@ function previewSuratPenetapan(penId) {
                     <div style="margin-top:40px; float:right; width:280px; text-align:left;">
                         <p style="margin:0;">Ditetapkan di : Kantor Pusat / Wilayah</p>
                         <p style="margin:2px 0 15px 0;">Pada Tanggal : <strong>${tglSelesaiLive}</strong></p>
-                        <p style="font-weight:bold; margin-bottom:55px; text-transform:uppercase;">${escapeHTML(s.skJabatan || 'KOMITE ETIK & HUKUM RSJD AHM')},</p>
+                        <p style="font-weight:bold; margin-bottom:55px; text-transform:uppercase;">${escapeHTML(s.skJabatan || 'KOMITE ETIK & DISIPLIN ANGGOTA')},</p>
                         <p style="font-weight:bold; text-decoration:underline; margin:0;">${escapeHTML(s.skNama || p.otorisasiOleh || currentUser.nama)}</p>
                         <p style="font-size:12px; color:#444; margin:0;">${s.skNip ? 'NIP. ' + escapeHTML(s.skNip) : 'Otorisator Penandatangan Dokumen'}</p>
                     </div>
@@ -1535,7 +1544,91 @@ document.addEventListener('keydown', e => {
         e.stopPropagation();
     }
 });
+
+// === Supabase Config Functions ===
+function getSupabaseConfig(){
+  try{ return JSON.parse(localStorage.getItem('sigap_supabase_config')||'{}'); }catch{ return {}; }
+}
+function openSupabaseModal(){
+  const cfg = getSupabaseConfig();
+  document.getElementById('supabaseUrl').value = cfg.url || SUPABASE_URL || '';
+  document.getElementById('supabaseKey').value = cfg.key || SUPABASE_ANON_KEY || '';
+  const st = document.getElementById('supabaseStatus');
+  st.textContent = 'Belum diuji';
+  st.style.background = '#f8fafc';
+  document.getElementById('modalSupabase').classList.add('active');
+}
+function saveSupabaseConfig(){
+  const url = document.getElementById('supabaseUrl').value.trim();
+  const key = document.getElementById('supabaseKey').value.trim();
+  if(!url || !key){ showToast('error','URL dan Key wajib diisi'); return; }
+  localStorage.setItem('sigap_supabase_config', JSON.stringify({url,key}));
+  SUPABASE_URL = url;
+  SUPABASE_ANON_KEY = key;
+  try{
+    if(typeof window.supabase !== 'undefined'){
+      supabase = window.supabase.createClient(url,key);
+      showToast('success','Konfigurasi disimpan dan client diinisialisasi');
+      closeModal('modalSupabase');
+      // optional reload to fetch
+      fetchFromSupabase();
+    }
+  }catch(e){
+    showToast('error','Gagal inisialisasi: '+e.message);
+  }
+}
+async function testSupabaseConnection(){
+  const url = document.getElementById('supabaseUrl').value.trim();
+  const key = document.getElementById('supabaseKey').value.trim();
+  const st = document.getElementById('supabaseStatus');
+  st.textContent = 'Menguji koneksi...';
+  st.style.background = '#fef3c7';
+  try{
+    const client = window.supabase.createClient(url,key);
+    const {data,error} = await client.from('aduan').select('id').limit(1);
+    if(error) throw error;
+    st.textContent = 'Koneksi berhasil! Tabel aduan dapat diakses.';
+    st.style.background = '#dcfce7';
+    showToast('success','Koneksi Supabase berhasil');
+  }catch(e){
+    st.textContent = 'Gagal: '+(e.message||e);
+    st.style.background = '#fee2e2';
+    showToast('error','Koneksi gagal: '+(e.message||e));
+  }
+}
 </script>
+
+
+<!-- Modal Supabase Config -->
+<div class="modal-overlay" id="modalSupabase">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-cog"></i> Konfigurasi Supabase</h3>
+            <button class="modal-close" onclick="closeModal('modalSupabase')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <form id="formSupabase">
+                <div class="form-group">
+                    <label>Supabase URL <span class="required">*</span></label>
+                    <input type="url" class="form-control" id="supabaseUrl" placeholder="https://xxx.supabase.co" required>
+                </div>
+                <div class="form-group">
+                    <label>Supabase Anon Key <span class="required">*</span></label>
+                    <textarea class="form-control" id="supabaseKey" rows="4" placeholder="eyJhbGci..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Status Koneksi</label>
+                    <div id="supabaseStatus" style="padding:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:12px">Belum diuji</div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('modalSupabase')">Batal</button>
+            <button type="button" class="btn btn-info" onclick="testSupabaseConnection()"><i class="fas fa-plug"></i> Test Koneksi</button>
+            <button type="button" class="btn btn-success" onclick="saveSupabaseConfig()"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
