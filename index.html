@@ -595,13 +595,17 @@ const DB_KEYS={aduan:'sigap_aduan',penanganan:'sigap_penanganan',masterEtik:'sig
 const EXCLUDE_FROM_EXPORT=['users','superadmins'];
 
 async function fetchFromSupabase() {
-    if (!supabase || !SUPABASE_URL.startsWith('http')) return;
+    if (!supabase || !SUPABASE_URL.startsWith('http') || !isSupabaseSyncEnabled()) return;
     try {
-        const tabelUtama = ['aduan', 'penanganan', 'users', 'superadmins'];
+        const tabelUtama = ['aduan', 'penanganan', 'users', 'superadmins', 'master_pic', 'master_eskalasi', 'master_etik', 'master_hukum', 'master_status'];
         for (let tabel of tabelUtama) {
             const { data, error } = await supabase.from(tabel).select('*');
-            if (error) throw error;
+            if (error) { console.warn('Fetch error', tabel, error.message); continue; }
             if (data && data.length > 0) localStorage.setItem(DB_KEYS[tabel], JSON.stringify(data));
+        }
+        const { data: roleData, error: roleErr } = await supabase.from('settings').select('value').eq('id','role_perms').maybeSingle();
+        if(!roleErr && roleData && roleData.value){
+            try{ localStorage.setItem(DB_KEYS.roles, roleData.value); }catch(e){}
         }
     } catch (error) { console.error(error); }
 }
@@ -609,11 +613,22 @@ async function fetchFromSupabase() {
 function getDB(k){try{return JSON.parse(localStorage.getItem(DB_KEYS[k]))||[];}catch{return[];}}
 function setDB(k, d) {
     localStorage.setItem(DB_KEYS[k], JSON.stringify(d));
-    if (supabase && SUPABASE_URL.startsWith('http')) {
+    if (supabase && SUPABASE_URL.startsWith('http') && isSupabaseSyncEnabled()) {
         const tableName = k === 'superadmins' ? 'superadmins' : k;
-        if (['aduan', 'penanganan', 'users', 'superadmins'].includes(tableName)) {
-            if(Array.isArray(d) && d.length === 0) return; 
-            supabase.from(tableName).upsert(d).then().catch(e => {});
+        const syncTables = ['aduan','penanganan','users','superadmins','master_pic','master_eskalasi','master_etik','master_hukum','master_status'];
+        if (syncTables.includes(tableName)) {
+            if(Array.isArray(d) && d.length === 0) return;
+            supabase.from(tableName).upsert(d).then(({error}) => {
+                if(error){
+                    console.error('Supabase upsert error', tableName, error);
+                    showToast('error','Sync gagal '+tableName+': '+error.message);
+                } else {
+                    console.log('Synced to Supabase:', tableName, Array.isArray(d)?d.length:1);
+                }
+            }).catch(err => {
+                console.error('Supabase upsert exception', err);
+                showToast('error','Sync exception '+tableName);
+            });
         }
     }
 }
