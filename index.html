@@ -3,755 +3,976 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SIM Aduan RSJD AHMA - Sistem Informasi Manajemen Aduan</title>
+<title>SIM Aduan Etik & Hukum - RSJD AHMA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
     darkMode: 'class',
     theme: {
       extend: {
-        fontFamily: { sans: ['Inter','ui-sans-serif','system-ui'] },
-        boxShadow: { soft: '0 10px 40px -10px rgba(0,0,0,0.15)' }
+        fontFamily: { sans: ['Inter', 'system-ui'] },
+        boxShadow: {
+          soft: '0 10px 30px -10px rgba(2,6,23,.12)',
+          glow: '0 0 0 1px rgba(99,102,241,.2), 0 8px 30px rgba(99,102,241,.15)'
+        },
+        borderRadius: { '2xl': '1.25rem' }
       }
     }
   }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  *{font-family:'Inter',system-ui}
-  .scrollbar-thin::-webkit-scrollbar{width:6px;height:6px}
-  .scrollbar-thin::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
-  .dark .scrollbar-thin::-webkit-scrollbar-thumb{background:#334155}
-  .animate-in{animation: in .25s ease}
-  @keyframes in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  :root { color-scheme: light dark; }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+  .scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: rgba(100,116,139,.4); border-radius: 9999px; }
+  .backdrop-blur-safari { -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+  @keyframes in { from { opacity:0; transform: translateY(4px) scale(.98);} to { opacity:1; transform:none; } }
+  .animate-in { animation: in .25s ease-out; }
 </style>
 </head>
-<body class="bg-[#f6f8fb] dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased">
+<body class="bg-[#f6f8fb] dark:bg-[#050a14] text-slate-800 dark:text-slate-200 antialiased min-h-screen">
 <div id="app" class="min-h-screen"></div>
 
-<!-- Toast Container -->
-<div id="toast-container" class="fixed top-4 right-4 z-[100] space-y-2"></div>
-
-<!-- Change Password Modal -->
-<div id="password-modal" class="fixed inset-0 z-[90] hidden">
-  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" data-close="password-modal"></div>
-  <div class="relative z-10 flex min-h-full items-center justify-center p-4">
-    <div class="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 shadow-soft border border-slate-200 dark:border-slate-800 animate-in">
-      <div class="px-6 pt-6 pb-2 flex items-center justify-between">
-        <div>
-          <h3 class="text-lg font-semibold">Ubah Password</h3>
-          <p class="text-sm text-slate-500 dark:text-slate-400">Gunakan password yang kuat dan mudah diingat</p>
+<!-- Config Modal -->
+<div id="configModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"></div>
+  <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-soft border border-slate-200 dark:border-slate-800 p-6 animate-in">
+      <div class="flex items-start gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-indigo-600 text-white grid place-items-center shadow-glow">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         </div>
-        <button data-close="password-modal" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      <form id="password-form" class="px-6 pb-6 pt-2 space-y-4">
+        <div class="flex-1">
+          <h2 class="text-xl font-bold">Konfigurasi Supabase</h2>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Masukkan URL dan Anon Key proyek Supabase Anda. Disimpan lokal di browser.</p>
+        </div>
+      <form id="configForm" class="mt-5 space-y-4">
         <div>
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Password Lama</label>
-          <div class="relative mt-1.5">
-            <input type="password" id="old-password" class="w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 pr-11 text-sm outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500" placeholder="••••••••" required />
-            <button type="button" data-toggle="old-password" class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">👁</button>
-          </div>
-          <p class="mt-1 text-xs text-slate-500">Untuk UX, tidak diverifikasi server untuk provider email.</p>
+          <label class="text-sm font-medium">SUPABASE_URL</label>
+          <input id="cfgUrl" type="url" required placeholder="https://xxxx.supabase.co" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Password Baru</label>
-          <div class="relative mt-1.5">
-            <input type="password" id="new-password" minlength="6" class="w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 pr-11 text-sm outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500" placeholder="Minimal 6 karakter" required />
-            <button type="button" data-toggle="new-password" class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">👁</button>
-          </div>
+          <label class="text-sm font-medium">SUPABASE_ANON_KEY</label>
+          <textarea id="cfgKey" required rows="3" placeholder="eyJhbGciOiJIUzI1NiIs..." class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500 font-mono text-xs"></textarea>
         </div>
-        <div>
-          <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Konfirmasi Password Baru</label>
-          <div class="relative mt-1.5">
-            <input type="password" id="confirm-password" minlength="6" class="w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 pr-11 text-sm outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500" placeholder="Ulangi password baru" required />
-            <button type="button" data-toggle="confirm-password" class="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">👁</button>
-          </div>
-          <p id="password-error" class="mt-1.5 text-xs text-rose-600 hidden"></p>
+        <div class="flex items-center justify-between pt-2">
+          <button type="button" id="cfgCancel" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-medium">Batal</button>
+          <button class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-glow">Simpan & Sambungkan</button>
         </div>
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <button type="button" data-close="password-modal" class="px-4 py-2.5 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700">Batal</button>
-          <button id="password-submit" type="submit" class="px-4 py-2.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-            <span>Simpan Password</span>
-          </button>
-        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-500">Kunci disimpan di localStorage <code>sb_url</code> & <code>sb_key</code>. Buka kembali via Pengaturan.</p>
       </form>
     </div>
   </div>
 </div>
 
-<script>
-(() => {
-  // ---------- State ----------
-  const initialCMS = JSON.parse(localStorage.getItem('rsjd_cms') || 'null') || {
-    heroTitle: 'SIM Aduan RSJD Dr. Amino Gondohutomo',
-    heroSubtitle: 'Layanan pengaduan terintegrasi untuk meningkatkan mutu pelayanan Rumah Sakit Jiwa Daerah.',
-    heroBadge: 'Cepat • Transparan • Akuntabel',
-    stats: [
-      { label: 'Aduan Diproses', value: '1,248' },
-      { label: 'Waktu Respons', value: '< 24 Jam' },
-      { label: 'Kepuasan', value: '96%' },
-    ]
-  };
+<!-- Generic Modal -->
+<div id="genericModal" class="fixed inset-0 z-[90] hidden">
+  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" data-close></div>
+  <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+    <div id="genericModalContent" class="w-full max-w-3xl bg-white dark:bg-slate-900 rounded-2xl shadow-soft border border-slate-200 dark:border-slate-800 max-h-[85vh] overflow-hidden flex flex-col animate-in"></div>
+  </div>
+</div>
 
-  const usersSeed = [
-    { id: 'u1', name: 'Super Admin', email: 'superadmin@rsjd.go.id', role: 'superadmin', password: 'admin123', avatar: 'SA' },
-    { id: 'u2', name: 'Admin Verifikator', email: 'admin@rsjd.go.id', role: 'admin', password: 'admin123', avatar: 'AV' },
-    { id: 'u3', name: 'Petugas Penanganan', email: 'petugas@rsjd.go.id', role: 'petugas', password: 'admin123', avatar: 'PP' },
-    { id: 'u4', name: 'Pimpinan', email: 'pimpinan@rsjd.go.id', role: 'pimpinan', password: 'admin123', avatar: 'PI' },
+<!-- Toast Container -->
+<div id="toastContainer" class="fixed top-4 right-4 z-[200] space-y-2 w-[320px]"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+
+const state = {
+  supabase: null,
+  user: null,
+  profile: null,
+  theme: localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+  cfg: { url: localStorage.getItem('sb_url') || '', key: localStorage.getItem('sb_key') || '' },
+  currentPage: 'dashboard',
+  sidebarOpen: false,
+  authTab: 'login',
+  kategori: [],
+  subKategori: [],
+  aduanList: [],
+  stats: { total:0, terkirim:0, proses:0, selesai:0 },
+  landing: { hero: null, fitur: [] },
+  loading: false,
+};
+
+function setTheme(t){ state.theme=t; localStorage.setItem('theme',t); document.documentElement.classList.toggle('dark', t==='dark'); }
+setTheme(state.theme);
+
+function toast(msg, type='info'){
+  const colors = {
+    info: 'bg-slate-900 text-white dark:bg-slate-800',
+    success: 'bg-emerald-600 text-white',
+    error: 'bg-rose-600 text-white',
+    warning: 'bg-amber-500 text-white'
+  };
+  const el = document.createElement('div');
+  el.className = `animate-in px-4 py-3 rounded-2xl shadow-soft text-sm font-medium ${colors[type]} flex items-start gap-2`;
+  el.innerHTML = `<span class="mt-0.5">•</span><span class="flex-1">${msg}</span><button class="opacity-70 hover:opacity-100" data-close>✕</button>`;
+  $('#toastContainer').appendChild(el);
+  el.querySelector('[data-close]').onclick = () => el.remove();
+  setTimeout(()=> el.remove(), 5000);
+}
+
+function showConfig(show=true){
+  $('#configModal').classList.toggle('hidden', !show);
+  if(show){
+    $('#cfgUrl').value = state.cfg.url;
+    $('#cfgKey').value = state.cfg.key;
+  }
+}
+
+function initSupabase(){
+  if(!state.cfg.url || !state.cfg.key){
+    showConfig(true);
+    return false;
+  }
+  try{
+    state.supabase = createClient(state.cfg.url, state.cfg.key, { auth:{ persistSession:true, autoRefreshToken:true } });
+    state.supabase.auth.onAuthStateChange(async (ev, session)=>{
+      state.user = session?.user ?? null;
+      if(state.user){
+        await fetchProfile();
+      }else{
+        state.profile = null;
+      }
+      render();
+    });
+    // initial session
+    state.supabase.auth.getSession().then(async ({data})=>{
+      state.user = data.session?.user ?? null;
+      if(state.user) await fetchProfile();
+      render();
+    });
+    fetchLanding();
+    return true;
+  }catch(e){
+    console.error(e);
+    toast('Gagal inisialisasi Supabase: '+e.message,'error');
+    showConfig(true);
+    return false;
+  }
+}
+
+async function fetchProfile(){
+  if(!state.supabase || !state.user) return;
+  const { data, error } = await state.supabase.from('users').select('*').eq('email', state.user.email).limit(1).maybeSingle();
+  if(error){ console.warn(error); }
+  state.profile = data || { email: state.user.email, role: 'pelapor', nama_lengkap: state.user.user_metadata?.nama_lengkap || '' };
+}
+
+async function fetchLanding(){
+  if(!state.supabase) return;
+  try{
+    const { data: hero } = await state.supabase.from('konten_landing').select('*').eq('tipe','hero').limit(1).maybeSingle();
+    const { data: fitur } = await state.supabase.from('konten_landing').select('*').eq('tipe','fitur').order('urutan',{ascending:true});
+    state.landing.hero = hero || { judul:'SIM Aduan Etik & Hukum RSJD AHMA', subjudul:'Sistem terpadu untuk pelaporan, verifikasi, penanganan, dan otorisasi aduan etik & hukum secara transparan dan akuntabel.' };
+    state.landing.fitur = fitur?.length ? fitur : [
+      { judul:'Pelaporan Mudah', isi:'Form aduan lengkap dengan unggah bukti digital.' },
+      { judul:'Verifikasi Cepat', isi:'Alur verifikasi terstruktur oleh verifikator.' },
+      { judul:'Penanganan Transparan', isi:'Tracking tahapan penanganan real-time.' },
+      { judul:'Otorisasi Aman', isi:'Persetujuan bertingkat oleh otorisator.' },
+    ];
+    render();
+  }catch(e){ /* ignore */ }
+}
+
+async function fetchKategori(){
+  if(!state.supabase) return;
+  const { data } = await state.supabase.from('kategori_aduan').select('*').order('nama');
+  state.kategori = data || [];
+  const { data: sub } = await state.supabase.from('sub_kategori').select('*').order('nama');
+  state.subKategori = sub || [];
+}
+
+async function fetchStats(){
+  if(!state.supabase) return;
+  const { data, error } = await state.supabase.from('aduan').select('status');
+  if(error) return;
+  const total = data.length;
+  const terkirim = data.filter(d=>d.status?.toLowerCase()==='terkirim').length;
+  const proses = data.filter(d=>['diverifikasi','proses','menunggu otorisasi'].includes(d.status?.toLowerCase())).length;
+  const selesai = data.filter(d=>d.status?.toLowerCase()==='selesai').length;
+  state.stats = { total, terkirim, proses, selesai };
+}
+
+async function fetchDaftarAduan(){
+  if(!state.supabase) return;
+  const { data, error } = await state.supabase.from('pengaduan').select('*').order('created_at',{ascending:false}).limit(200);
+  if(error){ toast('Gagal memuat aduan','error'); return; }
+  state.aduanList = data || [];
+}
+
+function roleCan(role, page){
+  const all = ['dashboard','buat_aduan','daftar_aduan','verifikasi','penanganan','otorisasi','pengaturan'];
+  const map = {
+    superadmin: all,
+    admin_sistem: all,
+    pelapor: ['dashboard','buat_aduan','daftar_aduan','pengaturan'],
+    operator: ['dashboard','daftar_aduan','verifikasi','pengaturan'],
+    verifikator: ['dashboard','daftar_aduan','verifikasi','pengaturan'],
+    komite_etik: ['dashboard','daftar_aduan','penanganan','pengaturan'],
+    investigator: ['dashboard','daftar_aduan','penanganan','pengaturan'],
+    pic: ['dashboard','daftar_aduan','penanganan','pengaturan'],
+    otorisator: ['dashboard','daftar_aduan','otorisasi','pengaturan'],
+    pimpinan: ['dashboard','daftar_aduan','pengaturan'],
+    auditor: ['dashboard','daftar_aduan','pengaturan'],
+  };
+  const allowed = map[role] || map.pelapor;
+  return allowed.includes(page);
+}
+
+function menuItems(){
+  const role = state.profile?.role || 'pelapor';
+  const items = [
+    { key:'dashboard', label:'Dashboard', icon:'📊' },
+    { key:'buat_aduan', label:'Buat Aduan', icon:'📝' },
+    { key:'daftar_aduan', label:'Daftar Aduan', icon:'📋' },
+    { key:'verifikasi', label:'Verifikasi', icon:'✅' },
+    { key:'penanganan', label:'Penanganan', icon:'🔧' },
+    { key:'otorisasi', label:'Otorisasi', icon:'🔐' },
+    { key:'pengaturan', label:'Pengaturan', icon:'⚙️' },
   ];
+  return items.filter(it=>roleCan(role,it.key));
+}
 
-  const state = {
-    view: 'landing',
-    user: JSON.parse(localStorage.getItem('rsjd_session') || 'null'),
-    theme: localStorage.getItem('rsjd_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
-    activeModule: 'dashboard',
-    cms: initialCMS,
-    users: JSON.parse(localStorage.getItem('rsjd_users') || 'null') || usersSeed,
-    aduan: JSON.parse(localStorage.getItem('rsjd_aduan') || 'null') || [
-      { id: 'ADU-2024-001', judul: 'AC ruang tunggu tidak dingin', kategori: 'Fasilitas', status: 'verifikasi', prioritas: 'Tinggi', tanggal: '2024-12-01', pelapor: 'Budi S.' },
-      { id: 'ADU-2024-002', judul: 'Pelayanan pendaftaran lambat', kategori: 'Pelayanan', status: 'penanganan', prioritas: 'Sedang', tanggal: '2024-12-02', pelapor: 'Siti A.' },
-      { id: 'ADU-2024-003', judul: 'Toilet lantai 2 kotor', kategori: 'Kebersihan', status: 'selesai', prioritas: 'Rendah', tanggal: '2024-11-30', pelapor: 'Anonim' },
-      { id: 'ADU-2024-004', judul: 'Parkir penuh', kategori: 'Fasilitas', status: 'otorisasi', prioritas: 'Sedang', tanggal: '2024-12-03', pelapor: 'Joko P.' },
-    ],
-    kategori: ['Fasilitas','Pelayanan','Kebersihan','Keamanan','Lainnya'],
-    isPasswordLoading: false,
-  };
+function fmtDate(s){
+  if(!s) return '-';
+  try{ return new Date(s).toLocaleString('id-ID',{ dateStyle:'medium', timeStyle:'short' }); }catch{ return s; }
+}
 
-  // ---------- Supabase Mock ----------
-  const supabase = window.supabase.createClient('https://example.supabase.co', 'public-anon-key');
+function statusBadge(s){
+  const st = (s||'').toLowerCase();
+  const map = {
+    terkirim:'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300',
+    diverifikasi:'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+    proses:'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+    'menunggu otorisasi':'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+    selesai:'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+    ditolak:'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',
+  };
+  return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold ${map[st]||'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200'}">${s||'-'}</span>`;
+}
 
-  supabase.auth.getUser = async () => ({ data: { user: state.user }, error: null });
-  supabase.auth.getSession = async () => ({ data: { session: state.user ? { user: state.user } : null } });
-  supabase.auth.signInWithPassword = async ({ email, password }) => {
-    await new Promise(r=>setTimeout(r,600));
-    const found = state.users.find(u => u.email.toLowerCase()===email.toLowerCase() && u.password===password);
-    if (!found) return { data: null, error: { message: 'Email atau password salah' } };
-    state.user = { ...found };
-    delete state.user.password;
-    localStorage.setItem('rsjd_session', JSON.stringify(state.user));
-    return { data: { user: state.user }, error: null };
+function priorityBadge(p){
+  const map = {
+    tinggi:'bg-rose-600 text-white',
+    sedang:'bg-amber-500 text-white',
+    rendah:'bg-slate-500 text-white'
   };
-  supabase.auth.signOut = async () => {
-    state.user = null;
-    localStorage.removeItem('rsjd_session');
-    return { error: null };
-  };
-  supabase.auth.updateUser = async ({ password }) => {
-    await new Promise(r=>setTimeout(r,900));
-    if (!state.user) return { data: null, error: { message: 'Tidak terautentikasi' } };
-    const idx = state.users.findIndex(u => u.id===state.user.id);
-    if (idx>=0) {
-      state.users[idx].password = password;
-      localStorage.setItem('rsjd_users', JSON.stringify(state.users));
-    }
-    return { data: { user: state.user }, error: null };
-  };
+  return `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide ${map[(p||'').toLowerCase()]||'bg-slate-500 text-white'}">${p||'-'}</span>`;
+}
 
-  // ---------- Helpers ----------
-  const $ = sel => document.querySelector(sel);
-  const $$ = sel => [...document.querySelectorAll(sel)];
-  const toast = (msg, type='success') => {
-    const wrap = $('#toast-container');
-    const el = document.createElement('div');
-    el.className = `animate-in min-w-[300px] max-w-md rounded-2xl border shadow-soft px-4 py-3 flex items-start gap-3 ${type==='success' ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-rose-600 border-rose-500 text-white'}`;
-    el.innerHTML = `<div class="mt-0.5">${type==='success' ? '✓' : '!'}</div><div class="flex-1 text-sm font-medium">${msg}</div><button class="opacity-70 hover:opacity-100" onclick="this.parentElement.remove()">✕</button>`;
-    wrap.appendChild(el);
-    setTimeout(()=> el.remove(), 4000);
-  };
-  const save = () => {
-    localStorage.setItem('rsjd_aduan', JSON.stringify(state.aduan));
-    localStorage.setItem('rsjd_cms', JSON.stringify(state.cms));
-  };
-  const formatRole = r => ({ superadmin:'Super Admin', admin:'Admin', petugas:'Petugas', pimpinan:'Pimpinan' }[r]||r);
-  const statusBadge = s => {
-    const map = {
-      verifikasi:'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-      penanganan:'bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300',
-      otorisasi:'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
-      selesai:'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-    };
-    return `<span class="px-2.5 py-1 rounded-full text-xs font-medium ${map[s]||'bg-slate-200'}">${s.toUpperCase()}</span>`;
-  };
-
-  // ---------- Theme ----------
-  const applyTheme = () => {
-    document.documentElement.classList.toggle('dark', state.theme==='dark');
-    localStorage.setItem('rsjd_theme', state.theme);
-  };
-  applyTheme();
-
-  // ---------- Render ----------
-  function render() {
-    const app = $('#app');
-    if (!state.user) {
-      if (state.view==='login') return app.innerHTML = renderLogin();
-      return app.innerHTML = renderLanding();
-    }
-    app.innerHTML = renderApp();
-    bindAppEvents();
+// ---------- RENDER ----------
+function render(){
+  const root = $('#app');
+  if(!state.supabase){
+    root.innerHTML = renderShell(renderConfigNeeded());
+    return;
   }
+  if(!state.user){
+    root.innerHTML = renderShell(renderLanding());
+    bindLanding();
+    return;
+  }
+  // logged in
+  root.innerHTML = renderShell(renderAppLayout());
+  bindApp();
+  // load data per page
+  if(state.currentPage==='dashboard'){ fetchStats().then(renderStats); }
+  if(state.currentPage==='daftar_aduan'){ fetchDaftarAduan().then(renderDaftar); }
+  if(state.currentPage==='buat_aduan'){ fetchKategori().then(renderBuatForm); }
+  if(['verifikasi','penanganan','otorisasi'].includes(state.currentPage)){ fetchDaftarAduan().then(renderWorklist); }
+}
 
-  function renderLanding() {
-    const s = state.cms;
-    return `
-    <header class="sticky top-0 z-40 border-b border-slate-200/70 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="size-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 grid place-items-center text-white font-black">AH</div>
-          <div class="leading-tight">
-            <div class="font-bold">RSJD AHMA</div>
-            <div class="text-[11px] uppercase tracking-wide text-slate-500">SIM Aduan</div>
-          </div>
-        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-300">
-          <a href="#fitur" class="hover:text-emerald-600">Fitur</a>
-          <a href="#alur" class="hover:text-emerald-600">Alur</a>
-          <a href="#kontak" class="hover:text-emerald-600">Kontak</a>
-        </nav>
-        <div class="flex items-center gap-2">
-          <button data-action="toggle-theme" class="size-9 grid place-items-center rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">🌓</button>
-          <button data-action="go-login" class="hidden sm:inline-flex px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold hover:opacity-90">Masuk</button>
+function renderShell(inner){
+  return `
+  <div class="min-h-screen">
+    ${inner}
+  </div>`;
+}
+
+function renderConfigNeeded(){
+  return `
+  <div class="min-h-screen grid place-items-center p-6">
+    <div class="max-w-md w-full bg-white dark:bg-slate-900 rounded-2xl shadow-soft border border-slate-200 dark:border-slate-800 p-8 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white grid place-items-center mx-auto shadow-glow">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>
+      </div>
+      <h1 class="mt-4 text-2xl font-extrabold">Konfigurasi Diperlukan</h1>
+      <p class="mt-2 text-slate-600 dark:text-slate-400 text-sm">Hubungkan aplikasi ke Supabase Anda untuk melanjutkan.</p>
+      <button id="openCfg" class="mt-6 w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Buka Konfigurasi</button>
+    </div>
+  </div>`;
+}
+
+function renderLanding(){
+  const hero = state.landing.hero || {};
+  const fitur = state.landing.fitur;
+  return `
+  <header class="sticky top-0 z-40 backdrop-blur-safari bg-white/70 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 text-white grid place-items-center font-black">AH</div>
+        <div>
+          <div class="font-bold leading-tight">SIM Aduan Etik & Hukum</div>
+          <div class="text-xs text-slate-500 -mt-0.5">RSJD AHMA</div>
         </div>
       </div>
-    </header>
-
-    <main>
-      <section class="relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-b from-emerald-50 to-transparent dark:from-emerald-950/20"></div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28 grid lg:grid-cols-2 gap-12 items-center relative">
-          <div>
-            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-600/10 text-emerald-700 dark:text-emerald-300 border border-emerald-600/20">${s.heroBadge}</span>
-            <h1 class="mt-4 text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.1]">${s.heroTitle}</h1>
-            <p class="mt-4 text-lg text-slate-600 dark:text-slate-300">${s.heroSubtitle}</p>
-            <div class="mt-8 flex flex-wrap gap-3">
-              <button data-action="go-login" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-sm">Masuk Sistem</button>
-              <button onclick="document.getElementById('fitur').scrollIntoView({behavior:'smooth'})" class="px-5 py-3 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800">Pelajari Lebih Lanjut</button>
-            </div>
-            <div class="mt-10 grid grid-cols-3 gap-6">
-              ${s.stats.map(st=>`
-                <div>
-                  <div class="text-2xl font-bold">${st.value}</div>
-                  <div class="text-sm text-slate-500">${st.label}</div>
-                </div>`).join('')}
-            </div>
-          <div class="relative">
-            <div class="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft p-3">
-              <div class="rounded-[1.5rem] bg-gradient-to-br from-slate-900 to-slate-800 p-6 text-white">
-                <div class="flex items-center justify-between">
-                  <div class="font-semibold">Dashboard Aduan</div>
-                  <span class="text-xs px-2 py-0.5 rounded-full bg-white/10">Live</span>
-                </div>
-                <div class="mt-6 grid grid-cols-2 gap-3">
-                  ${['Verifikasi','Penanganan','Otorisasi','Selesai'].map((l,i)=>`
-                    <div class="rounded-2xl bg-white/5 border border-white/10 p-4">
-                      <div class="text-2xl font-bold">${[12,8,5,124][i]}</div>
-                      <div class="text-xs opacity-80">${l}</div>
-                    </div>`).join('')}
-                </div>
-                <div class="mt-6 h-24 rounded-xl bg-white/5 border border-white/10 p-3 flex items-end gap-1">
-                  ${Array.from({length:18}).map((_,i)=>`<div class="flex-1 rounded-t bg-emerald-400/80" style="height:${20+Math.sin(i)*40+Math.random()*30}%"></div>`).join('')}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="fitur" class="py-20 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 class="text-3xl font-bold text-center">Modul Terintegrasi</h2>
-          <p class="text-center text-slate-600 dark:text-slate-400 mt-2 max-w-2xl mx-auto">Lengkap dari pelaporan hingga pelaporan manajemen dengan kontrol role berbasis Supabase Auth.</p>
-          <div class="mt-12 grid md:grid-cols-3 gap-6">
-            ${[
-              {t:'Aduan Masyarakat',d:'Form aduan publik & internal dengan tracking ID',i:'📨'},
-              {t:'Verifikasi',d:'Validasi kelengkapan dan klasifikasi aduan',i:'🔍'},
-              {t:'Penanganan',d:'Assign petugas, SLA, & update progres',i:'🛠️'},
-              {t:'Otorisasi Pimpinan',d:'Approval eskalasi & tindakan strategis',i:'✅'},
-              {t:'Pelaporan',d:'Dashboard analitik & export data',i:'📊'},
-              {t:'Parameter & CMS',d:'Master data, konten landing, tema',i:'⚙️'},
-            ].map(c=>`
-              <div class="rounded-2xl border border-slate-200 dark:border-slate-800 p-6 bg-[#fbfdff] dark:bg-slate-950">
-                <div class="text-2xl">${c.i}</div>
-                <div class="mt-3 font-semibold">${c.t}</div>
-                <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">${c.d}</div>
-              </div>`).join('')}
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer id="kontak" class="border-t border-slate-200 dark:border-slate-800 py-10 text-center text-sm text-slate-500">
-      © 2024 RSJD Dr. Amino Gondohutomo • SIM Aduan v1.0
-    </footer>
-    `;
-  }
-
-  function renderLogin() {
-    return `
-    <div class="min-h-screen grid place-items-center px-4 py-12 bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-slate-950 dark:via-slate-950 dark:to-emerald-950/20">
-      <div class="w-full max-w-[420px]">
-        <button data-action="go-landing" class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-emerald-600">← Kembali ke Beranda</button>
-        <div class="rounded-[1.5rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft p-8">
-          <div class="flex items-center gap-3">
-            <div class="size-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 grid place-items-center text-white font-black text-lg">AH</div>
-            <div>
-              <div class="font-bold text-lg leading-tight">Masuk SIM Aduan</div>
-              <div class="text-xs text-slate-500">RSJD Dr. Amino Gondohutomo</div>
-            </div>
-          </div>
-          <form id="login-form" class="mt-7 space-y-4">
-            <div>
-              <label class="text-sm font-medium">Email</label>
-              <input type="email" name="email" required value="admin@rsjd.go.id" class="mt-1.5 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none" />
-            </div>
-            <div>
-              <label class="text-sm font-medium">Password</label>
-              <input type="password" name="password" required value="admin123" class="mt-1.5 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3.5 py-2.5 text-sm focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none" />
-            </div>
-            <button class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold mt-2">Masuk</button>
-            <p class="text-xs text-slate-500 text-center">Demo: admin@rsjd.go.id / petugas@rsjd.go.id / pimpinan@rsjd.go.id / superadmin@rsjd.go.id • pass: admin123</p>
-          </form>
-        </div>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" class="w-9 h-9 grid place-items-center rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800" title="Tema">${state.theme==='dark'?'☀️':'🌙'}</button>
+        <button id="btnLogin" class="px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold">Masuk</button>
       </div>
     </div>
-    `;
-  }
-
-  function renderApp() {
-    const modules = [
-      { key:'dashboard', label:'Dashboard', icon:'🏠', roles:['superadmin','admin','petugas','pimpinan'] },
-      { key:'aduan', label:'Aduan', icon:'📨', roles:['superadmin','admin','petugas','pimpinan'] },
-      { key:'verifikasi', label:'Verifikasi', icon:'🔍', roles:['superadmin','admin'] },
-      { key:'penanganan', label:'Penanganan', icon:'🛠️', roles:['superadmin','admin','petugas'] },
-      { key:'otorisasi', label:'Otorisasi', icon:'✅', roles:['superadmin','pimpinan'] },
-      { key:'pelaporan', label:'Pelaporan', icon:'📊', roles:['superadmin','admin','pimpinan'] },
-      { key:'parameter', label:'Parameter', icon:'🗂️', roles:['superadmin'] },
-      { key:'cms', label:'CMS Landing', icon:'🎨', roles:['superadmin'] },
-      { key:'pengaturan', label:'Pengaturan Akun', icon:'⚙️', roles:['superadmin','admin','petugas','pimpinan'] },
-      { key:'superadmin', label:'Super Admin', icon:'👑', roles:['superadmin'] },
-    ].filter(m=>m.roles.includes(state.user.role));
-
-    return `
-    <div class="min-h-screen flex">
-      <!-- Sidebar -->
-      <aside id="sidebar" class="fixed lg:sticky top-0 z-40 h-screen w-[280px] shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex flex-col transition-transform lg:translate-x-0 -translate-x-full">
-        <div class="h-16 flex items-center gap-3 px-5 border-b border-slate-200 dark:border-slate-800">
-          <div class="size-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 grid place-items-center text-white font-black">AH</div>
-          <div>
-            <div class="font-bold leading-tight">SIM Aduan</div>
-            <div class="text-[11px] uppercase tracking-wide text-slate-500">RSJD AHMA</div>
+  </header>
+  <main>
+    <section class="relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 opacity-10 dark:opacity-20"></div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 text-xs font-semibold">Sistem Resmi RSJD AHMA</span>
+          <h1 class="mt-4 text-4xl lg:text-5xl font-extrabold tracking-tight">${hero.judul||'SIM Aduan Etik & Hukum RSJD AHMA'}</h1>
+          <p class="mt-4 text-lg text-slate-600 dark:text-slate-300">${hero.subjudul||''}</p>
+          <div class="mt-8 flex gap-3">
+            <button id="heroLogin" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-glow">Masuk Sekarang</button>
+            <button id="heroDaftar" class="px-6 py-3 rounded-2xl border border-slate-300 dark:border-slate-700 font-bold hover:bg-slate-50 dark:hover:bg-slate-800">Daftar Pelapor</button>
           </div>
-        </div>
-        <nav class="flex-1 overflow-y-auto p-3 scrollbar-thin space-y-1">
-          ${modules.map(m=>`
-            <button data-module="${m.key}" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${state.activeModule===m.key ? 'bg-emerald-600 text-white shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-900 text-slate-700 dark:text-slate-300'}">
-              <span class="text-lg">${m.icon}</span><span>${m.label}</span>
-            </button>`).join('')}
-        </nav>
-        <div class="p-3 border-t border-slate-200 dark:border-slate-800">
-          <div class="flex items-center gap-3 px-2 py-2">
-            <div class="size-9 rounded-full bg-slate-900 dark:bg-slate-800 text-white grid place-items-center font-bold text-sm">${state.user.avatar}</div>
-            <div class="min-w-0">
-              <div class="text-sm font-semibold truncate">${state.user.name}</div>
-              <div class="text-xs text-slate-500">${formatRole(state.user.role)}</div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Main -->
-      <div class="flex-1 min-w-0 flex flex-col">
-        <!-- Header -->
-        <header class="sticky top-0 z-30 h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl flex items-center justify-between px-4 lg:px-6">
-          <div class="flex items-center gap-2">
-            <button data-action="toggle-sidebar" class="lg:hidden size-9 grid place-items-center rounded-xl border border-slate-200 dark:border-slate-800">☰</button>
-            <div>
-              <h1 class="font-semibold leading-tight">${modules.find(m=>m.key===state.activeModule)?.label || ''}</h1>
-              <p class="text-xs text-slate-500 hidden sm:block">Selamat datang kembali, ${state.user.name.split(' ')[0]}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button data-action="toggle-theme" title="Ganti Tema" class="size-9 grid place-items-center rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">🌓</button>
-            <div class="relative">
-              <button id="profile-btn" class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800">
-                <div class="size-8 rounded-full bg-emerald-600 text-white grid place-items-center font-bold text-sm">${state.user.avatar}</div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-              </button>
-              <div id="profile-menu" class="hidden absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft p-1.5 z-50">
-                <div class="px-3 py-2">
-                  <div class="text-sm font-semibold">${state.user.name}</div>
-                  <div class="text-xs text-slate-500">${state.user.email}</div>
-                </div>
-                <div class="h-px bg-slate-200 dark:bg-slate-800 my-1"></div>
-                <button data-action="open-settings" class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-slate-100 dark:hover:bg-slate-800">Pengaturan Akun</button>
-                <button data-action="open-password" class="w-full text-left px-3 py-2 rounded-xl text-sm hover:bg-slate-100 dark:hover:bg-slate-800">Ubah Password</button>
-                <div class="h-px bg-slate-200 dark:bg-slate-800 my-1"></div>
-                <button data-action="logout" class="w-full text-left px-3 py-2 rounded-xl text-sm text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40">Keluar</button>
+        <div class="relative">
+          <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-soft border border-slate-200 dark:border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="font-bold">Autentikasi</div>
+              <div class="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 text-sm">
+                <button data-tab="login" class="px-3 py-1.5 rounded-lg ${state.authTab==='login'?'bg-white dark:bg-slate-700 shadow':''} font-semibold">Masuk</button>
+                <button data-tab="daftar" class="px-3 py-1.5 rounded-lg ${state.authTab==='daftar'?'bg-white dark:bg-slate-700 shadow':''} font-semibold">Daftar</button>
               </div>
             </div>
+            <div id="authFormWrap"></div>
           </div>
-        </header>
-
-        <!-- Content -->
-        <main class="flex-1 p-4 lg:p-6 bg-[#f6f8fb] dark:bg-slate-950">
-          <div class="max-w-7xl mx-auto">
-            ${renderModule()}
-          </div>
-        </main>
+        </div>
       </div>
-    </div>
-    `;
-  }
-
-  function renderModule() {
-    const m = state.activeModule;
-    if (m==='dashboard') return renderDashboard();
-    if (m==='aduan') return renderAduan();
-    if (m==='verifikasi') return renderVerifikasi();
-    if (m==='penanganan') return renderPenanganan();
-    if (m==='otorisasi') return renderOtorisasi();
-    if (m==='pelaporan') return renderPelaporan();
-    if (m==='parameter') return renderParameter();
-    if (m==='cms') return renderCMS();
-    if (m==='pengaturan') return renderPengaturan();
-    if (m==='superadmin') return renderSuperadmin();
-    return '<div>Modul tidak ditemukan</div>';
-  }
-
-  function card(title, child) {
-    return `<div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-      <div class="px-5 py-4 border-b border-slate-200 dark:border-slate-800 font-semibold">${title}</div>
-      <div class="p-5">${child}</div>
-    </div>`;
-  }
-
-  function renderDashboard() {
-    const total = state.aduan.length;
-    const selesai = state.aduan.filter(a=>a.status==='selesai').length;
-    return `
-    <div class="grid lg:grid-cols-3 gap-6">
-      ${[
-        {l:'Total Aduan',v:total,i:'📨'},
-        {l:'Selesai',v:selesai,i:'✅'},
-        {l:'Dalam Proses',v:total-selesai,i:'⏳'},
-      ].map(c=>`
-        <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 flex items-center gap-4">
-          <div class="size-12 rounded-2xl bg-emerald-600/10 text-emerald-700 dark:text-emerald-300 grid place-items-center text-2xl">${c.i}</div>
-          <div><div class="text-2xl font-bold">${c.v}</div><div class="text-sm text-slate-500">${c.l}</div></div>
-        </div>`).join('')}
-      <div class="lg:col-span-3">
-        ${card('Aduan Terbaru', `
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="text-left text-slate-500"><tr class="border-b border-slate-200 dark:border-slate-800"><th class="py-2 font-medium">ID</th><th class="font-medium">Judul</th><th class="font-medium">Kategori</th><th class="font-medium">Status</th></tr></thead>
-              <tbody>
-                ${state.aduan.slice(0,5).map(a=>`
-                  <tr class="border-b border-slate-100 dark:border-slate-800/70">
-                    <td class="py-3 font-mono text-xs">${a.id}</td>
-                    <td class="py-3 font-medium">${a.judul}</td>
-                    <td class="py-3 text-slate-600 dark:text-slate-400">${a.kategori}</td>
-                    <td class="py-3">${statusBadge(a.status)}</td>
-                  </tr>`).join('')}
-              </tbody>
-            </table>
-          </div>
-        `)}
-      </div>
-    </div>`;
-  }
-
-  function renderAduan() {
-    return card('Daftar Aduan <button data-action="add-aduan" class="float-right -mt-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold">+ Aduan Baru</button>', `
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead><tr class="text-left text-slate-500 border-b border-slate-200 dark:border-slate-800"><th class="py-2 font-medium">ID</th><th>Judul</th><th>Pelapor</th><th>Prioritas</th><th>Status</th></tr></thead>
-          <tbody>
-            ${state.aduan.map(a=>`
-              <tr class="border-b border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                <td class="py-3 font-mono text-xs">${a.id}</td>
-                <td class="py-3"><div class="font-medium">${a.judul}</div><div class="text-xs text-slate-500">${a.kategori} • ${a.tanggal}</div></td>
-                <td class="py-3">${a.pelapor}</td>
-                <td class="py-3">${a.prioritas}</td>
-                <td class="py-3">${statusBadge(a.status)}</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    `);
-  }
-
-  function renderVerifikasi() {
-    const list = state.aduan.filter(a=>a.status==='verifikasi');
-    return card('Verifikasi Aduan', list.length? `
-      <div class="space-y-3">
-        ${list.map(a=>`
-          <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between">
-            <div><div class="font-semibold">${a.judul}</div><div class="text-xs text-slate-500">${a.id} • ${a.kategori}</div></div>
-            <div class="flex gap-2">
-              <button data-action="verify" data-id="${a.id}" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold">Verifikasi</button>
-              <button class="px-3 py-1.5 rounded-lg border text-xs">Tolak</button>
+    </section>
+    <section class="py-16 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-extrabold text-center">Fitur Unggulan</h2>
+        <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          ${fitur.map(f=>`
+            <div class="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-gradient-to-b from-white to-slate-50 dark:from-slate-900 dark:to-slate-950">
+              <div class="w-10 h-10 rounded-xl bg-indigo-600/10 text-indigo-600 grid place-items-center font-bold">✓</div>
+              <h3 class="mt-3 font-bold">${f.judul}</h3>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">${f.isi||''}</p>
             </div>
-          </div>`).join('')}
-      </div>` : `<div class="text-sm text-slate-500">Tidak ada aduan menunggu verifikasi.</div>`);
-  }
-
-  function renderPenanganan() {
-    const list = state.aduan.filter(a=>['penanganan','verifikasi'].includes(a.status));
-    return card('Penanganan Aduan', `
-      <div class="grid md:grid-cols-2 gap-4">
-        ${list.map(a=>`
-          <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-4">
-            <div class="flex items-start justify-between">
-              <div><div class="font-semibold">${a.judul}</div><div class="text-xs text-slate-500">${a.id}</div></div>
-              ${statusBadge(a.status)}
-            </div>
-            <div class="mt-3 flex gap-2">
-              <button data-action="process" data-id="${a.id}" class="px-3 py-1.5 rounded-lg bg-sky-600 text-white text-xs font-semibold">Proses</button>
-              <button class="px-3 py-1.5 rounded-lg border text-xs">Detail</button>
-            </div>
-          </div>`).join('')}
-      </div>
-    `);
-  }
-
-  function renderOtorisasi() {
-    const list = state.aduan.filter(a=>a.status==='otorisasi');
-    return card('Otorisasi Pimpinan', `
-      ${list.length? list.map(a=>`
-        <div class="rounded-xl border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between">
-          <div><div class="font-semibold">${a.judul}</div><div class="text-xs text-slate-500">${a.id}</div></div>
-          <button data-action="authorize" data-id="${a.id}" class="px-3 py-1.5 rounded-lg bg-violet-600 text-white text-xs font-semibold">Setujui</button>
-        </div>`).join('') : `<div class="text-sm text-slate-500">Belum ada aduan untuk otorisasi.</div>`}
-    `);
-  }
-
-  function renderPelaporan() {
-    const byStatus = ['verifikasi','penanganan','otorisasi','selesai'].map(s=>({s, c: state.aduan.filter(a=>a.status===s).length}));
-    const max = Math.max(...byStatus.map(b=>b.c),1);
-    return `
-    <div class="grid lg:grid-cols-3 gap-6">
-      ${card('Distribusi Status', `
-        <div class="space-y-3">
-          ${byStatus.map(b=>`
-            <div>
-              <div class="flex justify-between text-sm mb-1"><span class="capitalize">${b.s}</span><span class="font-semibold">${b.c}</span></div>
-              <div class="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden"><div class="h-full bg-emerald-600" style="width:${(b.c/max)*100}%"></div></div>
-            </div>`).join('')}
-        </div>
-      `)}
-      ${card('Kinerja SLA', `<div class="text-5xl font-black text-emerald-600">96%</div><div class="text-sm text-slate-500 mt-1">Aduan selesai tepat waktu</div>`)}
-      ${card('Export', `<button class="w-full py-2.5 rounded-xl border font-medium hover:bg-slate-50 dark:hover:bg-slate-800">Export CSV</button><button class="w-full mt-2 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold">Export PDF</button>`)}
-    </div>`;
-  }
-
-  function renderParameter() {
-    return `
-    <div class="grid lg:grid-cols-2 gap-6">
-      ${card('Kategori Aduan', `
-        <div class="space-y-2" id="kategori-list">
-          ${state.kategori.map(k=>`<div class="flex items-center justify-between px-3 py-2 rounded-xl border">${k}<button class="text-xs text-rose-600">Hapus</button></div>`).join('')}
-        </div>
-        <div class="mt-3 flex gap-2">
-          <input id="new-kategori" placeholder="Kategori baru" class="flex-1 rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 px-3 py-2 text-sm" />
-          <button data-action="add-kategori" class="px-3 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold">Tambah</button>
-        </div>
-      `)}
-      ${card('Prioritas', `
-        <div class="space-y-2">
-          ${['Rendah','Sedang','Tinggi','Kritis'].map(p=>`<div class="px-3 py-2 rounded-xl border">${p}</div>`).join('')}
-        </div>
-      `)}
-    </div>`;
-  }
-
-  function renderCMS() {
-    const s = state.cms;
-    return card('CMS Landing Page', `
-      <div class="grid lg:grid-cols-2 gap-6">
-        <div class="space-y-4">
-          <div><label class="text-sm font-medium">Judul Hero</label><input id="cms-title" value="${s.heroTitle}" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm bg-white dark:bg-slate-950"/></div>
-          <div><label class="text-sm font-medium">Subjudul</label><textarea id="cms-sub" rows="3" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm bg-white dark:bg-slate-950">${s.heroSubtitle}</textarea></div>
-          <div><label class="text-sm font-medium">Badge</label><input id="cms-badge" value="${s.heroBadge}" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm bg-white dark:bg-slate-950"/></div>
-          <button data-action="save-cms" class="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-sm">Simpan Perubahan</button>
-        </div>
-        <div class="rounded-2xl border p-5 bg-slate-50 dark:bg-slate-950">
-          <div class="text-xs uppercase tracking-wide text-slate-500 mb-2">Preview</div>
-          <div class="text-2xl font-bold">${s.heroTitle}</div>
-          <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">${s.heroSubtitle}</div>
+          `).join('')}
         </div>
       </div>
-    `);
-  }
+    </section>
+    <footer class="py-8 text-center text-sm text-slate-500">© ${new Date().getFullYear()} RSJD AHMA. All rights reserved.</footer>
+  </main>`;
+}
 
-  function renderPengaturan() {
+function renderAuthForm(){
+  if(state.authTab==='login'){
     return `
-    <div class="grid lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-2">
-        ${card('Profil Pengguna', `
-          <div class="flex items-center gap-4">
-            <div class="size-16 rounded-2xl bg-emerald-600 text-white grid place-items-center text-2xl font-black">${state.user.avatar}</div>
-            <div>
-              <div class="text-xl font-bold">${state.user.name}</div>
-              <div class="text-sm text-slate-500">${state.user.email} • ${formatRole(state.user.role)}</div>
-            </div>
-          </div>
-          <div class="mt-6 grid sm:grid-cols-2 gap-4">
-            <div><label class="text-sm font-medium">Nama Lengkap</label><input value="${state.user.name}" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950" readonly/></div>
-            <div><label class="text-sm font-medium">Email</label><input value="${state.user.email}" class="mt-1 w-full rounded-xl border px-3 py-2 text-sm bg-slate-50 dark:bg-slate-950" readonly/></div>
-          </div>
-        `)}
+    <form id="loginForm" class="space-y-4">
+      <div>
+        <label class="text-sm font-medium">Email</label>
+        <input name="email" type="email" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
       </div>
       <div>
-        ${card('Keamanan', `
-          <p class="text-sm text-slate-600 dark:text-slate-400">Ganti password secara berkala untuk menjaga keamanan akun.</p>
-          <button data-action="open-password" class="mt-4 w-full py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-sm">Ubah Password</button>
-        `)}
+        <label class="text-sm font-medium">Password</label>
+        <input name="password" type="password" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
       </div>
-    </div>`;
-  }
-
-  function renderSuperadmin() {
-    return card('Manajemen Pengguna', `
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead><tr class="text-left text-slate-500 border-b"><th class="py-2">Nama</th><th>Email</th><th>Role</th><th>Aksi</th></tr></thead>
-          <tbody>
-            ${state.users.map(u=>`
-              <tr class="border-b border-slate-100 dark:border-slate-800">
-                <td class="py-3 font-medium">${u.name}</td>
-                <td class="py-3 text-slate-600 dark:text-slate-400">${u.email}</td>
-                <td class="py-3">${formatRole(u.role)}</td>
-                <td class="py-3"><button class="text-xs px-2 py-1 rounded-lg border">Reset Pass</button></td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
+      <button class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold">Masuk</button>
+      <p class="text-xs text-slate-500 text-center">Belum punya akun? Klik <b>Daftar</b> di atas.</p>
+    </form>`;
+  } else {
+    return `
+    <form id="signupForm" class="space-y-4">
+      <div>
+        <label class="text-sm font-medium">Nama Lengkap</label>
+        <input name="nama" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
       </div>
-    `);
+      <div>
+        <label class="text-sm font-medium">Email</label>
+        <input name="email" type="email" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+      </div>
+      <div>
+        <label class="text-sm font-medium">Password</label>
+        <input name="password" type="password" required minlength="6" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+      </div>
+      <button class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Daftar sebagai Pelapor</button>
+      <p class="text-xs text-slate-500 text-center">Dengan mendaftar, Anda setuju pada kebijakan privasi.</p>
+    </form>`;
   }
+}
 
-  // ---------- Events ----------
-  function bindAppEvents() {
-    // sidebar module click
-    $$('[data-module]').forEach(btn=>{
-      btn.onclick = () => {
-        state.activeModule = btn.dataset.module;
-        render();
-      };
+function renderAppLayout(){
+  const items = menuItems();
+  const role = state.profile?.role || '-';
+  const name = state.profile?.nama_lengkap || state.user?.email || '';
+  return `
+  <div class="min-h-screen flex">
+    <!-- Sidebar -->
+    <aside class="fixed lg:sticky top-0 z-40 h-screen w-[280px] bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transform ${state.sidebarOpen?'translate-x-0':'-translate-x-full lg:translate-x-0'} transition-transform duration-300 flex flex-col">
+      <div class="h-16 flex items-center gap-3 px-5 border-b border-slate-200 dark:border-slate-800">
+        <div class="w-10 h-10 rounded-2xl bg-indigo-600 text-white grid place-items-center font-black shadow-glow">AH</div>
+        <div>
+          <div class="font-extrabold leading-tight">SIM Aduan</div>
+          <div class="text-[11px] uppercase tracking-wider text-slate-500">RSJD AHMA</div>
+        </div>
+        <button id="closeSidebar" class="lg:hidden ml-auto w-9 h-9 grid place-items-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">✕</button>
+      </div>
+      <div class="p-3 space-y-1 overflow-y-auto scroll-thin flex-1">
+        ${items.map(it=>`
+          <button data-page="${it.key}" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition ${state.currentPage===it.key?'bg-indigo-600 text-white shadow-glow':'hover:bg-slate-100 dark:hover:bg-slate-800'}">
+            <span class="w-6 text-center">${it.icon}</span>${it.label}
+          </button>
+        `).join('')}
+      </div>
+      <div class="p-3 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        <div class="flex items-center gap-3 px-2">
+          <div class="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-800 grid place-items-center font-bold text-slate-700 dark:text-slate-200">${(name[0]||'U').toUpperCase()}</div>
+          <div class="min-w-0 flex-1">
+            <div class="text-sm font-bold truncate">${name}</div>
+            <div class="text-xs text-slate-500 capitalize">${role.replace('_',' ')}</div>
+          </div>
+          <button id="appTheme" class="w-9 h-9 grid place-items-center rounded-xl border border-slate-300 dark:border-slate-700" title="Tema">${state.theme==='dark'?'☀️':'🌙'}</button>
+        </div>
+        <div class="flex gap-2">
+          <button id="btnLogout" class="flex-1 py-2 rounded-xl bg-slate-900 text-white dark:bg-slate-800 text-sm font-semibold">Keluar</button>
+          <button id="btnConfig" class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-sm">⚙️</button>
+        </div>
+      </div>
+    </aside>
+    <!-- Main -->
+    <div class="flex-1 min-w-0 flex flex-col">
+      <header class="sticky top-0 z-30 h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-safari border-b border-slate-200 dark:border-slate-800 flex items-center px-4 lg:px-8 gap-3">
+        <button id="openSidebar" class="lg:hidden w-10 h-10 grid place-items-center rounded-xl border border-slate-300 dark:border-slate-700">☰</button>
+        <h1 class="text-lg lg:text-xl font-extrabold capitalize">${state.currentPage.replace('_',' ')}</h1>
+        <div class="ml-auto flex items-center gap-2">
+          <span class="hidden sm:inline text-xs px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 font-bold">Online</span>
+        </div>
+      </header>
+      <main class="flex-1 p-4 lg:p-8 bg-[#f6f8fb] dark:bg-[#050a14]">
+        <div id="pageContent" class="max-w-7xl mx-auto"></div>
+      </main>
+    </div>
+  </div>`;
+}
+
+// ---------- BINDINGS ----------
+function bindLanding(){
+  $('#themeToggle')?.addEventListener('click', ()=>{ setTheme(state.theme==='dark'?'light':'dark'); render(); });
+  $('#btnLogin')?.addEventListener('click', ()=>{ document.querySelector('[data-tab="login"]')?.click(); document.getElementById('authFormWrap')?.scrollIntoView({behavior:'smooth'}); });
+  $('#heroLogin')?.addEventListener('click', ()=>{ document.querySelector('[data-tab="login"]')?.click(); });
+  $('#heroDaftar')?.addEventListener('click', ()=>{ document.querySelector('[data-tab="daftar"]')?.click(); });
+  $$('[data-tab]').forEach(btn=>{
+    btn.onclick = ()=>{ state.authTab = btn.dataset.tab; render(); };
+  });
+  $('#authFormWrap').innerHTML = renderAuthForm();
+  $('#loginForm')?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const { error } = await state.supabase.auth.signInWithPassword({ email: fd.get('email'), password: fd.get('password') });
+    if(error) toast(error.message,'error'); else toast('Berhasil masuk','success');
+  });
+  $('#signupForm')?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const { error } = await state.supabase.auth.signUp({
+      email: fd.get('email'),
+      password: fd.get('password'),
+      options:{ data:{ nama_lengkap: fd.get('nama'), role:'pelapor' } }
     });
-  }
-
-  // Delegated
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('[data-action]');
-    if (!btn) return;
-    const act = btn.dataset.action;
-
-    if (act==='toggle-theme') {
-      state.theme = state.theme==='dark' ? 'light' : 'dark';
-      applyTheme(); render();
-    }
-    if (act==='go-login') { state.view='login'; render(); }
-    if (act==='go-landing') { state.view='landing'; render(); }
-    if (act==='toggle-sidebar') { $('#sidebar').classList.toggle('-translate-x-full'); }
-    if (act==='open-password') { openPasswordModal(); }
-    if (act==='open-settings') { state.activeModule='pengaturan'; render(); closeProfile(); }
-    if (act==='logout') { supabase.auth.signOut().then(()=>{ toast('Berhasil keluar','success'); render(); }); }
-    if (act==='add-aduan') { const id=`ADU-${Date.now().toString().slice(-6)}`; state.aduan.unshift({id, judul:'Aduan baru dari demo', kategori:'Lainnya', status:'verifikasi', prioritas:'Sedang', tanggal:new Date().toISOString().slice(0,10), pelapor:state.user.name}); save(); render(); toast('Aduan baru ditambahkan'); }
-    if (act==='verify') { const a=state.aduan.find(x=>x.id===btn.dataset.id); if(a){a.status='penanganan'; save(); render(); toast('Aduan diverifikasi'); } }
-    if (act==='process') { const a=state.aduan.find(x=>x.id===btn.dataset.id); if(a){a.status='otorisasi'; save(); render(); toast('Aduan diproses'); } }
-    if (act==='authorize') { const a=state.aduan.find(x=>x.id===btn.dataset.id); if(a){a.status='selesai'; save(); render(); toast('Aduan disetujui & selesai'); } }
-    if (act==='add-kategori') { const inp=$('#new-kategori'); if(inp.value.trim()){ state.kategori.push(inp.value.trim()); save(); render(); } }
-    if (act==='save-cms') {
-      state.cms.heroTitle = $('#cms-title').value;
-      state.cms.heroSubtitle = $('#cms-sub').value;
-      state.cms.heroBadge = $('#cms-badge').value;
-      save(); toast('CMS disimpan'); render();
-    }
+    if(error) toast(error.message,'error'); else toast('Pendaftaran berhasil. Silakan cek email untuk verifikasi.','success');
   });
+}
 
-  // Profile dropdown
-  document.addEventListener('click', e => {
-    const btn = e.target.closest('#profile-btn');
-    const menu = $('#profile-menu');
-    if (btn) menu.classList.toggle('hidden');
-    else if (!e.target.closest('#profile-menu')) menu?.classList.add('hidden');
+function bindApp(){
+  $('#openSidebar')?.addEventListener('click',()=>{ state.sidebarOpen=true; render(); });
+  $('#closeSidebar')?.addEventListener('click',()=>{ state.sidebarOpen=false; render(); });
+  $$('[data-page]').forEach(btn=>{
+    btn.onclick = ()=>{ state.currentPage = btn.dataset.page; state.sidebarOpen=false; render(); };
   });
-  function closeProfile(){ $('#profile-menu')?.classList.add('hidden'); }
+  $('#appTheme')?.addEventListener('click',()=>{ setTheme(state.theme==='dark'?'light':'dark'); render(); });
+  $('#btnLogout')?.addEventListener('click', async()=>{ await state.supabase.auth.signOut(); toast('Keluar','info'); });
+  $('#btnConfig')?.addEventListener('click',()=> showConfig(true));
 
-  // Login form
-  document.addEventListener('submit', async e => {
-    if (e.target.id==='login-form') {
+  const pc = $('#pageContent');
+  if(state.currentPage==='dashboard') pc.innerHTML = renderDashboard();
+  if(state.currentPage==='daftar_aduan') pc.innerHTML = renderDaftarAduanSkeleton();
+  if(state.currentPage==='buat_aduan') pc.innerHTML = renderBuatAduanSkeleton();
+  if(state.currentPage==='verifikasi') pc.innerHTML = renderWorklistSkeleton('Verifikasi Aduan','Terkirim');
+  if(state.currentPage==='penanganan') pc.innerHTML = renderWorklistSkeleton('Penanganan Aduan','Diverifikasi / Proses');
+  if(state.currentPage==='otorisasi') pc.innerHTML = renderWorklistSkeleton('Otorisasi Aduan','Menunggu Otorisasi');
+  if(state.currentPage==='pengaturan') pc.innerHTML = renderPengaturan();
+}
+
+function renderDashboard(){
+  return `
+  <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    ${[
+      {label:'Total Aduan', val:state.stats.total, icon:'📊', cls:'from-indigo-600 to-violet-600'},
+      {label:'Terkirim', val:state.stats.terkirim, icon:'📨', cls:'from-sky-600 to-cyan-600'},
+      {label:'Proses', val:state.stats.proses, icon:'⚙️', cls:'from-amber-600 to-orange-600'},
+      {label:'Selesai', val:state.stats.selesai, icon:'✅', cls:'from-emerald-600 to-teal-600'},
+    ].map(c=>`
+      <div class="relative overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-soft">
+        <div class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-gradient-to-br ${c.cls} opacity-15 blur-2xl"></div>
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-sm font-semibold text-slate-500">${c.label}</div>
+            <div class="text-3xl font-extrabold mt-1" id="stat-${c.label}">${c.val}</div>
+          </div>
+          <div class="text-2xl">${c.icon}</div>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+  <div class="mt-8 grid lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-soft">
+      <h3 class="font-bold text-lg">Ringkasan Cepat</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Pantau status aduan terkini.</p>
+      <div class="mt-4 text-sm">
+        <p>Selamat datang, <b>${state.profile?.nama_lengkap||state.user?.email}</b>. Peran Anda: <b class="capitalize">${state.profile?.role?.replace('_',' ')}</b>.</p>
+        <p class="mt-2 text-slate-500">Gunakan menu di samping untuk mengelola aduan sesuai kewenangan.</p>
+      </div>
+    </div>
+    <div class="rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white p-6 shadow-glow">
+      <h3 class="font-bold text-lg">Panduan Singkat</h3>
+      <ul class="mt-3 space-y-2 text-sm/relaxed list-disc pl-5 opacity-95">
+        <li>Buat aduan dengan bukti yang jelas.</li>
+        <li>Verifikator memeriksa kelengkapan.</li>
+        <li>PIC melakukan penanganan.</li>
+        <li>Otorisator memberikan keputusan akhir.</li>
+      </ul>
+    </div>
+  </div>`;
+}
+function renderStats(){
+  $('#stat-Total Aduan') && ($('#stat-Total Aduan').textContent = state.stats.total);
+  $('#stat-Terkirim') && ($('#stat-Terkirim').textContent = state.stats.terkirim);
+  $('#stat-Proses') && ($('#stat-Proses').textContent = state.stats.proses);
+  $('#stat-Selesai') && ($('#stat-Selesai').textContent = state.stats.selesai);
+}
+
+function renderDaftarAduanSkeleton(){
+  return `
+  <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+    <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+      <h3 class="font-bold text-lg flex-1">Daftar Aduan</h3>
+      <input id="searchAduan" placeholder="Cari nomor / nama..." class="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm w-56">
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300">
+          <tr>
+            <th class="text-left px-5 py-3 font-semibold">Nomor</th>
+            <th class="text-left px-5 py-3 font-semibold">Pelapor</th>
+            <th class="text-left px-5 py-3 font-semibold">Kategori</th>
+            <th class="text-left px-5 py-3 font-semibold">Status</th>
+            <th class="text-left px-5 py-3 font-semibold">Prioritas</th>
+            <th class="text-left px-5 py-3 font-semibold">Tanggal</th>
+            <th class="text-right px-5 py-3 font-semibold">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="daftarBody" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+      </table>
+    </div>
+  </div>`;
+}
+function renderDaftar(){
+  const tbody = $('#daftarBody');
+  if(!tbody) return;
+  const q = ($('#searchAduan')?.value || '').toLowerCase();
+  const rows = state.aduanList.filter(r=>{
+    if(!q) return true;
+    return (r.nomor_aduan||'').toLowerCase().includes(q) || (r.nama_pelapor||'').toLowerCase().includes(q);
+  });
+  tbody.innerHTML = rows.map(r=>`
+    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+      <td class="px-5 py-3 font-mono text-xs">${r.nomor_aduan||'-'}</td>
+      <td class="px-5 py-3 font-semibold">${r.nama_pelapor||'-'}</td>
+      <td class="px-5 py-3">${r.kategori_nama||'-'}<div class="text-xs text-slate-500">${r.sub_kategori_nama||''}</div></td>
+      <td class="px-5 py-3">${statusBadge(r.status)}</td>
+      <td class="px-5 py-3">${priorityBadge(r.prioritas)}</td>
+      <td class="px-5 py-3 text-slate-600 dark:text-slate-400">${fmtDate(r.created_at)}</td>
+      <td class="px-5 py-3 text-right">
+        <button data-detail="${r.id}" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">Lihat</button>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="7" class="px-5 py-10 text-center text-slate-500">Tidak ada data</td></tr>`;
+  $$('[data-detail]').forEach(btn=> btn.onclick = ()=> openDetail(btn.dataset.detail));
+  $('#searchAduan')?.addEventListener('input',()=>renderDaftar());
+}
+
+async function openDetail(id){
+  const aduan = state.aduanList.find(a=>a.id==id) || (await state.supabase.from('aduan').select('*').eq('id',id).maybeSingle()).data;
+  if(!aduan){ toast('Aduan tidak ditemukan','error'); return; }
+  const { data: logs } = await state.supabase.from('log_aktivitas').select('*').eq('aduan_id',id).order('created_at',{ascending:true});
+  const content = `
+    <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between gap-4">
+      <div>
+        <h3 class="text-xl font-extrabold">Detail Aduan</h3>
+        <p class="text-sm text-slate-500 font-mono">${aduan.nomor_aduan||''}</p>
+      </div>
+      <button data-close class="w-9 h-9 grid place-items-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">✕</button>
+    </div>
+    <div class="p-6 overflow-y-auto scroll-thin space-y-6">
+      <div class="grid sm:grid-cols-2 gap-4 text-sm">
+        ${[
+          ['Pelapor', aduan.nama_pelapor],
+          ['Kontak', aduan.kontak],
+          ['Email', aduan.email_pelapor],
+          ['Kategori', aduan.kategori_nama || state.kategori.find(k=>k.id===aduan.kategori_id)?.nama],
+          ['Sub Kategori', aduan.sub_kategori_nama || state.subKategori.find(s=>s.id===aduan.sub_kategori_id)?.nama],
+          ['Prioritas', aduan.prioritas],
+          ['Status', aduan.status],
+          ['Tanggal Kejadian', fmtDate(aduan.tanggal_kejadian)],
+          ['Lokasi', aduan.lokasi],
+        ].map(([k,v])=>`<div><div class="text-xs uppercase tracking-wide text-slate-500 font-bold">${k}</div><div class="font-semibold mt-0.5">${v||'-'}</div></div>`).join('')}
+      </div>
+      <div>
+        <div class="text-xs uppercase tracking-wide text-slate-500 font-bold mb-1">Deskripsi</div>
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm whitespace-pre-wrap">${aduan.deskripsi||'-'}</div>
+      </div>
+      ${aduan.bukti_url ? `<div><a href="${aduan.bukti_url}" target="_blank" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold">📎 Lihat Bukti</a></div>`:''}
+      <div>
+        <h4 class="font-bold mb-2">Timeline Aktivitas</h4>
+        <div class="relative pl-6 border-l-2 border-slate-200 dark:border-slate-800 space-y-4">
+          ${(logs||[]).map(l=>`
+            <div class="relative">
+              <div class="absolute -left-[27px] top-0 w-5 h-5 rounded-full bg-indigo-600 border-4 border-white dark:border-slate-900"></div>
+              <div class="text-xs text-slate-500">${fmtDate(l.created_at)}</div>
+              <div class="font-semibold">${l.aktivitas||l.aksi||'-'}</div>
+              <div class="text-sm text-slate-600 dark:text-slate-400">${l.keterangan||''}</div>
+            </div>
+          `).join('') || '<div class="text-sm text-slate-500">Belum ada aktivitas</div>'}
+        </div>
+      </div>
+    </div>
+  `;
+  openGeneric(content);
+}
+
+function openGeneric(html){
+  $('#genericModalContent').innerHTML = html;
+  $('#genericModal').classList.remove('hidden');
+  $$('#genericModal [data-close]').forEach(b=> b.onclick = ()=> $('#genericModal').classList.add('hidden'));
+}
+$('#genericModal').addEventListener('click', e=>{ if(e.target.dataset.close!==undefined) $('#genericModal').classList.add('hidden'); });
+
+function renderBuatAduanSkeleton(){
+  return `
+  <div class="max-w-3xl">
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-soft p-6">
+      <h3 class="text-xl font-extrabold">Form Buat Aduan</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400">Isi data dengan lengkap dan benar.</p>
+      <form id="formAduan" class="mt-6 grid sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-1">
+          <label class="text-sm font-medium">Nama Pelapor</label>
+          <input name="nama_pelapor" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+        </div>
+        <div class="sm:col-span-1">
+          <label class="text-sm font-medium">Kontak</label>
+          <input name="kontak" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-sm font-medium">Email Pelapor</label>
+          <input name="email_pelapor" type="email" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+        </div>
+        <div class="sm:col-span-1">
+          <label class="text-sm font-medium">Kategori</label>
+          <select name="kategori_id" id="katSel" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"></select>
+        </div>
+        <div class="sm:col-span-1">
+          <label class="text-sm font-medium">Sub Kategori</label>
+          <select name="sub_kategori_id" id="subKatSel" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"></select>
+        </div>
+        <div class="sm:col-span-1">
+          <label class="text-sm font-medium">Prioritas</label>
+          <select name="prioritas" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+            <option>Rendah</option><option>Sedang</option><option>Tinggi</option>
+          </select>
+        </div>
+        <div class="sm:col-span-1">
+          <label class="text-sm font-medium">Urgensi</label>
+          <input name="urgensi" placeholder="Mis. Segera" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+        </div>
+        <div class="sm:col-span-1">
+          <label class="text-sm font-medium">Tanggal Kejadian</label>
+          <input name="tanggal_kejadian" type="datetime-local" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+        </div>
+        <div class="sm:col-span-1">
+          <label class="text-sm font-medium">Lokasi</label>
+          <input name="lokasi" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-sm font-medium">Deskripsi</label>
+          <textarea name="deskripsi" rows="4" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"></textarea>
+        </div>
+        <div class="sm:col-span-2">
+          <label class="text-sm font-medium">Bukti Digital (gambar/pdf)</label>
+          <input name="bukti" type="file" accept="image/*,application/pdf" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 file:mr-3 file:px-3 file:py-2 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white file:text-sm">
+          <p class="text-xs text-slate-500 mt-1">Maks 10MB. Disimpan di bucket 'bukti_digital'.</p>
+        </div>
+        <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+          <button type="reset" class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700">Reset</button>
+          <button class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-glow">Kirim Aduan</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function renderBuatForm(){
+  const katSel = $('#katSel');
+  if(!katSel) return;
+  katSel.innerHTML = `<option value="">Pilih...</option>` + state.kategori.map(k=>`<option value="${k.id}">${k.nama}</option>`).join('');
+  katSel.onchange = ()=>{
+    const sub = state.subKategori.filter(s=>s.kategori_id==katSel.value);
+    $('#subKatSel').innerHTML = `<option value="">Pilih...</option>` + sub.map(s=>`<option value="${s.id}">${s.nama}</option>`).join('');
+  };
+  $('#formAduan')?.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const file = fd.get('bukti');
+    let bukti_url = null;
+    if(file && file.size>0){
+      if(file.size > 10*1024*1024){ toast('File terlalu besar','error'); return; }
+      const ext = file.name.split('.').pop();
+      const path = `aduan/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: upErr } = await state.supabase.storage.from('bukti_digital').upload(path, file, { upsert:false });
+      if(upErr){ toast('Upload gagal: '+upErr.message,'error'); return; }
+      const { data } = state.supabase.storage.from('bukti_digital').getPublicUrl(path);
+      bukti_url = data.publicUrl;
+    }
+    const payload = {
+      nama_pelapor: fd.get('nama_pelapor'),
+      kontak: fd.get('kontak'),
+      email_pelapor: fd.get('email_pelapor'),
+      kategori_id: fd.get('kategori_id') || null,
+      sub_kategori_id: fd.get('sub_kategori_id') || null,
+      prioritas: fd.get('prioritas'),
+      urgensi: fd.get('urgensi'),
+      tanggal_kejadian: fd.get('tanggal_kejadian') ? new Date(fd.get('tanggal_kejadian')).toISOString() : null,
+      lokasi: fd.get('lokasi'),
+      deskripsi: fd.get('deskripsi'),
+      bukti_url,
+      status: 'Terkirim',
+      pelapor_id: state.profile?.id || null,
+    };
+    const { error } = await state.supabase.from('aduan').insert(payload);
+    if(error){ toast('Gagal menyimpan: '+error.message,'error'); }
+    else { toast('Aduan berhasil dikirim','success'); e.target.reset(); state.currentPage='daftar_aduan'; render(); }
+  });
+}
+
+function renderWorklistSkeleton(title, subtitle){
+  return `
+  <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+    <div class="p-5 border-b border-slate-200 dark:border-slate-800">
+      <h3 class="font-bold text-lg">${title}</h3>
+      <p class="text-sm text-slate-500">Filter status: ${subtitle}</p>
+    </div>
+    <div class="p-5 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead><tr class="text-left text-slate-600 dark:text-slate-300">
+          <th class="py-2 pr-4">Nomor</th><th class="py-2 pr-4">Pelapor</th><th class="py-2 pr-4">Status</th><th class="py-2 pr-4">Prioritas</th><th class="py-2 pr-4">Tanggal</th><th class="py-2"></th>
+        </tr></thead>
+        <tbody id="workBody"></tbody>
+      </table>
+    </div>
+  </div>`;
+}
+function renderWorklist(){
+  const body = $('#workBody');
+  if(!body) return;
+  let filter = [];
+  if(state.currentPage==='verifikasi') filter = ['terkirim'];
+  if(state.currentPage==='penanganan') filter = ['diverifikasi','proses'];
+  if(state.currentPage==='otorisasi') filter = ['menunggu otorisasi'];
+  const rows = state.aduanList.filter(r=> filter.includes((r.status||'').toLowerCase()));
+  body.innerHTML = rows.map(r=>`
+    <tr class="border-t border-slate-200 dark:border-slate-800">
+      <td class="py-3 pr-4 font-mono text-xs">${r.nomor_aduan||'-'}</td>
+      <td class="py-3 pr-4 font-semibold">${r.nama_pelapor||'-'}</td>
+      <td class="py-3 pr-4">${statusBadge(r.status)}</td>
+      <td class="py-3 pr-4">${priorityBadge(r.prioritas)}</td>
+      <td class="py-3 pr-4 text-slate-600 dark:text-slate-400">${fmtDate(r.created_at)}</td>
+      <td class="py-3 text-right">
+        <button data-act="${r.id}" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold">
+          ${state.currentPage==='verifikasi'?'Verifikasi': state.currentPage==='penanganan'?'Tangani':'Otorisasi'}
+        </button>
+      </td>
+    </tr>
+  `).join('') || `<tr><td colspan="6" class="py-10 text-center text-slate-500">Tidak ada aduan untuk ditindak</td></tr>`;
+  $$('[data-act]').forEach(btn=> btn.onclick = ()=> openAction(btn.dataset.act));
+}
+
+async function openAction(id){
+  const aduan = state.aduanList.find(a=>a.id==id);
+  if(!aduan) return;
+  if(state.currentPage==='verifikasi'){
+    const html = `
+      <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-start">
+        <div><h3 class="text-xl font-extrabold">Verifikasi Aduan</h3><p class="text-sm text-slate-500 font-mono">${aduan.nomor_aduan}</p></div>
+        <button data-close class="w-9 h-9 grid place-items-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">✕</button>
+      </div>
+      <form id="formVerif" class="p-6 space-y-4">
+        <div>
+          <label class="text-sm font-medium">Hasil Verifikasi</label>
+          <select name="hasil" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5">
+            <option value="Valid">Valid / Diterima</option>
+            <option value="Ditolak">Ditolak</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-sm font-medium">Catatan</label>
+          <textarea name="catatan" rows="3" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"></textarea>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button" data-close class="px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700">Batal</button>
+          <button class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold">Simpan</button>
+        </div>
+      </form>`;
+    openGeneric(html);
+    $('#formVerif').onsubmit = async e=>{
       e.preventDefault();
       const fd = new FormData(e.target);
-      const { data, error } = await supabase.auth.signInWithPassword({ email: fd.get('email'), password: fd.get('password') });
-      if (error) return toast(error.message,'error');
-      state.view='app';
-      toast('Selamat datang, '+state.user.name);
-      render();
-    }
-    if (e.target.id==='password-form') {
+      const hasil = fd.get('hasil');
+      const catatan = fd.get('catatan');
+      const { error:e1 } = await state.supabase.from('verifikasi').insert({ aduan_id:id, verifikator_id: state.profile?.id||null, hasil, catatan });
+      if(e1){ toast('Gagal simpan verifikasi','error'); return; }
+      const newStatus = hasil==='Valid'?'Diverifikasi':'Ditolak';
+      await state.supabase.from('aduan').update({ status:newStatus }).eq('id',id);
+      await state.supabase.from('log_aktivitas').insert({ aduan_id:id, aktivitas:'Verifikasi', keterangan:`Hasil: ${hasil}` });
+      toast('Verifikasi tersimpan','success');
+      $('#genericModal').classList.add('hidden');
+      fetchDaftarAduan().then(render);
+    };
+  }
+  if(state.currentPage==='penanganan'){
+    const html = `
+      <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between">
+        <div><h3 class="text-xl font-extrabold">Tambah Tahap Penanganan</h3><p class="text-sm text-slate-500 font-mono">${aduan.nomor_aduan}</p></div>
+        <button data-close class="w-9 h-9 grid place-items-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">✕</button>
+      </div>
+      <form id="formTangani" class="p-6 space-y-4">
+        <div><label class="text-sm font-medium">Tahap</label><input name="tahap" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"></div>
+        <div><label class="text-sm font-medium">Catatan</label><textarea name="catatan" rows="3" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"></textarea></div>
+        <div class="flex justify-end gap-2"><button data-close type="button" class="px-4 py-2.5 rounded-xl border">Batal</button><button class="px-5 py-2.5 rounded-xl bg-amber-600 text-white font-bold">Simpan</button></div>
+      </form>`;
+    openGeneric(html);
+    $('#formTangani').onsubmit = async e=>{
       e.preventDefault();
-      await handlePasswordSubmit();
-    }
-  });
-
-  // Password modal
-  function openPasswordModal() {
-    $('#password-modal').classList.remove('hidden');
-    $('#password-error').classList.add('hidden');
-    $('#password-form').reset();
-    closeProfile();
+      const fd = new FormData(e.target);
+      await state.supabase.from('penanganan_tahap').insert({ aduan_id:id, pic_id: state.profile?.id||null, tahap: fd.get('tahap'), catatan: fd.get('catatan') });
+      await state.supabase.from('aduan').update({ status:'Proses' }).eq('id',id);
+      await state.supabase.from('log_aktivitas').insert({ aduan_id:id, aktivitas:'Penanganan', keterangan: fd.get('tahap') });
+      toast('Tahap ditambahkan','success');
+      $('#genericModal').classList.add('hidden');
+      fetchDaftarAduan().then(render);
+    };
   }
-  function closePasswordModal() {
-    $('#password-modal').classList.add('hidden');
+  if(state.currentPage==='otorisasi'){
+    const html = `
+      <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between">
+        <div><h3 class="text-xl font-extrabold">Otorisasi Aduan</h3><p class="text-sm text-slate-500 font-mono">${aduan.nomor_aduan}</p></div>
+        <button data-close class="w-9 h-9 grid place-items-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">✕</button>
+      </div>
+      <form id="formOtor" class="p-6 space-y-4">
+        <div><label class="text-sm font-medium">Keputusan</label><select name="keputusan" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"><option>Disetujui</option><option>Ditolak</option></select></div>
+        <div><label class="text-sm font-medium">Catatan</label><textarea name="catatan" rows="3" class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"></textarea></div>
+        <div class="flex justify-end gap-2"><button data-close type="button" class="px-4 py-2.5 rounded-xl border">Batal</button><button class="px-5 py-2.5 rounded-xl bg-purple-600 text-white font-bold">Simpan</button></div>
+      </form>`;
+    openGeneric(html);
+    $('#formOtor').onsubmit = async e=>{
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      await state.supabase.from('otorisasi').insert({ aduan_id:id, otorisator_id: state.profile?.id||null, keputusan: fd.get('keputusan'), catatan: fd.get('catatan') });
+      const newStatus = fd.get('keputusan')==='Disetujui'?'Selesai':'Ditolak';
+      await state.supabase.from('aduan').update({ status:newStatus }).eq('id',id);
+      await state.supabase.from('log_aktivitas').insert({ aduan_id:id, aktivitas:'Otorisasi', keterangan: fd.get('keputusan') });
+      toast('Otorisasi tersimpan','success');
+      $('#genericModal').classList.add('hidden');
+      fetchDaftarAduan().then(render);
+    };
   }
-  document.addEventListener('click', e => {
-    if (e.target.dataset.close==='password-modal') closePasswordModal();
-  });
-  document.addEventListener('click', e => {
-    const t = e.target.closest('[data-toggle]');
-    if (t) {
-      const inp = document.getElementById(t.dataset.toggle);
-      inp.type = inp.type==='password' ? 'text' : 'password';
-    }
-  });
+}
 
-  async function handlePasswordSubmit() {
-    const oldPw = $('#old-password').value.trim();
-    const newPw = $('#new-password').value.trim();
-    const conf = $('#confirm-password').value.trim();
-    const errEl = $('#password-error');
-
-    if (newPw.length < 6) {
-      errEl.textContent = 'Password baru minimal 6 karakter.';
-      errEl.classList.remove('hidden'); return;
-    }
-    if (newPw !== conf) {
-      errEl.textContent = 'Konfirmasi password tidak cocok.';
-      errEl.classList.remove('hidden'); return;
-    }
-    if (!oldPw) {
-      errEl.textContent = 'Password lama wajib diisi.';
-      errEl.classList.remove('hidden'); return;
-    }
-    errEl.classList.add('hidden');
-    const btn = $('#password-submit');
-    btn.disabled = true; btn.innerHTML = '<span>Menyimpan...</span>';
-
-    // Simulate supabase call (password lama tidak diverifikasi server)
-    const { error } = await supabase.auth.updateUser({ password: newPw });
-    btn.disabled = false; btn.innerHTML = '<span>Simpan Password</span>';
-    if (error) return toast(error.message,'error');
-    closePasswordModal();
-    toast('Password berhasil diubah. Anda tetap login.');
+function renderPengaturan(){
+  return `
+  <div class="max-w-3xl space-y-6">
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-soft">
+      <h3 class="text-xl font-extrabold">Profil Pengguna</h3>
+      <div class="mt-4 grid sm:grid-cols-2 gap-4 text-sm">
+        <div><div class="text-xs uppercase font-bold text-slate-500">Nama</div><div class="font-semibold mt-1">${state.profile?.nama_lengkap||'-'}</div></div>
+        <div><div class="text-xs uppercase font-bold text-slate-500">Email</div><div class="font-semibold mt-1">${state.profile?.email||state.user?.email}</div></div>
+        <div><div class="text-xs uppercase font-bold text-slate-500">Role</div><div class="font-semibold mt-1 capitalize">${state.profile?.role||'-'}</div></div>
+        <div><div class="text-xs uppercase font-bold text-slate-500">ID</div><div class="font-mono text-xs mt-1">${state.profile?.id||'-'}</div></div>
+      </div>
+    </div>
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-soft">
+      <h3 class="font-bold text-lg">Ubah Password</h3>
+      <form id="formPass" class="mt-4 grid sm:grid-cols-2 gap-4">
+        <div class="sm:col-span-2"><label class="text-sm font-medium">Password Baru</label><input name="pass" type="password" minlength="6" required class="mt-1 w-full rounded-xl border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5"></div>
+        <div class="sm:col-span-2 flex justify-end"><button class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold">Update Password</button></div>
+      </form>
+    </div>
+    <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-soft">
+      <h3 class="font-bold text-lg">Konfigurasi Supabase</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">URL: <span class="font-mono text-xs">${state.cfg.url||'-'}</span></p>
+      <button id="openCfg2" class="mt-4 px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 font-semibold">Buka Konfigurasi</button>
+    </div>
+  </div>`;
+}
+document.addEventListener('click', e=>{
+  if(e.target.id==='openCfg2') showConfig(true);
+});
+document.addEventListener('submit', e=>{
+  if(e.target.id==='formPass'){
+    e.preventDefault();
+    const pass = e.target.pass.value;
+    state.supabase.auth.updateUser({ password: pass }).then(({error})=>{
+      if(error) toast(error.message,'error'); else toast('Password diperbarui','success');
+    });
   }
+});
 
-  // Init
+// Config form binding
+$('#configForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const url = $('#cfgUrl').value.trim();
+  const key = $('#cfgKey').value.trim();
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  state.cfg = { url, key };
+  showConfig(false);
+  initSupabase();
   render();
-})();
+  toast('Konfigurasi disimpan','success');
+});
+$('#cfgCancel').addEventListener('click', ()=> showConfig(false));
+document.addEventListener('click', e=>{
+  if(e.target.id==='openCfg') showConfig(true);
+});
+
+// Init
+if(!state.cfg.url || !state.cfg.key){
+  // show config later after first render
+}
+initSupabase();
+render();
+
+// Ensure app renders even if supabase not configured
+if(!state.supabase){
+  setTimeout(()=>{ if(!state.supabase) { render(); } }, 0);
+}
 </script>
 <script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
 </body>
