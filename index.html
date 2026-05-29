@@ -3,1164 +3,1004 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SIM Aduan Etik & Hukum RSJD AHMA</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<title>SIM Aduan RSJD AHMA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-  :root { color-scheme: light; }
-  * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-  .scrollbar-thin::-webkit-scrollbar { width:6px; height:6px; }
-  .scrollbar-thin::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; }
-  .shadow-soft { box-shadow: 0 4px 24px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.04); }
+:root{
+  --primary:#0ea5e9;
+  --primary-dark:#0284c7;
+  --secondary:#8b5cf6;
+  --accent:#22d3ee;
+  --success:#10b981;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --bg:#f0f7ff;
+  --surface:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --glass:rgba(255,255,255,.7);
+}
+*{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif}
+body{background:linear-gradient(135deg,#e0f2fe 0%,#f5f3ff 50%,#ecfeff 100%);color:var(--text);min-height:100vh}
+.glass{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.4)}
+.rounded-2xl{border-radius:1.25rem}
+.shadow-soft{box-shadow:0 10px 30px -10px rgba(2,132,199,.25)}
+.btn{border-radius:1rem;padding:.75rem 1.25rem;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
+.btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn-ghost{background:rgba(255,255,255,.6)}
+.badge{padding:.25rem .65rem;border-radius:999px;font-size:.75rem;font-weight:600}
+.badge-success{background:#dcfce7;color:#166534}
+.badge-warning{background:#fef3c7;color:#92400e}
+.badge-danger{background:#fee2e2;color:#991b1b}
+.badge-info{background:#dbeafe;color:#1e40af}
+.badge-gray{background:#f1f5f9;color:#475569}
+.table{width:100%;border-collapse:separate;border-spacing:0}
+.table th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:.75rem 1rem;background:#f8fafc;position:sticky;top:0;z-index:10}
+.table td{padding:.9rem 1rem;border-top:1px solid var(--border);font-size:.9rem}
+.table tr:hover td{background:#f8fafc}
+.input{width:100%;border:1px solid var(--border);border-radius:1rem;padding:.75rem 1rem;background:#fff;outline:none;transition:.2s}
+.input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(14,165,233,.15)}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;background-size:1rem}
+.sidebar-link{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:1rem;color:#334155;font-weight:500;transition:.2s}
+.sidebar-link:hover{background:rgba(255,255,255,.7)}
+.sidebar-link.active{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;box-shadow:0 8px 20px -8px rgba(14,165,233,.6)}
+.scroll-thin::-webkit-scrollbar{width:6px;height:6px}
+.scroll-thin::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+.animate-in{animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.toast{position:fixed;right:1rem;bottom:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
+.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:1rem;z-index:100}
+.hidden{display:none !important}
 </style>
 </head>
-<body class="bg-[#f6f8fb] text-slate-800 antialiased min-h-screen">
-<div id="app" class="min-h-screen">
+<body>
+<div id="toast" class="toast"></div>
 
-  <!-- LOADING -->
-  <div id="app-loader" class="fixed inset-0 grid place-items-center bg-[#f6f8fb] z-[100]">
-    <div class="flex flex-col items-center gap-4">
-      <div class="w-12 h-12 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-sm font-medium text-slate-600">Memuat SIM Aduan Etik & Hukum...</p>
-    </div>
-  </div>
-
-  <!-- AUTH SCREEN -->
-  <div id="auth-screen" class="hidden min-h-screen grid lg:grid-cols-2">
-    <div class="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-teal-700 via-cyan-700 to-sky-700 text-white relative overflow-hidden">
-      <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(circle at 1px 1px,#fff 1px,transparent 0);background-size:24px 24px;"></div>
-      <div class="relative z-10">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center shadow-soft">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 4v5c0 5-3.5 9-7 9s-7-4-7-9V7l7-4z" stroke="white" stroke-width="1.5"/></svg>
-          </div>
-          <div>
-            <h1 class="text-xl font-semibold leading-tight">RSJD AHMA</h1>
-            <p class="text-sm text-white/80 -mt-0.5">Etik & Hukum</p>
-          </div>
-        </div>
-      </div>
-      <div class="relative z-10 max-w-md">
-        <h2 class="text-4xl font-bold leading-tight">Sistem Informasi Manajemen Aduan Etik & Hukum</h2>
-        <p class="mt-4 text-white/85 leading-relaxed">
-          Transparan, akuntabel, dan terintegrasi. Kelola pengaduan etik & hukum dengan alur verifikasi, penanganan, hingga otorisasi yang terstandarisasi.
-        </p>
-        <div class="mt-8 grid grid-cols-3 gap-3">
-          <div class="rounded-2xl bg-white/10 p-4 backdrop-blur"><p class="text-2xl font-bold">11</p><p class="text-xs text-white/80">Peran Akses</p></div>
-          <div class="rounded-2xl bg-white/10 p-4 backdrop-blur"><p class="text-2xl font-bold">E2E</p><p class="text-xs text-white/80">Audit Trail</p></div>
-          <div class="rounded-2xl bg-white/10 p-4 backdrop-blur"><p class="text-2xl font-bold">24/7</p><p class="text-xs text-white/80">Pelaporan</p></div>
-        </div>
-      </div>
-      <p class="relative z-10 text-xs text-white/70">© RSJD Dr. Amino Gondohutomo</p>
-    </div>
-
-    <div class="flex items-center justify-center p-6 sm:p-10">
-      <div class="w-full max-w-md">
-        <div class="mb-8 text-center lg:text-left">
-          <h3 class="text-2xl font-bold text-slate-900">Selamat Datang</h3>
-          <p class="text-sm text-slate-600 mt-1">Masuk untuk melanjutkan ke dashboard</p>
-        </div>
-
-        <div class="bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6">
-          <div class="flex bg-slate-100 rounded-xl p-1 mb-6">
-            <button id="tab-login" class="flex-1 py-2.5 rounded-lg text-sm font-semibold bg-white shadow-sm text-slate-900">Masuk</button>
-            <button id="tab-signup" class="flex-1 py-2.5 rounded-lg text-sm font-semibold text-slate-600">Daftar</button>
-          </div>
-
-          <!-- LOGIN -->
-          <form id="form-login" class="space-y-4">
-            <div>
-              <label class="text-sm font-medium text-slate-700">Email</label>
-              <input id="login-email" type="email" required class="mt-1.5 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600 bg-slate-50 px-4 py-3 text-sm" placeholder="nama@rsjd.go.id" />
-            </div>
-            <div>
-              <label class="text-sm font-medium text-slate-700">Kata Sandi</label>
-              <input id="login-password" type="password" required class="mt-1.5 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600 bg-slate-50 px-4 py-3 text-sm" placeholder="••••••••" />
-            </div>
-            <button type="submit" class="w-full py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm shadow-soft flex items-center justify-center gap-2">
-              <span>Masuk Sekarang</span>
-            </button>
-            <p class="text-xs text-slate-500 text-center">Lupa kata sandi? Hubungi admin sistem.</p>
-          </form>
-
-          <!-- SIGNUP -->
-          <form id="form-signup" class="space-y-4 hidden">
-            <div>
-              <label class="text-sm font-medium text-slate-700">Nama Lengkap</label>
-              <input id="signup-name" type="text" required class="mt-1.5 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600 bg-slate-50 px-4 py-3 text-sm" placeholder="Nama Anda" />
-            </div>
-            <div>
-              <label class="text-sm font-medium text-slate-700">Email</label>
-              <input id="signup-email" type="email" required class="mt-1.5 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600 bg-slate-50 px-4 py-3 text-sm" placeholder="nama@email.com" />
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="text-sm font-medium text-slate-700">Kata Sandi</label>
-                <input id="signup-password" type="password" required minlength="6" class="mt-1.5 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600 bg-slate-50 px-4 py-3 text-sm" placeholder="Min. 6 karakter" />
-              </div>
-              <div>
-                <label class="text-sm font-medium text-slate-700">Ulangi</label>
-                <input id="signup-password2" type="password" required minlength="6" class="mt-1.5 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600 bg-slate-50 px-4 py-3 text-sm" placeholder="Ulangi" />
-              </div>
-            </div>
-            <button type="submit" class="w-full py-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white font-semibold text-sm shadow-soft">Daftar Sebagai Pelapor</button>
-            <p class="text-xs text-slate-500 text-center">Dengan mendaftar, Anda menyetujui kebijakan privasi RSJD.</p>
-          </form>
-        </div>
-
-        <div class="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500">
-          <button id="open-config-from-auth" class="underline hover:text-teal-700">Konfigurasi Supabase</button>
-          <span>•</span>
-          <span>v1.0.0</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MAIN LAYOUT -->
-  <div id="main-layout" class="hidden min-h-screen">
-    <!-- SIDEBAR -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-[280px] bg-white border-r border-slate-200/80 flex flex-col transition-transform lg:translate-x-0 -translate-x-full">
-      <div class="h-[72px] flex items-center gap-3 px-5 border-b border-slate-200/80">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-600 to-cyan-600 flex items-center justify-center text-white shadow-soft">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 4v5c0 5-3.5 9-7 9s-7-4-7-9V7l7-4z" stroke="white" stroke-width="1.7"/></svg>
-        </div>
-        <div>
-          <p class="font-bold leading-none text-slate-900">SIM ADUAN</p>
-          <p class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Etik & Hukum</p>
-        </div>
-      </div>
-
-      <div class="p-4 border-b border-slate-200/80">
-        <div class="flex items-center gap-3">
-          <img id="user-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=User" class="w-10 h-10 rounded-2xl bg-slate-100" alt="avatar" />
-          <div class="min-w-0">
-            <p id="user-name" class="font-semibold text-sm truncate">-</p>
-            <p id="user-role" class="text-xs text-slate-500 capitalize">-</p>
-          </div>
-          <span id="user-badge" class="ml-auto text-[10px] px-2 py-1 rounded-lg bg-teal-50 text-teal-700 font-bold uppercase">-</span>
-        </div>
-      </div>
-
-      <nav id="sidebar-menu" class="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin"></nav>
-
-      <div class="p-3 border-t border-slate-200/80 space-y-1">
-        <button id="btn-config" class="hidden w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a7.5 7.5 0 00.1-6l2.1-1.2-2-3.5-2.5 1a7.5 0 00-5.2-3l-.4-2.7h-4l-.4 2.7a7.5 0 00-5.2 3l-2.5-1-2 3.5 2.1 1.2a7.5 7.5 0 000 6l-2.1 1.2 2 3.5 2.5-1a7.5 7.5 0 005.2 3l.4 2.7h4l.4-2.7a7.5 7.5 0 005.2-3l2.5 1 2-3.5-2.1-1.2z"/></svg>
-          Konfigurasi
-        </button>
-        <button id="btn-logout" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-600 hover:bg-rose-50">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>
-          Keluar
-        </button>
-      </div>
-    </aside>
-
-    <!-- MAIN -->
-    <div class="lg:pl-[280px] min-h-screen flex flex-col">
-      <!-- TOPBAR -->
-      <header class="sticky top-0 z-30 h-[72px] bg-white/80 backdrop-blur-xl border-b border-slate-200/80 flex items-center px-4 lg:px-8">
-        <button id="sidebar-toggle" class="lg:hidden mr-3 p-2 rounded-xl hover:bg-slate-100">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
-        <div class="flex-1 min-w-0">
-          <h1 id="page-title" class="text-xl font-bold text-slate-900 truncate">Dashboard</h1>
-          <p id="page-subtitle" class="text-xs text-slate-500 hidden sm:block">Ringkasan aktivitas aduan etik & hukum</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="hidden sm:flex items-center gap-2 pl-3 pr-4 py-2 rounded-full bg-slate-100">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-semibold text-slate-700">Online</span>
-          </div>
-          <button id="btn-refresh" class="p-2.5 rounded-xl hover:bg-slate-100 text-slate-600">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 11-3.6-7.2"/><path d="M21 3v6h-6"/></svg>
-          </button>
-        </div>
-      </header>
-
-      <!-- CONTENT -->
-      <main class="flex-1 p-4 lg:p-8">
-        <!-- DASHBOARD -->
-        <section data-page="dashboard" class="page space-y-6">
-          <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            <div class="bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-5">
-              <div class="flex items-center justify-between">
-                <p class="text-sm font-semibold text-slate-600">Total Aduan</p>
-                <div class="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center text-teal-700">📊</div>
-              </div>
-              <p id="stat-total" class="text-3xl font-bold mt-3">0</p>
-              <p class="text-xs text-slate-500 mt-1">Semua periode</p>
-            </div>
-            <div class="bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-5">
-              <div class="flex items-center justify-between">
-                <p class="text-sm font-semibold text-slate-600">Menunggu Verifikasi</p>
-                <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">⏳</div>
-              </div>
-              <p id="stat-verif" class="text-3xl font-bold mt-3">0</p>
-              <p class="text-xs text-slate-500 mt-1">Perlu tindakan</p>
-            </div>
-            <div class="bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-5">
-              <div class="flex items-center justify-between">
-                <p class="text-sm font-semibold text-slate-600">Diproses</p>
-                <div class="w-9 h-9 rounded-xl bg-sky-50 flex items-center justify-center">⚙️</div>
-              </div>
-              <p id="stat-proses" class="text-3xl font-bold mt-3">0</p>
-              <p class="text-xs text-slate-500 mt-1">Investigasi/PIC</p>
-            </div>
-            <div class="bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-5">
-              <div class="flex items-center justify-between">
-                <p class="text-sm font-semibold text-slate-600">Selesai</p>
-                <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center">✅</div>
-              </div>
-              <p id="stat-selesai" class="text-3xl font-bold mt-3">0</p>
-              <p class="text-xs text-slate-500 mt-1">Telah diotorisasi</p>
-            </div>
-          </div>
-
-          <div class="grid xl:grid-cols-3 gap-6">
-            <div class="xl:col-span-2 bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6">
-              <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-slate-900">Aduan Terbaru</h3>
-                <button data-goto="daftar_aduan" class="text-xs font-semibold text-teal-700 hover:underline">Lihat Semua</button>
-              </div>
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead class="text-xs text-slate-500 border-b">
-                    <tr><th class="text-left py-2 font-semibold">Judul</th><th class="text-left py-2 font-semibold">Kategori</th><th class="text-left py-2 font-semibold">Status</th><th class="text-left py-2 font-semibold">Tgl</th></tr>
-                  </thead>
-                  <tbody id="tbl-dashboard" class="divide-y"></tbody>
-                </table>
-              </div>
-            </div>
-            <div class="bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6">
-              <h3 class="font-bold text-slate-900 mb-4">Distribusi Status</h3>
-              <div id="dist-status" class="space-y-3"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- BUAT ADUAN -->
-        <section data-page="buat_aduan" class="page hidden">
-          <div class="max-w-3xl mx-auto bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6 sm:p-8">
-            <h3 class="text-lg font-bold mb-1">Formulir Pengaduan Baru</h3>
-            <p class="text-sm text-slate-600 mb-6">Isi data dengan lengkap dan jujur. Bukti digital akan disimpan aman.</p>
-            <form id="form-aduan" class="space-y-5">
-              <div class="grid sm:grid-cols-2 gap-5">
-                <div class="sm:col-span-2">
-                  <label class="text-sm font-medium">Judul Aduan</label>
-                  <input id="aduan-judul" required class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-600" placeholder="Ringkasan singkat masalah"/>
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Kategori</label>
-                  <select id="aduan-kategori" required class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-600"></select>
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Tanggal Kejadian</label>
-                  <input id="aduan-tgl" type="date" required class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-600"/>
-                </div>
-                <div class="sm:col-span-2">
-                  <label class="text-sm font-medium">Lokasi</label>
-                  <input id="aduan-lokasi" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-600" placeholder="Unit / Ruangan"/>
-                </div>
-                <div class="sm:col-span-2">
-                  <label class="text-sm font-medium">Pihak Terlapor</label>
-                  <input id="aduan-terlapor" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-600" placeholder="Nama / Jabatan (opsional)"/>
-                </div>
-                <div class="sm:col-span-2">
-                  <label class="text-sm font-medium">Uraian Kejadian</label>
-                  <textarea id="aduan-uraian" required rows="5" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-600" placeholder="Jelaskan kronologi secara detail..."></textarea>
-                </div>
-                <div class="sm:col-span-2">
-                  <label class="text-sm font-medium">Bukti Digital (PDF/JPG/PNG, maks 10MB)</label>
-                  <input id="aduan-bukti" type="file" multiple accept=".pdf,.jpg,.jpeg,.png" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-teal-600 file:text-white file:font-semibold hover:file:bg-teal-700"/>
-                  <p class="text-xs text-slate-500 mt-1">Bisa unggah lebih dari satu file.</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3 pt-2">
-                <button type="submit" class="px-5 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-sm shadow-soft">Kirim Aduan</button>
-                <button type="reset" class="px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm">Reset</button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- DAFTAR ADUAN -->
-        <section data-page="daftar_aduan" class="page hidden">
-          <div class="bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6">
-            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-              <div class="flex-1">
-                <h3 class="font-bold text-slate-900">Daftar Aduan</h3>
-                <p class="text-xs text-slate-500">Filter dan kelola aduan masuk</p>
-              </div>
-              <div class="flex gap-2">
-                <input id="search-aduan" placeholder="Cari judul..." class="w-48 rounded-xl border-slate-300 bg-slate-50 px-3 py-2 text-sm focus:border-teal-600 focus:ring-teal-600"/>
-                <select id="filter-status" class="rounded-xl border-slate-300 bg-slate-50 px-3 py-2 text-sm focus:border-teal-600 focus:ring-teal-600">
-                  <option value="">Semua Status</option>
-                  <option>Baru</option>
-                  <option>Diverifikasi</option>
-                  <option>Diproses</option>
-                  <option>Selesai</option>
-                  <option>Ditolak</option>
-                </select>
-              </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="text-xs text-slate-600 bg-slate-50">
-                  <tr>
-                    <th class="text-left px-3 py-2 font-semibold">ID</th>
-                    <th class="text-left px-3 py-2 font-semibold">Judul</th>
-                    <th class="text-left px-3 py-2 font-semibold">Pelapor</th>
-                    <th class="text-left px-3 py-2 font-semibold">Kategori</th>
-                    <th class="text-left px-3 py-2 font-semibold">Status</th>
-                    <th class="text-left px-3 py-2 font-semibold">Tgl</th>
-                    <th class="text-right px-3 py-2 font-semibold">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="tbl-aduan" class="divide-y"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- VERIFIKASI -->
-        <section data-page="verifikasi" class="page hidden">
-          <div class="grid lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-1 bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-5">
-              <h3 class="font-bold mb-3">Antrian Verifikasi</h3>
-              <div id="list-verif" class="space-y-2 max-h-[60vh] overflow-y-auto scrollbar-thin pr-1"></div>
-            </div>
-            <div class="lg:col-span-2 bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6">
-              <h3 class="font-bold mb-1">Form Verifikasi</h3>
-              <p class="text-sm text-slate-600 mb-4">Pilih aduan dari daftar kiri</p>
-              <form id="form-verif" class="space-y-4 opacity-50 pointer-events-none">
-                <input type="hidden" id="verif-id"/>
-                <div>
-                  <label class="text-sm font-medium">Keputusan</label>
-                  <select id="verif-keputusan" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-600">
-                    <option value="Diverifikasi">Diverifikasi - Lanjut Penanganan</option>
-                    <option value="Ditolak">Ditolak - Tidak Memenuhi Syarat</option>
-                    <option value="Butuh Info">Butuh Informasi Tambahan</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Catatan Verifikator</label>
-                  <textarea id="verif-catatan" rows="4" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm focus:border-teal-600 focus:ring-teal-600"></textarea>
-                </div>
-                <div class="flex gap-2">
-                  <button class="px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm">Simpan Verifikasi</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- PENANGANAN -->
-        <section data-page="penanganan" class="page hidden">
-          <div class="grid lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-1 bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-5">
-              <h3 class="font-bold mb-3">Aduan Siap Ditangani</h3>
-              <div id="list-tangani" class="space-y-2 max-h-[60vh] overflow-y-auto scrollbar-thin pr-1"></div>
-            </div>
-            <div class="lg:col-span-2 bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6">
-              <h3 class="font-bold mb-1">Form Penanganan</h3>
-              <form id="form-tangani" class="space-y-4 opacity-50 pointer-events-none">
-                <input type="hidden" id="tangani-id"/>
-                <div class="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label class="text-sm font-medium">PIC / Investigator</label>
-                    <input id="tangani-pic" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm" placeholder="Nama PIC"/>
-                  </div>
-                  <div>
-                    <label class="text-sm font-medium">Target Selesai</label>
-                    <input id="tangani-target" type="date" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm"/>
-                  </div>
-                  <div class="sm:col-span-2">
-                    <label class="text-sm font-medium">Rencana Tindak Lanjut</label>
-                    <textarea id="tangani-rencana" rows="3" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm"></textarea>
-                  </div>
-                  <div class="sm:col-span-2">
-                    <label class="text-sm font-medium">Hasil / Rekomendasi</label>
-                    <textarea id="tangani-hasil" rows="4" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm"></textarea>
-                  </div>
-                  <div>
-                    <label class="text-sm font-medium">Status Penanganan</label>
-                    <select id="tangani-status" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm">
-                      <option>Diproses</option>
-                      <option>Selesai Ditangani</option>
-                    </select>
-                  </div>
-                <button class="px-5 py-3 rounded-xl bg-sky-700 hover:bg-sky-800 text-white font-semibold text-sm">Simpan Penanganan</button>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- OTORISASI -->
-        <section data-page="otorisasi" class="page hidden">
-          <div class="grid lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-1 bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-5">
-              <h3 class="font-bold mb-3">Menunggu Otorisasi</h3>
-              <div id="list-otor" class="space-y-2 max-h-[60vh] overflow-y-auto scrollbar-thin pr-1"></div>
-            </div>
-            <div class="lg:col-span-2 bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6">
-              <h3 class="font-bold mb-1">Form Otorisasi</h3>
-              <form id="form-otor" class="space-y-4 opacity-50 pointer-events-none">
-                <input type="hidden" id="otor-id"/>
-                <div>
-                  <label class="text-sm font-medium">Keputusan Pimpinan</label>
-                  <select id="otor-keputusan" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm">
-                    <option>Disetujui</option>
-                    <option>Dikembalikan</option>
-                    <option>Ditolak</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Catatan Otorisasi</label>
-                  <textarea id="otor-catatan" rows="4" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm"></textarea>
-                </div>
-                <button class="px-5 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-sm">Simpan Otorisasi</button>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        <!-- PENGATURAN -->
-        <section data-page="pengaturan" class="page hidden space-y-6">
-          <div class="bg-white rounded-[1.25rem] shadow-soft border border-slate-200/70 p-6">
-            <h3 class="font-bold text-lg mb-1">Pengaturan Sistem</h3>
-            <p class="text-sm text-slate-600 mb-4">Hanya Superadmin yang dapat mengakses menu ini.</p>
-            <div class="flex flex-wrap gap-2 border-b border-slate-200 mb-6">
-              <button data-settab="users" class="settab px-4 py-2 text-sm font-semibold border-b-2 border-teal-700 text-teal-700">Manajemen User</button>
-              <button data-settab="param" class="settab px-4 py-2 text-sm font-semibold text-slate-500">Parameter Umum</button>
-              <button data-settab="kategori" class="settab px-4 py-2 text-sm font-semibold text-slate-500">Kategori & Sub</button>
-              <button data-settab="template" class="settab px-4 py-2 text-sm font-semibold text-slate-500">Dokumen Template</button>
-              <button data-settab="cms" class="settab px-4 py-2 text-sm font-semibold text-slate-500">Konten Landing CMS</button>
-              <button data-settab="supabase" class="settab px-4 py-2 text-sm font-semibold text-slate-500">Konfigurasi Supabase</button>
-              <button data-settab="profil" class="settab px-4 py-2 text-sm font-semibold text-slate-500">Profil & Keamanan</button>
-            </div>
-
-            <!-- USERS -->
-            <div data-setpanel="users">
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="font-bold">Manajemen User</h4>
-                <button id="btn-add-user" class="px-3 py-2 rounded-xl bg-teal-700 text-white text-xs font-semibold">Tambah User</button>
-              </div>
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead class="bg-slate-50 text-xs"><tr><th class="text-left px-3 py-2">Nama</th><th class="text-left px-3 py-2">Email</th><th class="text-left px-3 py-2">Role</th><th class="text-right px-3 py-2">Aksi</th></tr></thead>
-                  <tbody id="tbl-users" class="divide-y"></tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- PARAM -->
-            <div data-setpanel="param" class="hidden">
-              <h4 class="font-bold mb-3">Parameter Umum</h4>
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead class="bg-slate-50 text-xs"><tr><th class="text-left px-3 py-2">Key</th><th class="text-left px-3 py-2">Value</th><th class="text-right px-3 py-2">Aksi</th></tr></thead>
-                  <tbody id="tbl-param" class="divide-y"></tbody>
-                </table>
-              </div>
-              <button id="btn-add-param" class="mt-3 px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold">Tambah Parameter</button>
-            </div>
-
-            <!-- KATEGORI -->
-            <div data-setpanel="kategori" class="hidden">
-              <h4 class="font-bold mb-3">Kategori Aduan</h4>
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead class="bg-slate-50 text-xs"><tr><th class="text-left px-3 py-2">Nama</th><th class="text-left px-3 py-2">Deskripsi</th><th class="text-right px-3 py-2">Aksi</th></tr></thead>
-                  <tbody id="tbl-kategori" class="divide-y"></tbody>
-                </table>
-              </div>
-              <button id="btn-add-kategori" class="mt-3 px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold">Tambah Kategori</button>
-            </div>
-
-            <!-- TEMPLATE -->
-            <div data-setpanel="template" class="hidden">
-              <h4 class="font-bold mb-3">Dokumen Template</h4>
-              <p class="text-sm text-slate-600">Kelola template surat dan dokumen standar. (Placeholder)</p>
-              <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-1">
-                <li>Template Berita Acara Verifikasi</li>
-                <li>Template Surat Pemanggilan</li>
-                <li>Template Laporan Investigasi</li>
-              </ul>
-            </div>
-
-            <!-- CMS -->
-            <div data-setpanel="cms" class="hidden">
-              <h4 class="font-bold mb-3">Konten Landing CMS</h4>
-              <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                  <thead class="bg-slate-50 text-xs"><tr><th class="text-left px-3 py-2">Judul</th><th class="text-left px-3 py-2">Slug</th><th class="text-right px-3 py-2">Aksi</th></tr></thead>
-                  <tbody id="tbl-cms" class="divide-y"></tbody>
-                </table>
-              </div>
-              <button id="btn-add-cms" class="mt-3 px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold">Tambah Konten</button>
-            </div>
-
-            <!-- SUPABASE -->
-            <div data-setpanel="supabase" class="hidden">
-              <h4 class="font-bold mb-3">Konfigurasi Supabase</h4>
-              <div class="bg-slate-50 rounded-xl p-4 text-sm space-y-2">
-                <p><span class="font-semibold">URL:</span> <span id="cfg-url">-</span></p>
-                <p><span class="font-semibold">Anon Key:</span> <span id="cfg-key">-</span></p>
-              </div>
-              <button id="btn-edit-supabase" class="mt-3 px-3 py-2 rounded-xl bg-teal-700 text-white text-xs font-semibold">Edit Konfigurasi</button>
-            </div>
-
-            <!-- PROFIL -->
-            <div data-setpanel="profil" class="hidden">
-              <h4 class="font-bold mb-3">Ganti Kata Sandi</h4>
-              <form id="form-password" class="max-w-md space-y-4">
-                <div>
-                  <label class="text-sm font-medium">Kata Sandi Baru</label>
-                  <input id="new-pass" type="password" minlength="6" required class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm"/>
-                </div>
-                <div>
-                  <label class="text-sm font-medium">Ulangi Kata Sandi</label>
-                  <input id="new-pass2" type="password" minlength="6" required class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm"/>
-                </div>
-                <button class="px-5 py-3 rounded-xl bg-slate-900 text-white font-semibold text-sm">Simpan Password</button>
-              </form>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer class="px-8 py-6 text-center text-xs text-slate-500">
-        SIM Aduan Etik & Hukum RSJD AHMA • Dibangun dengan keamanan & tata kelola
-      </footer>
-    </div>
-  </div>
-</div>
-
-<!-- MODALS -->
-<div id="modal-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-50"></div>
-
-<!-- CONFIG MODAL -->
-<div id="modal-config" class="fixed inset-0 z-[60] hidden place-items-center p-4">
-  <div class="bg-white rounded-[1.25rem] shadow-soft w-full max-w-lg border border-slate-200">
-    <div class="px-6 py-4 border-b flex items-center justify-between">
-      <h3 class="font-bold">Konfigurasi Supabase</h3>
-      <button data-close="modal-config" class="p-2 rounded-lg hover:bg-slate-100">✕</button>
-    </div>
-    <form id="form-config" class="p-6 space-y-4">
+<!-- Config Modal -->
+<div id="configModal" class="modal-backdrop hidden">
+  <div class="glass rounded-2xl shadow-soft w-full max-w-lg p-6 animate-in">
+    <h2 class="text-2xl font-bold">Konfigurasi Supabase</h2>
+    <p class="text-sm text-slate-600 mt-1">Masukkan URL dan Anon Key proyek Supabase Anda. Disimpan di localStorage.</p>
+    <form id="configForm" class="mt-5 space-y-4">
       <div>
-        <label class="text-sm font-medium">SUPABASE_URL</label>
-        <input id="cfg-input-url" required class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm" placeholder="https://xyz.supabase.co"/>
+        <label class="text-sm font-semibold">Supabase URL</label>
+        <input id="cfgUrl" class="input mt-1" placeholder="https://xxxxx.supabase.co" required>
       </div>
       <div>
-        <label class="text-sm font-medium">SUPABASE_ANON_KEY</label>
-        <input id="cfg-input-key" required class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm" placeholder="eyJhbGci..."/>
+        <label class="text-sm font-semibold">Anon Public Key</label>
+        <textarea id="cfgKey" class="input mt-1 h-28" placeholder="eyJhbGc..." required></textarea>
       </div>
-      <p class="text-xs text-slate-500">Disimpan di localStorage peramban Anda. Hanya Superadmin yang dapat mengubah setelah terpasang.</p>
-      <div class="flex justify-end gap-2 pt-2">
-        <button type="button" data-close="modal-config" class="px-4 py-2.5 rounded-xl bg-slate-100 text-sm font-semibold">Batal</button>
-        <button class="px-4 py-2.5 rounded-xl bg-teal-700 text-white text-sm font-semibold">Simpan & Hubungkan</button>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn btn-primary flex-1 justify-center">Simpan & Sambungkan</button>
+        <button type="button" id="cfgCancel" class="btn btn-ghost">Batal</button>
       </div>
+      <p class="text-xs text-slate-500">Tips: Buat bucket <b>bukti_digital</b> dan <b>dokumen_template</b> (public) di Storage.</p>
     </form>
   </div>
 </div>
 
-<!-- GENERIC MODAL -->
-<div id="modal-generic" class="fixed inset-0 z-[60] hidden place-items-center p-4">
-  <div class="bg-white rounded-[1.25rem] shadow-soft w-full max-w-lg border border-slate-200">
-    <div class="px-6 py-4 border-b flex items-center justify-between">
-      <h3 id="generic-title" class="font-bold">-</h3>
-      <button data-close="modal-generic" class="p-2 rounded-lg hover:bg-slate-100">✕</button>
+<!-- Auth Modal -->
+<div id="authModal" class="modal-backdrop hidden">
+  <div class="glass rounded-2xl shadow-soft w-full max-w-md p-0 overflow-hidden animate-in">
+    <div class="grid grid-cols-2">
+      <button id="tabLogin" class="py-3 font-semibold bg-white">Masuk</button>
+      <button id="tabRegister" class="py-3 font-semibold bg-slate-100 text-slate-500">Daftar</button>
     </div>
-    <div id="generic-body" class="p-6"></div>
+    <div class="p-6">
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="text-sm font-semibold">Email</label>
+          <input type="email" id="loginEmail" class="input mt-1" required>
+        </div>
+        <div>
+          <label class="text-sm font-semibold">Password</label>
+          <input type="password" id="loginPass" class="input mt-1" required>
+        </div>
+        <button class="btn btn-primary w-full justify-center">Masuk</button>
+      </form>
+      <form id="registerForm" class="space-y-4 hidden">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm font-semibold">Nama Lengkap</label>
+            <input id="regNama" class="input mt-1" required>
+          </div>
+          <div>
+            <label class="text-sm font-semibold">Telepon</label>
+            <input id="regTelp" class="input mt-1">
+          </div>
+        </div>
+        <div>
+          <label class="text-sm font-semibold">Email</label>
+          <input type="email" id="regEmail" class="input mt-1" required>
+        </div>
+        <div>
+          <label class="text-sm font-semibold">Password</label>
+          <input type="password" id="regPass" class="input mt-1" required minlength="6">
+        </div>
+        <button class="btn btn-primary w-full justify-center">Daftar sebagai Pelapor</button>
+        <p class="text-xs text-slate-500 text-center">Akun akan dibuat dengan role Pelapor Eksternal</p>
+      </form>
+    </div>
   </div>
 </div>
 
-<!-- DETAIL ADUAN MODAL -->
-<div id="modal-detail" class="fixed inset-0 z-[60] hidden place-items-center p-4">
-  <div class="bg-white rounded-[1.25rem] shadow-soft w-full max-w-2xl border border-slate-200 max-h-[85vh] overflow-y-auto">
-    <div class="px-6 py-4 border-b flex items-center justify-between sticky top-0 bg-white">
-      <h3 class="font-bold">Detail Aduan</h3>
-      <button data-close="modal-detail" class="p-2 rounded-lg hover:bg-slate-100">✕</button>
+<!-- Landing Page -->
+<div id="landingPage" class="">
+  <header class="sticky top-0 z-40 glass border-b border-white/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center text-white font-black">A</div>
+        <div>
+          <div class="font-extrabold leading-none">SIM ADUAN</div>
+          <div class="text-xs text-slate-500 -mt-0.5">RSJD AHMA</div>
+        </div>
+      </div>
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
+        <a href="#fitur" class="hover:text-sky-600">Fitur</a>
+        <a href="#alur" class="hover:text-sky-600">Alur</a>
+        <a href="#kontak" class="hover:text-sky-600">Kontak</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button id="btnConfig" class="btn btn-ghost text-sm hidden sm:inline-flex">Config</button>
+        <button id="btnLogin" class="btn btn-primary text-sm">Masuk</button>
+      </div>
     </div>
-    <div id="detail-body" class="p-6 text-sm space-y-4"></div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10 grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <span class="badge badge-info">Sistem Informasi Manajemen Aduan</span>
+        <h1 class="text-4xl md:text-5xl font-black leading-tight mt-4">Layanan Aduan Cepat, Transparan & Akuntabel</h1>
+        <p class="mt-4 text-slate-600 text-lg">Kelola pengaduan pasien, keluarga, dan stakeholder RSJD AHMA dari pencatatan hingga otorisasi selesai dalam satu platform terpadu.</p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button id="heroMasuk" class="btn btn-primary">Mulai Lapor</button>
+          <a href="#fitur" class="btn btn-ghost">Pelajari Fitur</a>
+        </div>
+        <div class="mt-8 grid grid-cols-3 gap-4">
+          <div class="glass rounded-2xl p-4 text-center">
+            <div class="text-2xl font-black text-sky-600" id="statTotal">0</div>
+            <div class="text-xs text-slate-600">Total Aduan</div>
+          </div>
+          <div class="glass rounded-2xl p-4 text-center">
+            <div class="text-2xl font-black text-emerald-600" id="statSelesai">0</div>
+            <div class="text-xs text-slate-600">Selesai</div>
+          </div>
+          <div class="glass rounded-2xl p-4 text-center">
+            <div class="text-2xl font-black text-violet-600" id="statProses">0</div>
+            <div class="text-xs text-slate-600">Diproses</div>
+          </div>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -inset-6 bg-gradient-to-br from-sky-400/30 to-violet-400/30 blur-3xl rounded-full"></div>
+        <div class="relative glass rounded-2xl shadow-soft p-6">
+          <img id="heroImg" src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1600&auto=format&fit=crop" class="rounded-2xl w-full h-[380px] object-cover" alt="hero">
+          <div class="absolute bottom-10 left-10 right-10 glass rounded-2xl p-4 shadow-soft">
+            <div class="text-sm font-bold">Status Realtime</div>
+            <div class="text-xs text-slate-600">Pantau progres aduan Anda kapan saja</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fitur -->
+    <section id="fitur" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center max-w-2xl mx-auto">
+        <h2 class="text-3xl font-black">Fitur Unggulan</h2>
+        <p class="text-slate-600 mt-2">Dirancang untuk mempercepat respon dan meningkatkan kepuasan layanan.</p>
+      </div>
+      <div id="fiturGrid" class="grid md:grid-cols-3 gap-6 mt-10">
+        <!-- dynamic -->
+      </div>
+    </section>
+
+    <!-- Alur -->
+    <section id="alur" class="bg-white/60 border-y border-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <h2 class="text-3xl font-black text-center">Alur Penanganan Aduan</h2>
+        <div class="grid md:grid-cols-5 gap-4 mt-10">
+          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">📝</div><div class="font-bold mt-2">Pencatatan</div><div class="text-xs text-slate-600">Pelapor kirim aduan</div></div>
+          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">🔍</div><div class="font-bold mt-2">Verifikasi</div><div class="text-xs text-slate-600">Validasi & klasifikasi</div></div>
+          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">⚙️</div><div class="font-bold mt-2">Penanganan</div><div class="text-xs text-slate-600">Tindak lanjut unit</div></div>
+          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">✅</div><div class="font-bold mt-2">Otorisasi</div><div class="text-xs text-slate-600">Persetujuan pimpinan</div></div>
+          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">📢</div><div class="font-bold mt-2">Selesai</div><div class="text-xs text-slate-600">Notifikasi ke pelapor</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kontak -->
+    <section id="kontak" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="glass rounded-2xl p-8 md:p-12 grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <h3 class="text-2xl font-black">Butuh Bantuan?</h3>
+          <p class="text-slate-600 mt-2">Tim layanan pelanggan RSJD AHMA siap membantu 24/7.</p>
+          <div class="mt-6 space-y-3 text-sm">
+            <div>📞 (024) 123-4567</div>
+            <div>✉️ aduan@rsjd-ahma.go.id</div>
+            <div>📍 Jl. Kesehatan No.1, Semarang</div>
+          </div>
+        <form class="space-y-3" onsubmit="event.preventDefault(); toast('Pesan terkirim (demo)')">
+          <input class="input" placeholder="Nama Anda">
+          <input class="input" placeholder="Email">
+          <textarea class="input h-24" placeholder="Pesan singkat"></textarea>
+          <button class="btn btn-primary w-full justify-center">Kirim Pesan</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-white/60 py-8 text-center text-sm text-slate-600">
+    © <span id="year"></span> RSJD AHMA — SIM Aduan v1.0
+  </footer>
+</div>
+
+<!-- App Layout -->
+<div id="appLayout" class="hidden min-h-screen">
+  <div class="flex">
+    <aside id="sidebar" class="fixed left-0 top-0 h-screen w-[280px] glass border-r border-white/50 p-4 flex flex-col gap-4 overflow-y-auto scroll-thin">
+      <div class="flex items-center gap-3 px-2">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center text-white font-black">A</div>
+        <div>
+          <div class="font-extrabold leading-none">SIM ADUAN</div>
+          <div class="text-xs text-slate-500 -mt-0.5">RSJD AHMA</div>
+        </div>
+      </div>
+      <div class="glass rounded-2xl p-3">
+        <div class="text-xs text-slate-500">Masuk sebagai</div>
+        <div id="sbName" class="font-bold truncate">-</div>
+        <div id="sbRole" class="text-xs badge badge-info w-fit mt-1">-</div>
+      </div>
+      <nav id="sbNav" class="flex-1 space-y-1"></nav>
+      <button id="btnLogout" class="sidebar-link !text-red-600 hover:!bg-red-50">🚪 Keluar</button>
+    </aside>
+    <main class="flex-1 ml-[280px] min-h-screen">
+      <header class="sticky top-0 z-30 glass border-b border-white/50">
+        <div class="h-16 px-6 flex items-center justify-between">
+          <div>
+            <h1 id="pageTitle" class="text-xl font-black">Dashboard</h1>
+            <div id="pageSub" class="text-xs text-slate-500 -mt-0.5">Ringkasan aktivitas</div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="btnNotif" class="relative btn-ghost !p-3">
+              🔔
+              <span id="notifCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center hidden">0</span>
+            </button>
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center text-white font-bold" id="avatar">A</div>
+          </div>
+        </div>
+      </header>
+      <div class="p-6 max-w-[1400px] mx-auto">
+        <div id="moduleContainer" class="animate-in"></div>
+      </div>
+    </main>
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast" class="fixed top-5 right-5 z-[100] space-y-2"></div>
+<!-- Generic Modal -->
+<div id="genericModal" class="modal-backdrop hidden">
+  <div class="glass rounded-2xl shadow-soft w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+    <div class="p-5 border-b border-white/60 flex items-center justify-between">
+      <h3 id="gmTitle" class="text-lg font-bold">Modal</h3>
+      <button id="gmClose" class="btn btn-ghost !p-2">✕</button>
+    </div>
+    <div id="gmBody" class="p-5 overflow-y-auto scroll-thin"></div>
+  </div>
+</div>
 
 <script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-const $ = sel => document.querySelector(sel);
-const $$ = sel => [...document.querySelectorAll(sel)];
-const toast = (msg, type='info') => {
-  const wrap = $('#toast');
-  const el = document.createElement('div');
-  el.className = `px-4 py-3 rounded-xl shadow-soft text-sm font-medium border ${type==='error'?'bg-rose-600 text-white border-rose-700':type==='success'?'bg-emerald-600 text-white border-emerald-700':'bg-slate-900 text-white border-slate-800'} animate-[fadeIn_.2s]`;
-  el.textContent = msg;
-  wrap.appendChild(el);
-  setTimeout(()=>{ el.remove(); }, 4000);
-};
+const ROLES = ['Super Admin','Admin RS','Kepala Bagian','Verifikator','Petugas Penanganan','Otorisator','Staf','Pelapor Internal','Pelapor Eksternal','Auditor','Viewer'];
+const MODULES = [
+  {key:'dashboard', label:'Dashboard', icon:'📊', roles:ROLES},
+  {key:'pencatatan', label:'Pencatatan Aduan', icon:'📝', roles:['Super Admin','Admin RS','Staf','Pelapor Internal','Pelapor Eksternal']},
+  {key:'daftar', label:'Daftar Aduan', icon:'📋', roles:ROLES},
+  {key:'verifikasi', label:'Verifikasi', icon:'🔍', roles:['Super Admin','Admin RS','Verifikator']},
+  {key:'penanganan', label:'Penanganan', icon:'⚙️', roles:['Super Admin','Admin RS','Petugas Penanganan']},
+  {key:'otorisasi', label:'Otorisasi', icon:'✅', roles:['Super Admin','Kepala Bagian','Otorisator']},
+  {key:'log', label:'Log Aktivitas', icon:'🕒', roles:['Super Admin','Admin RS','Auditor']},
+  {key:'notifikasi', label:'Notifikasi', icon:'🔔', roles:ROLES},
+  {key:'parameter', label:'Parameter Umum', icon:'🧩', roles:['Super Admin']},
+  {key:'kategori', label:'Kategori & Sub', icon:'🗂️', roles:['Super Admin','Admin RS']},
+  {key:'template', label:'Dokumen Template', icon:'📄', roles:['Super Admin','Admin RS']},
+  {key:'konten', label:'Manajemen Konten', icon:'🎨', roles:['Super Admin','Admin RS']},
+  {key:'users', label:'Manajemen User', icon:'👥', roles:['Super Admin']},
+  {key:'pengaturan', label:'Pengaturan', icon:'⚙️', roles:ROLES},
+];
 
-const state = {
-  supabase: null,
-  session: null,
-  profile: null,
-  currentPage: 'dashboard',
-  aduanCache: [],
-  roles: ['superadmin','admin_sistem','pelapor','operator','verifikator','komite_etik','investigator','pic','otorisator','pimpinan','auditor'],
-  menu: [
-    { id:'dashboard', label:'Dashboard', icon:'📊', roles:['superadmin','admin_sistem','pelapor','operator','verifikator','komite_etik','investigator','pic','otorisator','pimpinan','auditor'] },
-    { id:'buat_aduan', label:'Buat Aduan', icon:'✍️', roles:['pelapor','superadmin','admin_sistem'] },
-    { id:'daftar_aduan', label:'Daftar Aduan', icon:'📋', roles:['superadmin','admin_sistem','pelapor','operator','verifikator','komite_etik','investigator','pic','otorisator','pimpinan','auditor'] },
-    { id:'verifikasi', label:'Verifikasi', icon:'🔍', roles:['operator','verifikator','superadmin','admin_sistem'] },
-    { id:'penanganan', label:'Penanganan', icon:'🛠️', roles:['komite_etik','investigator','pic','superadmin','admin_sistem'] },
-    { id:'otorisasi', label:'Otorisasi', icon:'✅', roles:['otorisator','pimpinan','superadmin','admin_sistem'] },
-    { id:'pengaturan', label:'Pengaturan Sistem', icon:'⚙️', roles:['superadmin'] },
-  ]
-};
+let supabase = null;
+let state = { user:null, profile:null, notifUnRead:0 };
+const $ = s=>document.querySelector(s);
+const $$ = s=>document.querySelectorAll(s);
 
-const rolePageAccess = Object.fromEntries(state.menu.map(m=>[m.id,m.roles]));
+function toast(msg,type='info'){
+  const el=document.createElement('div');
+  el.className=`glass rounded-2xl px-4 py-3 shadow-soft text-sm font-semibold ${type==='error'?'text-red-700':type==='success'?'text-emerald-700':'text-slate-800'}`;
+  el.textContent=msg;
+  $('#toast').appendChild(el);
+  setTimeout(()=>el.remove(),4000);
+}
+function show(el){el.classList.remove('hidden')}
+function hide(el){el.classList.add('hidden')}
+function openGM(title,html){$('#gmTitle').textContent=title;$('#gmBody').innerHTML=html;show($('#genericModal'))}
+function closeGM(){hide($('#genericModal'))}
+$('#gmClose').onclick=closeGM;
 
-/* ---------- CONFIG ---------- */
-function getConfig(){
-  return { url: localStorage.getItem('sb_url'), key: localStorage.getItem('sb_key') };
+function loadConfig(){
+  const cfg=localStorage.getItem('simaduan_cfg');
+  if(!cfg) return null;
+  try{return JSON.parse(cfg)}catch{return null}
 }
-function saveConfig(url,key){
-  localStorage.setItem('sb_url',url);
-  localStorage.setItem('sb_key',key);
+function saveConfig(cfg){localStorage.setItem('simaduan_cfg',JSON.stringify(cfg))}
+async function initSupabase(cfg){
+  supabase = createClient(cfg.url, cfg.key);
+  const { data:{session} } = await supabase.auth.getSession();
+  if(session) await afterLogin(session.user);
+  updateNotifCount();
 }
-function showModal(id){ $('#modal-backdrop').classList.remove('hidden'); $(`#${id}`).classList.remove('hidden'); $(`#${id}`).classList.add('grid'); }
-function hideModal(id){ $('#modal-backdrop').classList.add('hidden'); $(`#${id}`).classList.add('hidden'); $(`#${id}`).classList.remove('grid'); }
-function openConfig(prefill=true){
-  const cfg = getConfig();
-  if(prefill){ $('#cfg-input-url').value = cfg.url||''; $('#cfg-input-key').value = cfg.key||''; }
-  showModal('modal-config');
+async function afterLogin(user){
+  state.user=user;
+  const { data:prof } = await supabase.from('users').select('*').eq('id',user.id).maybeSingle();
+  if(!prof){
+    // create minimal profile for new auth user
+    const { data:ins } = await supabase.from('users').insert({id:user.id,email:user.email,nama:user.user_metadata?.nama||user.email.split('@')[0],role:'Pelapor Eksternal',aktif:true}).select().single();
+    state.profile=ins;
+  }else state.profile=prof;
+  $('#sbName').textContent=state.profile.nama;
+  $('#sbRole').textContent=state.profile.role;
+  $('#avatar').textContent=state.profile.nama.charAt(0).toUpperCase();
+  hide($('#landingPage'));
+  show($('#appLayout'));
+  renderSidebar();
+  navigate('dashboard');
 }
-function initSupabase(){
-  const {url,key} = getConfig();
-  if(!url||!key) return null;
-  try{
-    state.supabase = createClient(url,key,{ auth:{ persistSession:true, autoRefreshToken:true } });
-    return state.supabase;
-  }catch(e){ console.error(e); toast('Gagal inisialisasi Supabase','error'); return null; }
-}
-
-/* ---------- AUTH ---------- */
-async function fetchProfile(user){
-  if(!state.supabase) return null;
-  try{
-    const { data, error } = await state.supabase.from('users').select('*').eq('email', user.email).maybeSingle();
-    if(error) throw error;
-    if(!data){
-      // auto create pelapor
-      const insert = { email:user.email, nama:user.user_metadata?.name||user.email.split('@')[0], role:'pelapor' };
-      const { data:ins } = await state.supabase.from('users').insert(insert).select().single();
-      return ins;
-    }
-    return data;
-  }catch(e){
-    console.warn('profile fetch error',e);
-    return { email:user.email, nama:user.email.split('@')[0], role:'pelapor' };
-  }
-}
-
-async function checkSession(){
-  if(!state.supabase) return;
-  const { data:{session} } = await state.supabase.auth.getSession();
-  state.session = session;
-  if(session?.user){
-    state.profile = await fetchProfile(session.user);
-    showMain();
-  }else{
-    showAuth();
-  }
-}
-
-/* ---------- UI SHOW ---------- */
-function showAuth(){
-  $('#app-loader').classList.add('hidden');
-  $('#auth-screen').classList.remove('hidden');
-  $('#main-layout').classList.add('hidden');
-}
-function showMain(){
-  $('#app-loader').classList.add('hidden');
-  $('#auth-screen').classList.add('hidden');
-  $('#main-layout').classList.remove('hidden');
-  renderUser();
-  renderMenu();
-  navigate('dashboard', true);
-  loadDashboard();
-}
-function renderUser(){
-  const p = state.profile||{};
-  $('#user-name').textContent = p.nama || p.email || '-';
-  $('#user-role').textContent = p.role || '-';
-  $('#user-badge').textContent = (p.role||'').substring(0,4).toUpperCase();
-  $('#user-avatar').src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(p.nama||p.email||'User')}`;
-  // config button visibility
-  if(p.role==='superadmin'){ $('#btn-config').classList.remove('hidden'); } else { $('#btn-config').classList.add('hidden'); }
-}
-function renderMenu(){
-  const role = state.profile?.role;
-  const nav = $('#sidebar-menu');
-  nav.innerHTML = '';
-  state.menu.filter(m=>m.roles.includes(role)).forEach(m=>{
-    const btn = document.createElement('button');
-    btn.dataset.page = m.id;
-    btn.className = `w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-100 text-slate-700 ${state.currentPage===m.id?'bg-teal-50 text-teal-800 font-semibold':''}`;
-    btn.innerHTML = `<span class="text-lg w-6 text-center">${m.icon}</span><span>${m.label}</span>`;
-    btn.onclick = ()=> navigate(m.id);
-    nav.appendChild(btn);
+function renderSidebar(){
+  const nav=$('#sbNav');
+  nav.innerHTML='';
+  const role=state.profile?.role;
+  MODULES.filter(m=>m.roles.includes(role)||m.roles.includes('*')).forEach(m=>{
+    const a=document.createElement('button');
+    a.className='sidebar-link w-full text-left';
+    a.dataset.key=m.key;
+    a.innerHTML=`<span class="text-lg">${m.icon}</span><span>${m.label}</span>`;
+    a.onclick=()=>navigate(m.key);
+    nav.appendChild(a);
   });
 }
-
-/* ---------- NAVIGATION ---------- */
-function navigate(pageId, force=false){
-  const role = state.profile?.role;
-  const allowed = rolePageAccess[pageId] || [];
-  if(!force && !allowed.includes(role)){
-    toast('Akses ditolak','error');
-    pageId = 'dashboard';
+function setActiveSidebar(key){
+  $$('#sbNav .sidebar-link').forEach(b=>b.classList.toggle('active',b.dataset.key===key));
+}
+async function navigate(key){
+  if(!state.profile) return;
+  setActiveSidebar(key);
+  const mod=MODULES.find(m=>m.key===key);
+  $('#pageTitle').textContent=mod.label;
+  const container=$('#moduleContainer');
+  container.innerHTML=`<div class="glass rounded-2xl p-10 text-center">Memuat...</div>`;
+  try{
+    const html=await renderModule(key);
+    container.innerHTML=html;
+    if(moduleInit[key]) await moduleInit[key]();
+  }catch(e){
+    console.error(e);
+    container.innerHTML=`<div class="glass rounded-2xl p-10 text-center text-red-600">Gagal memuat: ${e.message}</div>`;
   }
-  state.currentPage = pageId;
-  $$('.page').forEach(s=>s.classList.toggle('hidden', s.dataset.page!==pageId));
-  $('#page-title').textContent = state.menu.find(m=>m.id===pageId)?.label || 'Halaman';
-  renderMenu();
-  // load page data
-  if(pageId==='daftar_aduan') loadAduan();
-  if(pageId==='verifikasi') loadVerifList();
-  if(pageId==='penanganan') loadTanganiList();
-  if(pageId==='otorisasi') loadOtorList();
-  if(pageId==='pengaturan') loadSettings();
-}
-function guard(){ return true; }
-
-/* ---------- DASHBOARD ---------- */
-async function loadDashboard(){
-  if(!state.supabase){ $('#stat-total').textContent='—'; return; }
-  try{
-    const { data, error } = await state.supabase.from('aduan').select('id,status,kategori,judul,created_at').order('created_at',{ascending:false}).limit(20);
-    if(error) throw error;
-    state.aduanCache = data||[];
-    $('#stat-total').textContent = data.length;
-    $('#stat-verif').textContent = data.filter(d=>d.status==='Baru').length;
-    $('#stat-proses').textContent = data.filter(d=>['Diverifikasi','Diproses'].includes(d.status)).length;
-    $('#stat-selesai').textContent = data.filter(d=>d.status==='Selesai').length;
-
-    const tbody = $('#tbl-dashboard'); tbody.innerHTML='';
-    data.slice(0,5).forEach(r=>{
-      const tr = document.createElement('tr');
-      tr.className='border-b last:border-0';
-      tr.innerHTML = `<td class="py-2 pr-3 font-medium">${r.judul||'-'}</td><td class="py-2 pr-3 text-slate-600">${r.kategori||'-'}</td><td class="py-2 pr-3"><span class="text-xs px-2 py-1 rounded-lg bg-slate-100">${r.status}</span></td><td class="py-2 text-slate-500">${new Date(r.created_at).toLocaleDateString('id-ID')}</td>`;
-      tbody.appendChild(tr);
-    });
-
-    const dist = $('#dist-status'); dist.innerHTML='';
-    const groups = {};
-    data.forEach(d=> groups[d.status]=(groups[d.status]||0)+1);
-    Object.entries(groups).forEach(([k,v])=>{
-      const pct = Math.round(v/data.length*100)||0;
-      dist.innerHTML += `<div><div class="flex justify-between text-xs mb-1"><span class="font-medium">${k}</span><span>${v}</span></div><div class="h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-teal-600" style="width:${pct}%"></div></div></div>`;
-    });
-  }catch(e){ console.warn(e); toast('Gagal memuat dashboard','error'); }
 }
 
-/* ---------- DAFTAR ADUAN ---------- */
-async function loadAduan(){
-  if(!state.supabase) return;
-  const isPelapor = state.profile?.role==='pelapor';
-  try{
-    let q = state.supabase.from('pengaduan').select('*').order('created_at',{ascending:false});
-    if(isPelapor) q = q.eq('pelapor_email', state.profile.email);
-    const { data, error } = await q;
-    if(error) throw error;
-    const tbody = $('#tbl-aduan'); tbody.innerHTML='';
-    (data||[]).forEach(r=>{
-      const tr = document.createElement('tr');
-      tr.className='hover:bg-slate-50';
-      tr.innerHTML = `<td class="px-3 py-2 text-xs text-slate-500">${String(r.id).slice(0,8)}</td>
-        <td class="px-3 py-2 font-medium">${r.judul}</td>
-        <td class="px-3 py-2 text-slate-600">${r.pelapor_nama||'-'}</td>
-        <td class="px-3 py-2">${r.kategori||'-'}</td>
-        <td class="px-3 py-2"><span class="text-xs px-2 py-1 rounded-lg ${statusColor(r.status)}">${r.status}</span></td>
-        <td class="px-3 py-2 text-slate-500">${new Date(r.created_at).toLocaleDateString('id-ID')}</td>
-        <td class="px-3 py-2 text-right"><button data-detail="${r.id}" class="text-xs px-2 py-1 rounded-lg bg-slate-900 text-white">Detail</button></td>`;
-      tbody.appendChild(tr);
-    });
-    tbody.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>showDetail(b.dataset.detail));
-  }catch(e){ console.warn(e); toast('Gagal memuat daftar','error'); }
-}
-function statusColor(s){
-  if(s==='Baru') return 'bg-amber-100 text-amber-800';
-  if(s==='Diverifikasi') return 'bg-sky-100 text-sky-800';
-  if(s==='Diproses') return 'bg-indigo-100 text-indigo-800';
-  if(s==='Selesai') return 'bg-emerald-100 text-emerald-800';
-  if(s==='Ditolak') return 'bg-rose-100 text-rose-800';
-  return 'bg-slate-100 text-slate-700';
+// ---------- MODULES ----------
+const moduleInit={};
+
+async function renderModule(key){
+  switch(key){
+    case 'dashboard': return dashboardView();
+    case 'pencatatan': return pencatatanView();
+    case 'daftar': return daftarView();
+    case 'verifikasi': return verifikasiView();
+    case 'penanganan': return penangananView();
+    case 'otorisasi': return otorisasiView();
+    case 'log': return logView();
+    case 'notifikasi': return notifikasiView();
+    case 'parameter': return parameterView();
+    case 'kategori': return kategoriView();
+    case 'template': return templateView();
+    case 'konten': return kontenView();
+    case 'users': return usersView();
+    case 'pengaturan': return pengaturanView();
+  }
+  return '<div>Not implemented</div>';
 }
 
-/* ---------- DETAIL ---------- */
-async function showDetail(id){
-  if(!state.supabase) return;
-  try{
-    const { data, error } = await state.supabase.from('pengaduan').select('*').eq('id',id).single();
-    if(error) throw error;
-    const body = $('#detail-body');
-    body.innerHTML = `
-      <div class="grid sm:grid-cols-2 gap-4">
-        <div><p class="text-xs text-slate-500">Judul</p><p class="font-semibold">${data.judul}</p></div>
-        <div><p class="text-xs text-slate-500">Status</p><p class="font-semibold">${data.status}</p></div>
-        <div><p class="text-xs text-slate-500">Kategori</p><p>${data.kategori||'-'}</p></div>
-        <div><p class="text-xs text-slate-500">Tanggal Kejadian</p><p>${data.tanggal_kejadian||'-'}</p></div>
-        <div class="sm:col-span-2"><p class="text-xs text-slate-500">Uraian</p><p class="whitespace-pre-wrap">${data.uraian||'-'}</p></div>
-        <div><p class="text-xs text-slate-500">Pelapor</p><p>${data.pelapor_nama} (${data.pelapor_email})</p></div>
-        <div><p class="text-xs text-slate-500">Terlapor</p><p>${data.terlapor||'-'}</p></div>
+// Dashboard
+async function dashboardView(){
+  return `
+  <div class="grid lg:grid-cols-4 gap-5">
+    <div class="glass rounded-2xl p-5"><div class="text-xs text-slate-500">Total Aduan</div><div id="dTotal" class="text-3xl font-black">-</div></div>
+    <div class="glass rounded-2xl p-5"><div class="text-xs text-slate-500">Terkirim</div><div id="dTerkirim" class="text-3xl font-black text-sky-600">-</div></div>
+    <div class="glass rounded-2xl p-5"><div class="text-xs text-slate-500">Proses</div><div id="dProses" class="text-3xl font-black text-amber-600">-</div></div>
+    <div class="glass rounded-2xl p-5"><div class="text-xs text-slate-500">Selesai</div><div id="dSelesai" class="text-3xl font-black text-emerald-600">-</div></div>
+  </div>
+  <div class="grid lg:grid-cols-3 gap-5 mt-5">
+    <div class="lg:col-span-2 glass rounded-2xl p-5">
+      <h3 class="font-bold mb-3">Aduan Terbaru</h3>
+      <div class="overflow-x-auto"><table class="table" id="tblRecent"></table></div>
+    </div>
+    <div class="glass rounded-2xl p-5">
+      <h3 class="font-bold mb-3">Log Aktivitas Terbaru</h3>
+      <div id="logList" class="space-y-3 max-h-[360px] overflow-y-auto scroll-thin pr-2"></div>
+    </div>
+  </div>`;
+}
+moduleInit.dashboard=async()=>{
+  const { data:aduan } = await supabase.from('aduan').select('status');
+  $('#dTotal').textContent=aduan?.length||0;
+  $('#dTerkirim').textContent=aduan?.filter(a=>a.status==='Terkirim').length||0;
+  $('#dProses').textContent=aduan?.filter(a=>['Diverifikasi','Proses','Menunggu Otorisasi'].includes(a.status)).length||0;
+  $('#dSelesai').textContent=aduan?.filter(a=>a.status==='Selesai').length||0;
+  const { data:recent } = await supabase.from('aduan').select('nomor_aduan,judul,status,created_at').order('created_at',{ascending:false}).limit(8);
+  $('#tblRecent').innerHTML=`<thead><tr><th>No</th><th>Judul</th><th>Status</th><th>Tanggal</th></tr></thead><tbody>${
+    (recent||[]).map(r=>`<tr><td>${r.nomor_aduan}</td><td class="font-semibold">${r.judul}</td><td>${badgeStatus(r.status)}</td><td>${new Date(r.created_at).toLocaleDateString('id-ID')}</td></tr>`).join('')
+  }</tbody>`;
+  const { data:logs } = await supabase.from('log_aktivitas').select('aktivitas,keterangan,created_at,users(nama)').order('created_at',{ascending:false}).limit(10);
+  $('#logList').innerHTML=(logs||[]).map(l=>`
+    <div class="p-3 rounded-xl bg-white/60 border border-white">
+      <div class="text-sm font-semibold">${l.aktivitas}</div>
+      <div class="text-xs text-slate-600">${l.keterangan||''}</div>
+      <div class="text-[11px] text-slate-500 mt-1">${l.users?.nama||'-'} • ${new Date(l.created_at).toLocaleString('id-ID')}</div>
+    </div>`).join('');
+};
+
+// Pencatatan
+function pencatatanView(){
+  return `
+  <div class="glass rounded-2xl p-6 max-w-4xl">
+    <h3 class="text-xl font-black">Form Aduan Baru</h3>
+    <form id="formAduan" class="grid md:grid-cols-2 gap-4 mt-4">
+      <div class="md:col-span-2">
+        <label class="text-sm font-semibold">Judul Aduan</label>
+        <input name="judul" class="input mt-1" required>
       </div>
-      <div class="pt-4 border-t">
-        <p class="text-xs text-slate-500 mb-2">Bukti Digital</p>
-        <div id="bukti-list" class="space-y-2 text-sm"></div>
-      </div>`;
-    showModal('modal-detail');
-    // load bukti
-    const { data:files } = await state.supabase.from('bukti_aduan').select('*').eq('aduan_id',id);
-    const bl = $('#bukti-list');
-    if(files?.length){
-      files.forEach(f=>{
-        const url = state.supabase.storage.from('bukti_digital').getPublicUrl(f.path).data.publicUrl;
-        bl.innerHTML += `<a href="${url}" target="_blank" class="block px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border">${f.nama_file}</a>`;
-      });
-    }else bl.innerHTML = `<p class="text-slate-500">Tidak ada bukti.</p>`;
-  }catch(e){ toast('Gagal memuat detail','error'); }
+      <div>
+        <label class="text-sm font-semibold">Kategori</label>
+        <select name="kategori_id" id="fKategori" class="input select mt-1" required></select>
+      </div>
+      <div>
+        <label class="text-sm font-semibold">Sub Kategori</label>
+        <select name="sub_kategori_id" id="fSub" class="input select mt-1" required></select>
+      </div>
+      <div>
+        <label class="text-sm font-semibold">Prioritas</label>
+        <select name="prioritas" class="input select mt-1"><option>Rendah</option><option>Sedang</option><option>Tinggi</option><option>Kritis</option></select>
+      </div>
+      <div>
+        <label class="text-sm font-semibold">Lokasi Kejadian</label>
+        <input name="lokasi" class="input mt-1">
+      </div>
+      <div class="md:col-span-2">
+        <label class="text-sm font-semibold">Deskripsi</label>
+        <textarea name="deskripsi" class="input mt-1 h-32" required></textarea>
+      </div>
+      <div class="md:col-span-2">
+        <label class="text-sm font-semibold">Bukti Digital (max 5 file)</label>
+        <input type="file" id="fBukti" multiple accept="image/*,application/pdf" class="input mt-1">
+      </div>
+      <div class="md:col-span-2 flex gap-3 pt-2">
+        <button class="btn btn-primary">Kirim Aduan</button>
+        <button type="reset" class="btn btn-ghost">Reset</button>
+      </div>
+    </form>
+  </div>`;
+}
+moduleInit.pencatatan=async()=>{
+  const { data:kats } = await supabase.from('kategori_aduan').select('id,nama').eq('aktif',true);
+  $('#fKategori').innerHTML=`<option value="">Pilih</option>`+(kats||[]).map(k=>`<option value="${k.id}">${k.nama}</option>`).join('');
+  $('#fKategori').onchange=async e=>{
+    const { data:subs } = await supabase.from('sub_kategori').select('id,nama').eq('kategori_id',e.target.value).eq('aktif',true);
+    $('#fSub').innerHTML=`<option value="">Pilih</option>`+(subs||[]).map(s=>`<option value="${s.id}">${s.nama}</option>`).join('');
+  };
+  $('#formAduan').onsubmit=async ev=>{
+    ev.preventDefault();
+    const fd=new FormData(ev.target);
+    const payload=Object.fromEntries(fd.entries());
+    try{
+      const nomor=await generateNomor();
+      const { data:ad, error:err1 } = await supabase.from('aduan').insert({
+        nomor_aduan:nomor,
+        judul:payload.judul,
+        deskripsi:payload.deskripsi,
+        kategori_id:payload.kategori_id,
+        sub_kategori_id:payload.sub_kategori_id,
+        prioritas:payload.prioritas,
+        lokasi:payload.lokasi,
+        pelapor_id:state.profile.id,
+        status:'Terkirim',
+        progress:0
+      }).select().single();
+      if(err1) throw err1;
+      // upload bukti
+      const files=$('#fBukti').files;
+      for(const f of files){
+        const url=await uploadFile('bukti_digital',f);
+        await supabase.from('aduan').update({bukti_url:supabase.storage.from('bukti_digital').getPublicUrl(url.path).data.publicUrl}).eq('id',ad.id);
+        // simplistic: store last url
+      }
+      await logActivity(ad.id,'Aduan Dibuat',`Nomor ${nomor}`);
+      await createNotifForRole(['Verifikator','Admin RS'],'Aduan Baru',`Aduan ${nomor} perlu verifikasi`);
+      toast('Aduan berhasil dikirim','success');
+      ev.target.reset();
+    }catch(e){toast(e.message,'error')}
+  };
+};
+
+// Daftar
+function daftarView(){
+  return `
+  <div class="glass rounded-2xl p-5">
+    <div class="flex flex-wrap gap-3 items-center mb-4">
+      <input id="qSearch" class="input max-w-xs" placeholder="Cari nomor/judul...">
+      <select id="qStatus" class="input select max-w-[200px]"><option value="">Semua Status</option>${['Terkirim','Diverifikasi','Proses','Menunggu Otorisasi','Selesai','Ditolak'].map(s=>`<option>${s}</option>`).join('')}</select>
+      <button id="btnRefresh" class="btn btn-ghost">Refresh</button>
+    </div>
+    <div class="overflow-x-auto"><table class="table" id="tblDaftar"></table></div>
+  </div>`;
+}
+moduleInit.daftar=async()=>{
+  const load=async()=>{
+    let q=supabase.from('aduan').select('id,nomor_aduan,judul,status,prioritas,progress,created_at,kategori_aduan(nama),users(nama)').order('created_at',{ascending:false}).limit(200);
+    const s=$('#qSearch').value.trim();
+    if(s) q=q.or(`nomor_aduan.ilike.%${s}%,judul.ilike.%${s}%`);
+    const st=$('#qStatus').value;
+    if(st) q=q.eq('status',st);
+    const { data } = await q;
+    $('#tblDaftar').innerHTML=`<thead><tr><th>Nomor</th><th>Judul</th><th>Kategori</th><th>Pelapor</th><th>Prioritas</th><th>Status</th><th>Progress</th><th>Tanggal</th></tr></thead><tbody>${
+      (data||[]).map(r=>`<tr class="cursor-pointer hover:bg-sky-50" data-id="${r.id}"><td class="font-mono text-xs">${r.nomor_aduan}</td><td class="font-semibold">${r.judul}</td><td>${r.kategori_aduan?.nama||'-'}</td><td>${r.users?.nama||'-'}</td><td>${r.prioritas||'-'}</td><td>${badgeStatus(r.status)}</td><td>${r.progress||0}%</td><td>${new Date(r.created_at).toLocaleDateString('id-ID')}</td></tr>`).join('')
+    }</tbody>`;
+    $('#tblDaftar tbody').onclick=e=>{
+      const tr=e.target.closest('tr'); if(!tr) return;
+      openDetailAduan(tr.dataset.id);
+    };
+  };
+  $('#qSearch').oninput=debounce(load,400);
+  $('#qStatus').onchange=load;
+  $('#btnRefresh').onclick=load;
+  load();
+};
+
+// Verifikasi
+function verifikasiView(){
+  return `<div class="glass rounded-2xl p-5"><div class="overflow-x-auto"><table class="table" id="tblVerif"></table></div></div>`;
+}
+moduleInit.verifikasi=async()=>{
+  const { data } = await supabase.from('aduan').select('id,nomor_aduan,judul,created_at,users(nama),kategori_aduan(nama)').eq('status','Terkirim').order('created_at');
+  $('#tblVerif').innerHTML=`<thead><tr><th>Nomor</th><th>Judul</th><th>Kategori</th><th>Pelapor</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody>${
+    (data||[]).map(r=>`<tr><td class="font-mono text-xs">${r.nomor_aduan}</td><td>${r.judul}</td><td>${r.kategori_aduan?.nama||''}</td><td>${r.users?.nama||''}</td><td>${new Date(r.created_at).toLocaleDateString('id-ID')}</td><td><button data-id="${r.id}" class="btn btn-primary !py-1 !px-3 text-sm btnVerif">Verifikasi</button></td></tr>`).join('')
+  }</tbody>`;
+  $('#tblVerif').onclick=e=>{
+    const b=e.target.closest('.btnVerif'); if(!b) return;
+    openVerifForm(b.dataset.id);
+  };
+};
+async function openVerifForm(id){
+  const { data:ad } = await supabase.from('aduan').select('*').eq('id',id).single();
+  openGM('Verifikasi Aduan',`
+    <div class="space-y-3">
+      <div><b>${ad.nomor_aduan}</b> - ${ad.judul}</div>
+      <form id="fVerif" class="space-y-3">
+        <label class="text-sm font-semibold">Hasil Verifikasi</label>
+        <select name="hasil" class="input select"><option>Valid</option><option>Tidak Valid</option></select>
+        <label class="text-sm font-semibold">Catatan</label>
+        <textarea name="catatan" class="input h-24"></textarea>
+        <label class="text-sm font-semibold">Rekomendasi</label>
+        <input name="rekomendasi" class="input">
+        <button class="btn btn-primary">Simpan Verifikasi</button>
+      </form>
+    </div>`);
+  $('#fVerif').onsubmit=async ev=>{
+    ev.preventDefault();
+    const fd=Object.fromEntries(new FormData(ev.target).entries());
+    const status=fd.hasil==='Valid'?'Diverifikasi':'Ditolak';
+    await supabase.from('verifikasi').insert({aduan_id:id,verifikator_id:state.profile.id,hasil_verifikasi:fd.hasil,catatan:fd.catatan,rekomendasi:fd.rekomendasi});
+    await supabase.from('aduan').update({status,progress:status==='Diverifikasi'?10:0}).eq('id',id);
+    await logActivity(id,'Verifikasi',fd.hasil);
+    toast('Verifikasi disimpan','success'); closeGM(); navigate('verifikasi');
+  };
 }
 
-/* ---------- BUAT ADUAN ---------- */
-async function loadKategori(){
-  if(!state.supabase) return;
-  try{
-    const { data } = await state.supabase.from('kategori_aduan').select('*');
-    const sel = $('#aduan-kategori');
-    sel.innerHTML = '<option value="">Pilih kategori</option>';
-    (data||[]).forEach(k=> sel.innerHTML += `<option value="${k.nama}">${k.nama}</option>`);
-  }catch{ }
+// Penanganan
+function penangananView(){
+  return `<div class="glass rounded-2xl p-5"><div class="overflow-x-auto"><table class="table" id="tblPen"></table></div></div>`;
 }
-$('#form-aduan')?.addEventListener('submit', async e=>{
-  e.preventDefault();
-  if(!state.supabase) return toast('Supabase belum terkonfigurasi','error');
-  const payload = {
-    judul: $('#aduan-judul').value.trim(),
-    kategori: $('#aduan-kategori').value,
-    tanggal_kejadian: $('#aduan-tgl').value,
-    lokasi: $('#aduan-lokasi').value.trim(),
-    terlapor: $('#aduan-terlapor').value.trim(),
-    uraian: $('#aduan-uraian').value.trim(),
-    pelapor_email: state.profile.email,
-    pelapor_nama: state.profile.nama,
-    status: 'Baru'
+moduleInit.penanganan=async()=>{
+  const { data } = await supabase.from('aduan').select('id,nomor_aduan,judul,status,progress').in('status',['Diverifikasi','Proses']).order('created_at');
+  $('#tblPen').innerHTML=`<thead><tr><th>Nomor</th><th>Judul</th><th>Status</th><th>Progress</th><th>Aksi</th></tr></thead><tbody>${
+    (data||[]).map(r=>`<tr><td class="font-mono text-xs">${r.nomor_aduan}</td><td>${r.judul}</td><td>${badgeStatus(r.status)}</td><td>${r.progress||0}%</td><td><button data-id="${r.id}" class="btn btn-primary !py-1 !px-3 text-sm btnTahap">Tambah Tahap</button></td></tr>`).join('')
+  }</tbody>`;
+  $('#tblPen').onclick=e=>{
+    const b=e.target.closest('.btnTahap'); if(!b) return;
+    openTahapForm(b.dataset.id);
   };
+};
+function openTahapForm(id){
+  openGM('Tambah Tahap Penanganan',`
+    <form id="fTahap" class="space-y-3">
+      <label class="text-sm font-semibold">Deskripsi Tahap</label>
+      <textarea name="deskripsi" class="input h-24" required></textarea>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="text-sm font-semibold">Progress (%)</label><input type="number" name="progress" min="0" max="100" class="input"></div>
+        <div><label class="text-sm font-semibold">Estimasi Selesai</label><input type="date" name="estimasi" class="input"></div>
+      </div>
+      <button class="btn btn-primary">Simpan</button>
+    </form>`);
+  $('#fTahap').onsubmit=async ev=>{
+    ev.preventDefault();
+    const fd=Object.fromEntries(new FormData(ev.target).entries());
+    const { data:cnt } = await supabase.from('penanganan_tahap').select('id',{count:'exact',head:true}).eq('aduan_id',id);
+    await supabase.from('penanganan_tahap').insert({aduan_id:id,petugas_id:state.profile.id,tahap_ke:(cnt||0)+1,deskripsi:fd.deskripsi,progress:parseInt(fd.progress)||0,estimasi_selesai:fd.estimasi||null});
+    await supabase.from('aduan').update({status:'Proses',progress:parseInt(fd.progress)||0}).eq('id',id);
+    await logActivity(id,'Penanganan','Tahap ditambahkan');
+    toast('Tahap disimpan','success'); closeGM(); navigate('penanganan');
+  };
+}
+
+// Otorisasi
+function otorisasiView(){
+  return `<div class="glass rounded-2xl p-5"><div class="overflow-x-auto"><table class="table" id="tblOto"></table></div></div>`;
+}
+moduleInit.otorisasi=async()=>{
+  const { data } = await supabase.from('aduan').select('id,nomor_aduan,judul').eq('status','Menunggu Otorisasi');
+  $('#tblOto').innerHTML=`<thead><tr><th>Nomor</th><th>Judul</th><th>Aksi</th></tr></thead><tbody>${
+    (data||[]).map(r=>`<tr><td class="font-mono text-xs">${r.nomor_aduan}</td><td>${r.judul}</td><td><button data-id="${r.id}" class="btn btn-primary !py-1 !px-3 text-sm btnOto">Proses</button></td></tr>`).join('')
+  }</tbody>`;
+  $('#tblOto').onclick=e=>{
+    const b=e.target.closest('.btnOto'); if(!b) return;
+    openOtoForm(b.dataset.id);
+  };
+};
+function openOtoForm(id){
+  openGM('Otorisasi Aduan',`
+    <form id="fOto" class="space-y-3">
+      <label class="text-sm font-semibold">Keputusan</label>
+      <select name="keputusan" class="input select"><option>Setuju</option><option>Tolak</option></select>
+      <label class="text-sm font-semibold">Catatan</label>
+      <textarea name="catatan" class="input h-24"></textarea>
+      <button class="btn btn-primary">Simpan</button>
+    </form>`);
+  $('#fOto').onsubmit=async ev=>{
+    ev.preventDefault();
+    const fd=Object.fromEntries(new FormData(ev.target).entries());
+    await supabase.from('otorisasi').insert({aduan_id:id,otorisator_id:state.profile.id,keputusan:fd.keputusan,catatan:fd.catatan});
+    const newStatus=fd.keputusan==='Setuju'?'Selesai':'Ditolak';
+    await supabase.from('aduan').update({status:newStatus,progress:newStatus==='Selesai'?100:0}).eq('id',id);
+    await logActivity(id,'Otorisasi',fd.keputusan);
+    toast('Otorisasi disimpan','success'); closeGM(); navigate('otorisasi');
+  };
+}
+
+// Log
+function logView(){
+  return `<div class="glass rounded-2xl p-5">
+    <div class="flex gap-3 mb-3"><input id="logQ" class="input max-w-xs" placeholder="Filter aduan id/nomor"><button id="logRefresh" class="btn btn-ghost">Refresh</button></div>
+    <div class="overflow-x-auto"><table class="table" id="tblLog"></table></div>
+  </div>`;
+}
+moduleInit.log=async()=>{
+  const load=async()=>{
+    let q=supabase.from('log_aktivitas').select('id,aktivitas,keterangan,created_at,aduan_id,users(nama),aduan(nomor_aduan)').order('created_at',{ascending:false}).limit(200);
+    $('#tblLog').innerHTML='<tbody><tr><td>Memuat...</td></tr></tbody>';
+    const { data } = await q;
+    $('#tblLog').innerHTML=`<thead><tr><th>Waktu</th><th>Aduan</th><th>Aktivitas</th><th>User</th><th>Keterangan</th></tr></thead><tbody>${
+      (data||[]).map(l=>`<tr><td class="text-xs">${new Date(l.created_at).toLocaleString('id-ID')}</td><td class="font-mono text-xs">${l.aduan?.nomor_aduan||l.aduan_id||'-'}</td><td>${l.aktivitas}</td><td>${l.users?.nama||'-'}</td><td>${l.keterangan||''}</td></tr>`).join('')
+    }</tbody>`;
+  };
+  $('#logRefresh').onclick=load;
+  load();
+};
+
+// Notifikasi
+function notifikasiView(){
+  return `<div class="glass rounded-2xl p-5"><div id="notifList" class="space-y-3"></div></div>`;
+}
+moduleInit.notifikasi=async()=>{
+  const { data } = await supabase.from('notifikasi').select('*').eq('user_id',state.profile.id).order('created_at',{ascending:false}).limit(100);
+  $('#notifList').innerHTML=(data||[]).map(n=>`
+    <div class="p-4 rounded-xl border ${n.is_read?'bg-white/40':'bg-sky-50 border-sky-200'}">
+      <div class="font-bold">${n.judul}</div>
+      <div class="text-sm text-slate-700">${n.pesan||''}</div>
+      <div class="text-xs text-slate-500 mt-1">${new Date(n.created_at).toLocaleString('id-ID')}</div>
+      ${!n.is_read?`<button data-id="${n.id}" class="text-xs text-sky-700 font-semibold mt-1 btnRead">Tandai dibaca</button>`:''}
+    </div>`).join('')||'<div class="text-slate-500">Tidak ada notifikasi</div>';
+  $('#notifList').onclick=async e=>{
+    const b=e.target.closest('.btnRead'); if(!b) return;
+    await supabase.from('notifikasi').update({is_read:true,read_at:new Date().toISOString()}).eq('id',b.dataset.id);
+    navigate('notifikasi'); updateNotifCount();
+  };
+};
+
+// Parameter Umum CRUD
+function parameterView(){return crudTemplate('parameter_umum','Parameter Umum',['kunci','nilai','deskripsi','tipe']); }
+moduleInit.parameter=()=>initCrud('parameter_umum',['kunci','nilai','deskripsi','tipe']);
+
+// Kategori
+function kategoriView(){
+  return `<div class="grid lg:grid-cols-2 gap-5">
+    <div class="glass rounded-2xl p-5"><h3 class="font-bold mb-3">Kategori Aduan</h3><div id="katWrap"></div></div>
+    <div class="glass rounded-2xl p-5"><h3 class="font-bold mb-3">Sub Kategori</h3><div id="subWrap"></div></div>
+  </div>`;
+}
+moduleInit.kategori=async()=>{
+  await initCrudInline('kategori_aduan','katWrap',['nama','deskripsi','aktif'],{aktif:'checkbox'});
+  await initCrudInline('sub_kategori','subWrap',['kategori_id','nama','deskripsi','aktif'],{kategori_id:'select_kategori',aktif:'checkbox'});
+};
+
+// Template
+function templateView(){ return crudTemplate('dokumen_template','Dokumen Template',['nama','kategori','deskripsi','aktif'],true); }
+moduleInit.template=()=>initCrud('dokumen_template',['nama','kategori','deskripsi','file_url','aktif'],{file_url:'file',aktif:'checkbox'},'dokumen_template');
+
+// Konten
+function kontenView(){ return crudTemplate('konten_landing','Manajemen Konten',['section','judul','subjudul','konten','gambar_url','urutan','aktif'],true); }
+moduleInit.konten=()=>initCrud('konten_landing',['section','judul','subjudul','konten','gambar_url','urutan','aktif'],{konten:'textarea',gambar_url:'file',aktif:'checkbox'},'dokumen_template');
+
+// Users
+function usersView(){ return crudTemplate('users','Manajemen User',['nama','email','role','unit_kerja','telepon','aktif']); }
+moduleInit.users=()=>initCrud('users',['nama','email','role','unit_kerja','telepon','aktif'],{role:'select_role',aktif:'checkbox'});
+
+// Pengaturan
+function pengaturanView(){
+  return `<div class="grid lg:grid-cols-2 gap-5">
+    <div class="glass rounded-2xl p-6">
+      <h3 class="font-bold">Ubah Password</h3>
+      <form id="fPass" class="space-y-3 mt-3">
+        <input type="password" name="pass" placeholder="Password baru (min 6)" class="input" required minlength="6">
+        <button class="btn btn-primary">Simpan Password</button>
+      </form>
+    </div>
+    <div class="glass rounded-2xl p-6">
+      <h3 class="font-bold">Konfigurasi Supabase</h3>
+      <p class="text-sm text-slate-600">Hanya Super Admin</p>
+      <button id="btnReconfig" class="btn btn-ghost mt-3">Buka Config</button>
+    </div>
+  </div>`;
+}
+moduleInit.pengaturan=()=>{
+  $('#fPass').onsubmit=async e=>{
+    e.preventDefault();
+    const pass=e.target.pass.value;
+    const { error } = await supabase.auth.updateUser({password:pass});
+    if(error) toast(error.message,'error'); else toast('Password diperbarui','success');
+  };
+  $('#btnReconfig').onclick=()=>{ if(state.profile.role!=='Super Admin') return toast('Hanya Super Admin','error'); show($('#configModal')); };
+};
+
+// ---------- Helpers ----------
+function badgeStatus(s){
+  const map={Terkirim:'badge-info',Diverifikasi:'badge-warning',Proses:'badge-warning','Menunggu Otorisasi':'badge-warning',Selesai:'badge-success',Ditolak:'badge-danger'};
+  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+}
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
+async function generateNomor(){
+  const now=new Date();
+  const prefix=`ADU/${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  const { data } = await supabase.from('aduan').select('nomor_aduan').ilike('nomor_aduan',`${prefix}%`).order('nomor_aduan',{ascending:false}).limit(1);
+  let seq=1;
+  if(data && data.length){ const last=data[0].nomor_aduan.split('/').pop(); seq=parseInt(last)+1; }
+  return `${prefix}/${String(seq).padStart(4,'0')}`;
+}
+async function uploadFile(bucket,file){
+  const path=`${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
+  const { data, error } = await supabase.storage.from(bucket).upload(path,file,{upsert:false});
+  if(error) throw error;
+  const { data:url } = supabase.storage.from(bucket).getPublicUrl(path);
+  return {path, url:url.publicUrl};
+}
+async function logActivity(aduan_id,aktivitas,keterangan){
+  await supabase.from('log_aktivitas').insert({aduan_id,user_id:state.profile.id,aktivitas,keterangan});
+}
+async function createNotifForRole(roles,judul,pesan){
+  const { data:users } = await supabase.from('users').select('id').in('role',roles);
+  if(!users) return;
+  const rows=users.map(u=>({user_id:u.id,judul,pesan,is_read:false}));
+  await supabase.from('notifikasi').insert(rows);
+}
+async function updateNotifCount(){
+  if(!supabase || !state.profile) return;
+  const { count } = await supabase.from('notifikasi').select('id',{count:'exact',head:true}).eq('user_id',state.profile.id).eq('is_read',false);
+  state.notifUnRead=count||0;
+  const el=$('#notifCount');
+  if(count>0){el.textContent=count;show(el)} else hide(el);
+}
+async function openDetailAduan(id){
+  const { data } = await supabase.from('aduan').select('*,kategori_aduan(nama),sub_kategori(nama),users(nama)').eq('id',id).single();
+  if(!data) return;
+  openGM('Detail Aduan',`
+    <div class="space-y-3 text-sm">
+      <div class="grid grid-cols-2 gap-3">
+        <div><b>Nomor:</b> ${data.nomor_aduan}</div>
+        <div><b>Status:</b> ${badgeStatus(data.status)}</div>
+        <div><b>Kategori:</b> ${data.kategori_aduan?.nama||'-'}</div>
+        <div><b>Sub:</b> ${data.sub_kategori?.nama||'-'}</div>
+        <div><b>Pelapor:</b> ${data.users?.nama||'-'}</div>
+        <div><b>Prioritas:</b> ${data.prioritas||'-'}</div>
+      </div>
+      <div><b>Judul:</b> ${data.judul}</div>
+      <div><b>Deskripsi:</b><div class="p-3 bg-white rounded-xl mt-1">${data.deskripsi||''}</div></div>
+    </div>`);
+}
+
+// Generic CRUD
+function crudTemplate(table,title,fields,hasFile=false){
+  return `<div class="glass rounded-2xl p-5">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="font-bold text-lg">${title}</h3>
+      <button class="btn btn-primary !py-2 !px-4 text-sm" id="btnAdd">+ Tambah</button>
+    </div>
+    <div class="overflow-x-auto"><table class="table" id="tblCrud"></table></div>
+  </div>`;
+}
+async function initCrud(table,fields,fieldTypes={},bucket=null){
+  const container=$('#tblCrud');
+  async function load(){
+    const { data } = await supabase.from(table).select('*').order('created_at',{ascending:false}).limit(200);
+    container.innerHTML=`<thead><tr>${fields.map(f=>`<th>${f}</th>`).join('')}<th>Aksi</th></tr></thead><tbody>${
+      (data||[]).map(r=>`<tr><td>${fields.map(f=>formatCell(r[f],fieldTypes[f])).join('</td><td>')}</td><td>
+        <button data-id="${r.id}" class="text-sky-700 font-semibold text-sm mr-2 btnEdit">Edit</button>
+        <button data-id="${r.id}" class="text-red-600 font-semibold text-sm btnDel">Hapus</button>
+      </td></tr>`).join('')
+    }</tbody>`;
+  }
+  function formHtml(row={}){
+    return `<form id="crudForm" class="space-y-3">
+      ${fields.map(f=>{
+        const type=fieldTypes[f];
+        const val=row[f]??'';
+        if(type==='textarea') return `<div><label class="text-sm font-semibold">${f}</label><textarea name="${f}" class="input h-24">${val}</textarea></div>`;
+        if(type==='checkbox') return `<label class="flex items-center gap-2"><input type="checkbox" name="${f}" ${val?'checked':''}> ${f}</label>`;
+        if(type==='select_role') return `<div><label class="text-sm font-semibold">${f}</label><select name="${f}" class="input select">${ROLES.map(r=>`<option ${val===r?'selected':''}>${r}</option>`).join('')}</select></div>`;
+        if(type==='select_kategori') return `<div><label class="text-sm font-semibold">${f}</label><select name="${f}" class="input select" id="selKat"></select></div>`;
+        if(type==='file') return `<div><label class="text-sm font-semibold">${f}</label><input type="file" name="${f}_file" class="input"><input type="hidden" name="${f}" value="${val}"><div class="text-xs text-slate-500 mt-1">${val?`Current: ${val.slice(0,60)}...`:''}</div></div>`;
+        return `<div><label class="text-sm font-semibold">${f}</label><input name="${f}" value="${val}" class="input"></div>`;
+      }).join('')}
+      <button class="btn btn-primary">Simpan</button>
+    </form>`;
+  }
+  $('#btnAdd').onclick=()=>{ openGM('Tambah',formHtml()); bindForm(); };
+  container.onclick=async e=>{
+    const edit=e.target.closest('.btnEdit'); const del=e.target.closest('.btnDel');
+    if(edit){
+      const { data } = await supabase.from(table).select('*').eq('id',edit.dataset.id).single();
+      openGM('Edit',formHtml(data)); bindForm(data.id);
+    }
+    if(del){
+      if(!confirm('Hapus data?')) return;
+      await supabase.from(table).delete().eq('id',del.dataset.id);
+      toast('Dihapus','success'); load();
+    }
+  };
+  async function bindForm(id=null){
+    if(fieldTypes.kategori_id==='select_kategori'){
+      const { data:kats } = await supabase.from('kategori_aduan').select('id,nama');
+      $('#selKat').innerHTML=(kats||[]).map(k=>`<option value="${k.id}">${k.nama}</option>`).join('');
+    }
+    $('#crudForm').onsubmit=async ev=>{
+      ev.preventDefault();
+      const fd=new FormData(ev.target);
+      const payload={};
+      for(const f of fields){
+        const type=fieldTypes[f];
+        if(type==='checkbox') payload[f]=fd.get(f)==='on';
+        else if(type==='file'){
+          const file=fd.get(`${f}_file`);
+          if(file && file.size>0 && bucket){
+            const up=await uploadFile(bucket,file);
+            payload[f]=up.url;
+          }else payload[f]=fd.get(f);
+        }else payload[f]=fd.get(f);
+      }
+      if(id) await supabase.from(table).update(payload).eq('id',id);
+      else await supabase.from(table).insert(payload);
+      toast('Disimpan','success'); closeGM(); load();
+    };
+  }
+  load();
+}
+function formatCell(v,type){
+  if(type==='checkbox') return v? '✓':'-';
+  if(typeof v==='string' && v.startsWith('http')) return `<a href="${v}" target="_blank" class="text-sky-700 underline">file</a>`;
+  return v??'';
+}
+async function initCrudInline(table,wrapId,fields,fieldTypes){
+  const wrap=document.getElementById(wrapId);
+  wrap.innerHTML=`<div class="space-y-2" id="${wrapId}_list"></div><button class="btn btn-ghost !py-1 !px-3 text-sm mt-2" id="${wrapId}_add">+ Tambah</button>`;
+  const list=document.getElementById(`${wrapId}_list`);
+  async function load(){
+    const { data } = await supabase.from(table).select('*').order('created_at');
+    list.innerHTML=(data||[]).map(r=>`<div class="p-3 rounded-xl bg-white/70 border flex justify-between items-center"><div><div class="font-semibold">${r.nama||r.kunci||r.section}</div><div class="text-xs text-slate-600">${r.deskripsi||''}</div></div><div class="flex gap-2"><button data-id="${r.id}" class="text-xs btnEdit">Edit</button><button data-id="${r.id}" class="text-xs text-red-600 btnDel">Hapus</button></div></div>`).join('');
+  }
+  document.getElementById(`${wrapId}_add`).onclick=()=>openGM('Tambah',form());
+  list.onclick=async e=>{
+    const id=e.target.dataset.id;
+    if(e.target.classList.contains('btnDel')){ await supabase.from(table).delete().eq('id',id); load(); }
+    if(e.target.classList.contains('btnEdit')){ const { data }=await supabase.from(table).select('*').eq('id',id).single(); openGM('Edit',form(data)); }
+  };
+  function form(row={}){ return `<form id="inlineForm" class="space-y-3">${fields.map(f=>`<input name="${f}" placeholder="${f}" value="${row[f]||''}" class="input">`).join('')}<button class="btn btn-primary">Simpan</button></form>`; }
+  document.addEventListener('submit',async e=>{
+    if(e.target.id!=='inlineForm') return;
+    e.preventDefault();
+    const fd=Object.fromEntries(new FormData(e.target).entries());
+    if(rowId){ await supabase.from(table).update(fd).eq('id',rowId); }else await supabase.from(table).insert(fd);
+  });
+  load();
+}
+
+// Landing dynamic
+async function loadLanding(){
+  if(!supabase) return;
   try{
-    const { data:ins, error } = await state.supabase.from('aduan').insert(payload).select().single();
-    if(error) throw error;
-    // upload bukti
-    const files = $('#aduan-bukti').files;
-    for(const f of files){
-      const path = `${ins.id}/${Date.now()}_${f.name}`;
-      const { error:upErr } = await state.supabase.storage.from('bukti_digital').upload(path, f);
-      if(!upErr){
-        await state.supabase.from('bukti_aduan').insert({ aduan_id: ins.id, nama_file:f.name, path });
+    const { data:konten } = await supabase.from('konten_landing').select('*').eq('aktif',true).order('urutan');
+    if(konten && konten.length){
+      const hero=konten.find(k=>k.section==='hero');
+      if(hero){ $('#heroImg').src=hero.gambar_url||$('#heroImg').src; }
+      const fitur=konten.filter(k=>k.section==='fitur');
+      if(fitur.length){
+        $('#fiturGrid').innerHTML=fitur.map(f=>`<div class="glass rounded-2xl p-6"><div class="text-3xl">${f.gambar_url||'✨'}</div><h4 class="font-bold mt-3">${f.judul}</h4><p class="text-sm text-slate-600 mt-1">${f.konten||''}</p></div>`).join('');
       }
     }
-    toast('Aduan berhasil dikirim','success');
-    e.target.reset();
-    navigate('daftar_aduan');
-  }catch(err){ console.error(err); toast('Gagal mengirim aduan','error'); }
-});
+    const { data:stats } = await supabase.from('aduan').select('status');
+    if(stats){
+      $('#statTotal').textContent=stats.length;
+      $('#statSelesai').textContent=stats.filter(s=>s.status==='Selesai').length;
+      $('#statProses').textContent=stats.filter(s=>['Proses','Diverifikasi','Menunggu Otorisasi'].includes(s.status)).length;
+    }
+  }catch(e){ console.log(e) }
+}
 
-/* ---------- VERIFIKASI ---------- */
-async function loadVerifList(){
-  if(!state.supabase) return;
-  const { data } = await state.supabase.from('aduan').select('*').eq('status','Baru').order('created_at');
-  const list = $('#list-verif'); list.innerHTML='';
-  (data||[]).forEach(d=>{
-    const b = document.createElement('button');
-    b.className='w-full text-left px-3 py-2 rounded-xl border hover:bg-slate-50';
-    b.innerHTML = `<p class="font-semibold text-sm truncate">${d.judul}</p><p class="text-xs text-slate-500">${d.kategori}</p>`;
-    b.onclick = ()=> selectVerif(d);
-    list.appendChild(b);
-  });
-}
-function selectVerif(d){
-  $('#form-verif').classList.remove('opacity-50','pointer-events-none');
-  $('#verif-id').value = d.id;
-}
-$('#form-verif')?.addEventListener('submit', async e=>{
+// Init
+document.getElementById('year').textContent=new Date().getFullYear();
+const cfg=loadConfig();
+if(!cfg){ show($('#configModal')); }
+else{ initSupabase(cfg).then(loadLanding); }
+
+$('#configForm').onsubmit=e=>{
   e.preventDefault();
-  const id = $('#verif-id').value;
-  const status = $('#verif-keputusan').value==='Diverifikasi'?'Diverifikasi':'Ditolak';
-  try{
-    await state.supabase.from('aduan').update({ status, catatan_verifikasi: $('#verif-catatan').value }).eq('id',id);
-    toast('Verifikasi disimpan','success');
-    loadVerifList();
-    $('#form-verif').reset();
-    $('#form-verif').classList.add('opacity-50','pointer-events-none');
-  }catch{ toast('Gagal simpan','error'); }
-});
+  const cfg={url:$('#cfgUrl').value.trim(),key:$('#cfgKey').value.trim()};
+  saveConfig(cfg); hide($('#configModal')); initSupabase(cfg).then(loadLanding);
+};
+$('#cfgCancel').onclick=()=>hide($('#configModal'));
+$('#btnConfig').onclick=()=>show($('#configModal'));
+$('#btnLogin').onclick=()=>show($('#authModal'));
+$('#heroMasuk').onclick=()=>show($('#authModal'));
+$('#tabLogin').onclick=()=>{show($('#loginForm'));hide($('#registerForm'));$('#tabLogin').classList.add('bg-white');$('#tabRegister').classList.remove('bg-white');}
+$('#tabRegister').onclick=()=>{hide($('#loginForm'));show($('#registerForm'));$('#tabRegister').classList.add('bg-white');$('#tabLogin').classList.remove('bg-white');}
+$('#authModal').onclick=e=>{ if(e.target.id==='authModal') hide($('#authModal')); };
 
-/* ---------- PENANGANAN ---------- */
-async function loadTanganiList(){
-  if(!state.supabase) return;
-  const { data } = await state.supabase.from('aduan').select('*').eq('status','Diverifikasi').order('created_at');
-  const list = $('#list-tangani'); list.innerHTML='';
-  (data||[]).forEach(d=>{
-    const b = document.createElement('button');
-    b.className='w-full text-left px-3 py-2 rounded-xl border hover:bg-slate-50';
-    b.textContent = d.judul;
-    b.onclick = ()=> selectTangani(d);
-    list.appendChild(b);
-  });
-}
-function selectTangani(d){
-  $('#form-tangani').classList.remove('opacity-50','pointer-events-none');
-  $('#tangani-id').value = d.id;
-}
-$('#form-tangani')?.addEventListener('submit', async e=>{
+$('#loginForm').onsubmit=async e=>{
   e.preventDefault();
-  const id = $('#tangani-id').value;
-  try{
-    await state.supabase.from('aduan').update({
-      pic: $('#tangani-pic').value,
-      target_selesai: $('#tangani-target').value,
-      rencana: $('#tangani-rencana').value,
-      hasil: $('#tangani-hasil').value,
-      status: $('#tangani-status').value
-    }).eq('id',id);
-    toast('Penanganan disimpan','success');
-    loadTanganiList();
-  }catch{ toast('Gagal simpan','error'); }
-});
-
-/* ---------- OTORISASI ---------- */
-async function loadOtorList(){
-  if(!state.supabase) return;
-  const { data } = await state.supabase.from('aduan').select('*').in('status',['Selesai Ditangani','Diproses']).order('created_at');
-  const list = $('#list-otor'); list.innerHTML='';
-  (data||[]).forEach(d=>{
-    const b = document.createElement('button');
-    b.className='w-full text-left px-3 py-2 rounded-xl border hover:bg-slate-50';
-    b.textContent = d.judul;
-    b.onclick = ()=> selectOtor(d);
-    list.appendChild(b);
-  });
-}
-function selectOtor(d){
-  $('#form-otor').classList.remove('opacity-50','pointer-events-none');
-  $('#otor-id').value = d.id;
-}
-$('#form-otor')?.addEventListener('submit', async e=>{
+  if(!supabase) return toast('Config Supabase dulu','error');
+  const email=$('#loginEmail').value; const pass=$('#loginPass').value;
+  const { data, error } = await supabase.auth.signInWithPassword({email,password:pass});
+  if(error) return toast(error.message,'error');
+  hide($('#authModal'));
+  await afterLogin(data.user);
+};
+$('#registerForm').onsubmit=async e=>{
   e.preventDefault();
-  const id = $('#otor-id').value;
-  const keputusan = $('#otor-keputusan').value;
-  const status = keputusan==='Disetujui'?'Selesai': 'Dikembalikan';
-  try{
-    await state.supabase.from('aduan').update({ status, catatan_otorisasi: $('#otor-catatan').value }).eq('id',id);
-    toast('Otorisasi disimpan','success');
-    loadOtorList();
-  }catch{ toast('Gagal simpan','error'); }
-});
-
-/* ---------- SETTINGS ---------- */
-function switchSetTab(tab){
-  $$('[data-settab]').forEach(b=>{
-    const active = b.dataset.settab===tab;
-    b.classList.toggle('border-b-2',active);
-    b.classList.toggle('border-teal-700',active);
-    b.classList.toggle('text-teal-700',active);
-    b.classList.toggle('text-slate-500',!active);
-  });
-  $$('[data-setpanel]').forEach(p=> p.classList.toggle('hidden', p.dataset.setpanel!==tab));
-}
-$$('[data-settab]').forEach(b=> b.onclick=()=>switchSetTab(b.dataset.settab));
-
-async function loadSettings(){
-  if(state.profile?.role!=='superadmin') return;
-  const cfg = getConfig();
-  $('#cfg-url').textContent = cfg.url||'-';
-  $('#cfg-key').textContent = cfg.key ? cfg.key.slice(0,8)+'••••' : '-';
-  // users
-  try{
-    const { data:users } = await state.supabase.from('users').select('*').order('nama');
-    const tb = $('#tbl-users'); tb.innerHTML='';
-    (users||[]).forEach(u=>{
-      tb.innerHTML += `<tr><td class="px-3 py-2">${u.nama}</td><td class="px-3 py-2 text-slate-600">${u.email}</td><td class="px-3 py-2"><span class="text-xs px-2 py-1 rounded-lg bg-slate-100">${u.role}</span></td><td class="px-3 py-2 text-right"><button class="text-xs text-teal-700" data-edit-user="${u.id}">Edit</button></td></tr>`;
-    });
-  }catch{}
-  // param
-  try{
-    const { data:param } = await state.supabase.from('parameter_umum').select('*');
-    const tb = $('#tbl-param'); tb.innerHTML='';
-    (param||[]).forEach(p=>{
-      tb.innerHTML += `<tr><td class="px-3 py-2 font-mono text-xs">${p.key}</td><td class="px-3 py-2">${p.value}</td><td class="px-3 py-2 text-right"><button class="text-xs text-rose-600" data-del-param="${p.id}">Hapus</button></td></tr>`;
-    });
-  }catch{}
-  // kategori
-  try{
-    const { data:kat } = await state.supabase.from('kategori_aduan').select('*');
-    const tb = $('#tbl-kategori'); tb.innerHTML='';
-    (kat||[]).forEach(k=>{
-      tb.innerHTML += `<tr><td class="px-3 py-2 font-medium">${k.nama}</td><td class="px-3 py-2 text-slate-600">${k.deskripsi||'-'}</td><td class="px-3 py-2 text-right"><button class="text-xs text-rose-600" data-del-kat="${k.id}">Hapus</button></td></tr>`;
-    });
-  }catch{}
-  // cms
-  try{
-    const { data:cms } = await state.supabase.from('konten_landing').select('id,judul,slug');
-    const tb = $('#tbl-cms'); tb.innerHTML='';
-    (cms||[]).forEach(c=>{
-      tb.innerHTML += `<tr><td class="px-3 py-2">${c.judul}</td><td class="px-3 py-2 font-mono text-xs">${c.slug}</td><td class="px-3 py-2 text-right"><button class="text-xs text-rose-600" data-del-cms="${c.id}">Hapus</button></td></tr>`;
-    });
-  }catch{}
-}
-
-/* add user modal */
-$('#btn-add-user')?.addEventListener('click', ()=>{
-  $('#generic-title').textContent = 'Tambah User';
-  $('#generic-body').innerHTML = `
-    <form id="form-add-user" class="space-y-4">
-      <div><label class="text-sm font-medium">Nama</label><input required id="nu-nama" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm"/></div>
-      <div><label class="text-sm font-medium">Email</label><input required type="email" id="nu-email" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm"/></div>
-      <div><label class="text-sm font-medium">Role</label><select id="nu-role" class="mt-1 w-full rounded-xl border-slate-300 bg-slate-50 px-4 py-3 text-sm">${state.roles.map(r=>`<option>${r}</option>`).join('')}</select></div>
-      <div class="flex justify-end gap-2"><button type="button" data-close="modal-generic" class="px-4 py-2 rounded-xl bg-slate-100 text-sm">Batal</button><button class="px-4 py-2 rounded-xl bg-teal-700 text-white text-sm">Simpan</button></div>
-    </form>`;
-  showModal('modal-generic');
-  $('#form-add-user').onsubmit = async e=>{
-    e.preventDefault();
-    try{
-      await state.supabase.from('users').insert({ nama:$('#nu-nama').value, email:$('#nu-email').value, role:$('#nu-role').value });
-      toast('User ditambahkan','success');
-      hideModal('modal-generic');
-      loadSettings();
-    }catch{ toast('Gagal tambah user','error'); }
-  };
-});
-
-/* password change */
-$('#form-password')?.addEventListener('submit', async e=>{
-  e.preventDefault();
-  const p1 = $('#new-pass').value, p2 = $('#new-pass2').value;
-  if(p1!==p2) return toast('Password tidak cocok','error');
-  try{
-    const { error } = await state.supabase.auth.updateUser({ password:p1 });
-    if(error) throw error;
-    toast('Password diperbarui','success');
-    e.target.reset();
-  }catch{ toast('Gagal update password','error'); }
-});
-
-/* ---------- EVENT BINDINGS ---------- */
-function bindEvents(){
-  // auth tabs
-  $('#tab-login').onclick = ()=>{ $('#form-login').classList.remove('hidden'); $('#form-signup').classList.add('hidden'); $('#tab-login').classList.add('bg-white','shadow-sm','text-slate-900'); $('#tab-signup').classList.remove('bg-white','shadow-sm','text-slate-900'); };
-  $('#tab-signup').onclick = ()=>{ $('#form-signup').classList.remove('hidden'); $('#form-login').classList.add('hidden'); $('#tab-signup').classList.add('bg-white','shadow-sm','text-slate-900'); $('#tab-login').classList.remove('bg-white','shadow-sm','text-slate-900'); };
-
-  // login
-  $('#form-login').onsubmit = async e=>{
-    e.preventDefault();
-    if(!state.supabase) return toast('Konfigurasi Supabase belum ada','error');
-    const email = $('#login-email').value, password = $('#login-password').value;
-    const { data, error } = await state.supabase.auth.signInWithPassword({ email, password });
-    if(error){ toast(error.message,'error'); return; }
-    state.session = data.session;
-    state.profile = await fetchProfile(data.user);
-    showMain();
-    toast('Berhasil masuk','success');
-  };
-  // signup
-  $('#form-signup').onsubmit = async e=>{
-    e.preventDefault();
-    if(!state.supabase) return toast('Konfigurasi Supabase belum ada','error');
-    const nama = $('#signup-name').value, email = $('#signup-email').value, pw = $('#signup-password').value, pw2 = $('#signup-password2').value;
-    if(pw!==pw2) return toast('Password tidak cocok','error');
-    const { data, error } = await state.supabase.auth.signUp({ email, password:pw, options:{ data:{ name:nama } } });
-    if(error){ toast(error.message,'error'); return; }
-    // insert profile
-    await state.supabase.from('users').insert({ email, nama, role:'pelapor' });
-    toast('Pendaftaran berhasil, silakan masuk','success');
-    $('#tab-login').click();
-  };
-
-  // logout
-  $('#btn-logout').onclick = async ()=>{
-    await state.supabase?.auth.signOut();
-    state.session=null; state.profile=null;
-    showAuth();
-    toast('Anda telah keluar','info');
-  };
-
-  // config modal
-  $('#open-config-from-auth').onclick = ()=> openConfig();
-  $('#btn-config').onclick = ()=> openConfig();
-  $('#btn-edit-supabase').onclick = ()=> openConfig();
-
-  // config form
-  $('#form-config').onsubmit = e=>{
-    e.preventDefault();
-    const url = $('#cfg-input-url').value.trim();
-    const key = $('#cfg-input-key').value.trim();
-    if(!url||!key) return toast('Lengkapi data','error');
-    saveConfig(url,key);
-    initSupabase();
-    hideModal('modal-config');
-    toast('Konfigurasi disimpan','success');
-    checkSession();
-  };
-
-  // close modals
-  $$('[data-close]').forEach(b=> b.onclick=()=> hideModal(b.dataset.close));
-  $('#modal-backdrop').onclick = ()=>{ hideModal('modal-config'); hideModal('modal-generic'); hideModal('modal-detail'); };
-
-  // sidebar toggle
-  $('#sidebar-toggle').onclick = ()=> $('#sidebar').classList.toggle('-translate-x-full');
-
-  // refresh
-  $('#btn-refresh').onclick = ()=>{ loadDashboard(); loadAduan(); toast('Data diperbarui','info'); };
-
-  // goto buttons
-  document.addEventListener('click', e=>{
-    const go = e.target.closest('[data-goto]');
-    if(go) navigate(go.dataset.goto);
-  });
-
-  // search aduan
-  $('#search-aduan')?.addEventListener('input', e=>{
-    const q = e.target.value.toLowerCase();
-    $$('#tbl-aduan tr').forEach(tr=>{
-      const txt = tr.textContent.toLowerCase();
-      tr.style.display = txt.includes(q)?'':'none';
-    });
-  });
-}
-
-/* ---------- INIT ---------- */
-async function boot(){
-  bindEvents();
-  const cfg = getConfig();
-  if(!cfg.url || !cfg.key){
-    $('#app-loader').classList.add('hidden');
-    showAuth();
-    openConfig(false);
-    toast('Silakan konfigurasi Supabase terlebih dahulu','info');
-    return;
-  }
-  initSupabase();
-  await checkSession();
-  loadKategori();
-}
-boot();
-
-/* close modals on esc */
-window.addEventListener('keydown', e=>{ if(e.key==='Escape'){ hideModal('modal-config'); hideModal('modal-generic'); hideModal('modal-detail'); } });
+  if(!supabase) return toast('Config Supabase dulu','error');
+  const email=$('#regEmail').value; const pass=$('#regPass').value; const nama=$('#regNama').value; const telp=$('#regTelp').value;
+  const { data, error } = await supabase.auth.signUp({email,password:pass,options:{data:{nama}}});
+  if(error) return toast(error.message,'error');
+  // insert profile
+  await supabase.from('users').insert({id:data.user.id,email,nama,telepon:telp,role:'Pelapor Eksternal',aktif:true});
+  toast('Registrasi berhasil, silakan login','success');
+  $('#tabLogin').click();
+};
+$('#btnLogout').onclick=async()=>{ await supabase.auth.signOut(); location.reload(); };
+$('#btnNotif').onclick=()=>navigate('notifikasi');
+window.addEventListener('hashchange',()=>{ const h=location.hash.replace('#',''); if(h) navigate(h); });
 
 </script>
 <script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
