@@ -1,1008 +1,1691 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>SIM Aduan RSJD AHMA</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-:root{
-  --primary:#0ea5e9;
-  --primary-dark:#0284c7;
-  --secondary:#8b5cf6;
-  --accent:#22d3ee;
-  --success:#10b981;
-  --warning:#f59e0b;
-  --danger:#ef4444;
-  --bg:#f0f7ff;
-  --surface:#ffffff;
-  --text:#0f172a;
-  --muted:#64748b;
-  --border:#e2e8f0;
-  --glass:rgba(255,255,255,.7);
-}
-*{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif}
-body{background:linear-gradient(135deg,#e0f2fe 0%,#f5f3ff 50%,#ecfeff 100%);color:var(--text);min-height:100vh}
-.glass{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.4)}
-.rounded-2xl{border-radius:1.25rem}
-.shadow-soft{box-shadow:0 10px 30px -10px rgba(2,132,199,.25)}
-.btn{border-radius:1rem;padding:.75rem 1.25rem;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:.5rem}
-.btn-primary{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff}
-.btn-primary:hover{filter:brightness(1.05);transform:translateY(-1px)}
-.btn-ghost{background:rgba(255,255,255,.6)}
-.badge{padding:.25rem .65rem;border-radius:999px;font-size:.75rem;font-weight:600}
-.badge-success{background:#dcfce7;color:#166534}
-.badge-warning{background:#fef3c7;color:#92400e}
-.badge-danger{background:#fee2e2;color:#991b1b}
-.badge-info{background:#dbeafe;color:#1e40af}
-.badge-gray{background:#f1f5f9;color:#475569}
-.table{width:100%;border-collapse:separate;border-spacing:0}
-.table th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:.75rem 1rem;background:#f8fafc;position:sticky;top:0;z-index:10}
-.table td{padding:.9rem 1rem;border-top:1px solid var(--border);font-size:.9rem}
-.table tr:hover td{background:#f8fafc}
-.input{width:100%;border:1px solid var(--border);border-radius:1rem;padding:.75rem 1rem;background:#fff;outline:none;transition:.2s}
-.input:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(14,165,233,.15)}
-.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m19 9-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 1rem center;background-size:1rem}
-.sidebar-link{display:flex;align-items:center;gap:.75rem;padding:.75rem 1rem;border-radius:1rem;color:#334155;font-weight:500;transition:.2s}
-.sidebar-link:hover{background:rgba(255,255,255,.7)}
-.sidebar-link.active{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;box-shadow:0 8px 20px -8px rgba(14,165,233,.6)}
-.scroll-thin::-webkit-scrollbar{width:6px;height:6px}
-.scroll-thin::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
-.animate-in{animation:in .3s ease}
-@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.toast{position:fixed;right:1rem;bottom:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem}
-.modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:1rem;z-index:100}
-.hidden{display:none !important}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pelaporan Etik & Hukum Terpadu</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        :root{--bg:#020617;--bg-soft:#0f172a;--card:#0f172a;--card-soft:#111827;--text:#f8fafc;--muted:#94a3b8;--primary:#60a5fa;--accent:#f97316;--danger:#ef4444;--success:#22c55e;--surface:#111827;--surface-soft:rgba(255,255,255,0.06);--input-bg:#0f172a;--input-border:rgba(148,163,184,0.28);--placeholder:rgba(148,163,184,0.8)}
+        html,body{height:100%;}
+        body { font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: radial-gradient(circle at top, rgba(96,165,250,0.12), transparent 28%), linear-gradient(180deg, #020617 0%, #071126 55%, #0b1730 100%); color: var(--text); margin: 0; padding: 0; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; transition: background .3s ease, color .3s ease; }
+        body.light-theme { --bg:#f8fafc; --bg-soft:#f1f5f9; --card:#ffffff; --card-soft:#f8fafc; --text:#0f172a; --muted:#64748b; --primary:#1d4ed8; --accent:#f97316; --danger:#b91c1c; --success:#16a34a; --surface:#ffffff; --surface-soft:#f8fafc; --input-bg:#ffffff; --input-border:#cbd5e1; --placeholder:rgba(100,116,139,0.8); background: radial-gradient(circle at top, rgba(59,130,246,0.12), transparent 28%), linear-gradient(180deg, #f8fafc 0%, #e2e8f0 55%, #e2e8f0 100%); color: var(--text); }
+        body.light-theme .card, body.light-theme .top-bar, body.light-theme .hero-panel, body.light-theme .login-box { background: var(--card); color: var(--text); box-shadow: 0 18px 60px rgba(15,23,42,0.08); }
+        body.light-theme .tab-btn { color: #334155; }
+        body.light-theme button { color: #0f172a; }
+        body.light-theme .hero-btn.btn-primary-hero { color: #ffffff; }
+        body.light-theme .hero-btn.btn-secondary-hero { background: rgba(15,23,42,0.08); color: #0f172a; border-color: rgba(15,23,42,0.12); }
+        body.light-theme .dashboard-table th { background-color: #f1f5f9; color: #0f172a; }
+        body.light-theme .dashboard-table tr:nth-child(even) { background-color: #f8fafc; }
+        body.light-theme .badge { background: #e2e8f0; color: #0f172a; }
+        body.light-theme .login-box input, body.light-theme .login-box select, body.light-theme .login-box textarea { background: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
+        body.light-theme .hero-panel { background: rgba(255,255,255,0.95); border-color: rgba(148,163,184,0.3); }
+        body.light-theme .hero-card .mini-card { background: rgba(15,23,42,0.04); border-color: rgba(148,163,184,0.18); }
+        body.light-theme .feature-card { background: rgba(255,255,255,0.88); border-color: rgba(148,163,184,0.18); }
+        body.light-theme input, body.light-theme select, body.light-theme textarea { background: #ffffff; color: #0f172a; border-color: #cbd5e1; }
+        body.light-theme label { color: #334155; }
+        /* Ensure decorative pseudo-elements never block interactions */
+        *::before,*::after{pointer-events:none}
+        /* Keep top UI above decorative layers */
+        .top-bar, .tab-container, .login-box, #app-screen, #landing-screen{position:relative; z-index:20}
+        
+        /* Landing page layout */
+        #landing-screen { display: block; min-height: 100vh; padding: 0; }
+        .landing-hero { display: flex; align-items: center; justify-content: space-between; gap: 40px; padding: 80px 48px 40px; max-width: 1320px; margin: 0 auto; }
+        .landing-copy { max-width: 620px; }
+        .landing-copy .eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(96,165,250,0.12); color: var(--primary); padding: 8px 14px; border-radius: 999px; font-size: 13px; margin-bottom: 22px; }
+        .landing-copy h1 { font-size: clamp(3rem, 4vw, 4.5rem); line-height: 0.95; margin: 0; letter-spacing: -0.04em; }
+        .landing-copy h1 strong { color: #facc15; }
+        .landing-copy p { color: var(--muted); font-size: 1rem; line-height: 1.9; max-width: 540px; margin: 24px 0 32px; }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 16px; }
+        .hero-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 15px 24px; border-radius: 999px; font-weight: 700; border: none; cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
+        .hero-btn:hover{ transform: translateY(-2px); box-shadow: 0 18px 40px rgba(96,165,250,0.18); }
+        .btn-primary-hero { background: linear-gradient(90deg, #2563eb, #60a5fa); color: white; }
+        .btn-secondary-hero { background: rgba(255,255,255,0.08); color: var(--text); border: 1px solid rgba(255,255,255,0.12); }
+        .hero-panel { width: 100%; max-width: 520px; background: rgba(15,23,42,0.88); border: 1px solid rgba(255,255,255,0.08); border-radius: 32px; padding: 28px; box-shadow: 0 24px 80px rgba(0,0,0,0.18); backdrop-filter: blur(18px); }
+        .hero-panel h3 { font-size: 1rem; color: var(--primary); margin: 0; }
+        .hero-card { display: grid; gap: 18px; margin-top: 24px; }
+        .hero-card .mini-card { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-radius: 24px; background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.08); }
+        .hero-card .mini-card strong { font-size: 1.85rem; color: var(--text); display: block; }
+        .hero-card .mini-card span { color: var(--muted); font-size: 0.9rem; }
+        .hero-stats { display: grid; gap: 12px; background: rgba(10,25,59,0.92); border-radius: 24px; padding: 22px; }
+        .hero-stats p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+        .hero-stats .meter { height: 10px; width: 100%; background: rgba(148,163,184,0.16); border-radius:999px; overflow:hidden; margin-top: 12px; }
+        .hero-stats .meter > div { height:100%; width:76%; background: #fb7185; border-radius:999px; }
+        .feature-section { padding: 0 48px 64px; max-width: 1320px; margin: 0 auto; }
+        .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 24px; margin-top: 40px; }
+        .feature-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 28px; padding: 28px; min-height: 220px; display: flex; flex-direction: column; gap: 18px; }
+        .feature-card h3 { margin: 0; font-size: 1.1rem; color: var(--text); }
+        .feature-card p { margin: 0; color: var(--muted); line-height: 1.8; font-size: 0.96rem; }
+        .feature-card .icon { width: 48px; height: 48px; display:flex; align-items:center; justify-content:center; border-radius: 14px; background: rgba(96,165,250,0.18); color: #60a5fa; font-size: 1.25rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20px; margin-top: 40px; }
+        .stat-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 24px; text-align: center; }
+        .stat-card h4 { margin: 0; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; }
+        .stat-card p { margin: 16px 0 0; font-size: 2rem; font-weight: 800; color: var(--text); }
+        .stat-card small { color: var(--muted); }
+        .landing-section-title { max-width: 760px; margin: 0 auto; text-align: center; }
+        .landing-section-title h2 { font-size: clamp(2rem, 3vw, 3rem); margin-bottom: 12px; }
+        .landing-section-title p { color: var(--muted); line-height: 1.8; }
+
+        /* Layout Login & App */
+        #login-screen { display: none !important; position: fixed !important; top: 0; left: 0; right: 0; bottom: 0; min-height: 100vh; width: 100vw; align-items: center; justify-content: center; background: rgba(2,6,23,0.96); padding: 20px; z-index: 999999 !important; visibility: hidden; opacity: 0; transition: opacity .2s ease; }
+        #login-screen.show-modal { display: flex !important; visibility: visible !important; opacity: 1 !important; }
+        .login-box { position: relative; background: linear-gradient(180deg, #111827 0%, #0f172a 100%); color: #f8fafc; padding: 30px; border-radius: 24px; width: 100%; max-width: 460px; max-height: calc(100vh - 60px); overflow-y: auto; box-shadow: 0 32px 120px rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.14); }
+        .login-close { position: absolute; top: 18px; right: 18px; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.08); color: white; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        #app-screen { display: none; padding: 15px; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Navigasi 12 Tab */
+        /* Sidebar-style navigation */
+        .tab-container { display: flex; gap:8px; align-items:flex-start; margin: 0; background: transparent; border-radius: 8px; box-shadow: none; padding:0; flex-direction: column; position: fixed; left: 16px; top: 96px; width: 220px; height: calc(100vh - 120px); overflow-y: auto; z-index:25 }
+        .tab-container::-webkit-scrollbar{ width:8px } .tab-container::-webkit-scrollbar-thumb{ background:rgba(0,0,0,0.08); border-radius:8px }
+        .tab-btn { flex: 0 0 auto; width:100%; padding: 12px 14px; text-align: left; background: transparent; border: none; font-weight: 700; font-size: 13px; color: var(--muted); cursor: pointer; border-radius:10px; display: inline-flex; align-items:center; justify-content:flex-start; gap:10px; transition: all .14s ease }
+        .tab-btn.active { color: #1a365d; border-bottom: 3px solid #1a365d; background-color: #f8fafc; }
+        .tab-btn.active{ background: linear-gradient(90deg, rgba(14,165,233,0.06), transparent); border-left: 4px solid var(--accent); padding-left: 12px }
+        
+        /* Layout Asli */
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h2 { color: var(--text); margin-bottom: 5px; }
+        .header p { color: var(--muted); font-size: 14px; margin-top: 0; }
+        
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 8px 24px rgba(2,6,23,0.04); max-width: 900px; margin: 0 auto 20px auto; }
+        .card-large { max-width: 1100px; }
+        
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end;}
+        .form-group { flex: 1; margin-bottom: 15px; }
+        .form-row .form-group { margin-bottom: 0; } 
+        
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: var(--muted); }
+        input[type="text"], input[type="email"], input[type="number"], input[type="date"], input[type="file"], input[type="password"], select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--input-border); border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 14px; background: var(--input-bg); color: var(--text); }
+        input[type="text"]::placeholder, input[type="email"]::placeholder, input[type="number"]::placeholder, input[type="date"]::placeholder, input[type="password"]::placeholder, textarea::placeholder { color: var(--placeholder); }
+        input[readonly] { background-color: rgba(255,255,255,0.06); color: var(--muted); border-color: rgba(148,163,184,0.24); cursor: not-allowed; }
+        input:focus, textarea:focus, select:focus{ outline: none; box-shadow: 0 0 0 4px rgba(14,165,233,0.08); border-color: var(--accent) }
+        input[readonly] { background-color: #f1f5f9; color: #475569; border-color: #e2e8f0; cursor: not-allowed; }
+        textarea { resize: vertical; min-height: 80px; }
+        .file-hint { font-size: 11px; color: var(--muted); margin-top: 4px; display: block; }
+        
+        /* ReadOnly Header Box Asli */
+        .info-header { background-color: #eaf6ff; border: 1px solid #dbefff; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; color: #0369a1; display: none; line-height: 1.6;}
+        .info-header span { font-weight: bold; color: #0c4a6e; }
+        .info-header .highlight-rek { color: #b45309; font-weight: bold; }
+
+        /* Tombol Asli */
+        button { width: 100%; padding: 12px; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: transform .06s ease, box-shadow .12s ease }
+        button:hover{ transform: translateY(-1px); box-shadow: 0 6px 18px rgba(2,6,23,0.08) }
+        button.btn-submit { background-color: #dc2626; } button.btn-submit:active { background-color: #b91c1c; }
+        button.btn-verify { background-color: #2563eb; } button.btn-verify:active { background-color: #1d4ed8; }
+        button.btn-escalate { background-color: #059669; } button.btn-escalate:active { background-color: #047857; }
+        button.btn-pic { background-color: #8b5cf6; } button.btn-pic:active { background-color: #7c3aed; }
+        .sidebar-toggle-btn { margin-right: 6px; background: #64748b; font-size: 12px; } .sidebar-toggle-btn:hover { background: #475569; }
+        .recall-box { font-size: 12px; color: #475569; }
+        button.btn-otorisasi { background-color: #d97706; } button.btn-otorisasi:active { background-color: #b45309; }
+        button.btn-admin { background-color: #334155; } button.btn-admin:active { background-color: #1e293b; }
+        button.btn-search { background-color: #0ea5e9; margin-top:0;} button.btn-search:active { background-color: #0284c7; }
+        button.btn-auto { background-color: #10b981; padding: 10px; width: auto; margin-top: 0; white-space: nowrap; }
+        button.btn-pdf { background-color: #ef4444; }
+        button.btn-small { padding: 6px 10px; width: auto; font-size: 12px; margin-top: 0;}
+
+        /* Checkbox Asli */
+        .checkbox-group { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; background: #f8fafc; padding: 10px; border-radius: 5px; border: 1px solid #e2e8f0;}
+        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 14px;}
+
+        /* Timeline Lacak Asli */
+        .timeline { border-left: 3px solid #cbd5e1; margin: 20px 0 20px 15px; padding-left: 20px; list-style: none; }
+        .timeline li { margin-bottom: 20px; position: relative; font-size: 14px; }
+        .timeline li::before { content: ''; position: absolute; left: -29px; top: 0; width: 15px; height: 15px; background: white; border: 3px solid #cbd5e1; border-radius: 50%; }
+        .timeline li.done::before { background: #10b981; border-color: #10b981; }
+        .timeline li.done { color: #047857; font-weight: bold; }
+        .timeline-date { display: block; font-size: 11px; color: #94a3b8; font-weight: normal; margin-top: 3px; }
+
+        /* SK Preview Asli */
+        .sk-preview { background: var(--card); color: black; font-family: 'Times New Roman', Times, serif; padding: 28px; border: 1px solid #e6eef6; box-shadow: inset 0 0 8px rgba(0,0,0,0.02); margin-bottom: 15px; font-size: 13px; line-height: 1.6; text-align: justify; height: 56vh; max-height:720px; overflow-y: auto; display: none; }
+        .sk-preview h3 { text-align: center; margin: 0 0 5px 0; font-size: 15px; text-decoration: underline; }
+        .sk-preview p.nomor { text-align: center; margin: 0 0 20px 0; }
+        .sk-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .sk-table td { padding: 3px; vertical-align: top; }
+        .sk-table td:first-child { width: 25%; font-weight: bold; }
+        .sk-table td:nth-child(2) { width: 3%; }
+
+        /* Data Table */
+        .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+        .dashboard-table th, .dashboard-table td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+        .dashboard-table th { background-color: #f8fafc; color: #1a365d; }
+        .dashboard-table tr:nth-child(even) { background-color: #fcfcfc; }
+
+        /* Dashboard Infografis */
+        .stat-box { flex: 1; padding: 20px; border-radius: 8px; text-align: center; min-width: 150px; }
+        .stat-box h3 { font-size: 28px; margin: 0 0 5px 0; }
+        .stat-box p { margin: 0; font-size: 13px; font-weight: bold; opacity: 0.9; }
+
+        /* Checklist Hak Akses Khusus SuperAdmin */
+        .role-card { border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; background: #f8fafc; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);} 
+        .role-title { font-size: 15px; font-weight: bold; color: #1a365d; margin-bottom: 10px; border-bottom: 2px solid #cbd5e1; padding-bottom: 5px;}
+        .role-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+        .role-grid label { font-weight: normal; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; color: #334155;}
+        .role-grid input[type="checkbox"] { width: auto; }
+
+        .section { display: none; }
+        .section.active { display: block; }
+        hr { border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0; }
+
+        /* Top Bar */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--card); padding: 10px 16px; box-shadow: 0 6px 18px rgba(2,6,23,0.05); margin: 0 0 20px 0; border-radius: 12px;}
+        .badge { background: #e2e8f0; color: #334155; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;}
+        .param-list { list-style: none; padding: 0; margin: 0; }
+        .param-list li { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #eee; align-items: center;}
+
+        /* Pengaturan Cetak (Print) A4 Asli */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; color: black; background: white;}
+            .no-print { display: none !important; }
+            @page { size: A4 landscape; margin: 15mm; }
+            .dashboard-table th { background-color: #eee !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; -moz-print-color-adjust: exact; }
+            .dashboard-table th, .dashboard-table td { border: 1px solid #000; padding: 6px; }
+        }
+        
+        /* Main content spacing to accommodate sidebar on desktop */
+        #app-screen{ padding-left: 260px; transition: padding-left .18s ease }
+        body.sidebar-collapsed .tab-container{ position: static; width: auto; height: auto; flex-direction: row; overflow-x:auto; padding:6px 10px; margin-bottom: 12px; }
+        body.sidebar-collapsed #app-screen{ padding-left: 16px }
+        @media (max-width: 1024px) { #app-screen{ padding-left: 220px } }
+        @media (max-width: 900px) { /* collapse to top tabs on small screens */
+            .tab-container{ position: static; width: auto; height: auto; flex-direction: row; overflow-x:auto; padding:6px 10px; margin-bottom: 12px }
+            #app-screen{ padding-left: 16px }
+            .tab-btn{ white-space:nowrap; min-width: 84px; padding: 8px 12px; text-align:center }
+        }
+        @media (max-width: 480px) { .form-row { flex-direction: column; gap: 12px; align-items: stretch;} .sk-preview{ padding: 15px; height: 48vh } .card { margin-left: 8px; margin-right:8px } .login-box{ margin: 0 16px } .top-bar{ padding:10px } }
+    </style>
 </head>
 <body>
-<div id="toast" class="toast"></div>
 
-<!-- Config Modal -->
-<div id="configModal" class="modal-backdrop hidden">
-  <div class="glass rounded-2xl shadow-soft w-full max-w-lg p-6 animate-in">
-    <h2 class="text-2xl font-bold">Konfigurasi Supabase</h2>
-    <p class="text-sm text-slate-600 mt-1">Masukkan URL dan Anon Key proyek Supabase Anda. Disimpan di localStorage.</p>
-    <form id="configForm" class="mt-5 space-y-4">
-      <div>
-        <label class="text-sm font-semibold">Supabase URL</label>
-        <input id="cfgUrl" class="input mt-1" placeholder="https://xxxxx.supabase.co" required>
-      </div>
-      <div>
-        <label class="text-sm font-semibold">Anon Public Key</label>
-        <textarea id="cfgKey" class="input mt-1 h-28" placeholder="eyJhbGc..." required></textarea>
-      </div>
-      <div class="flex gap-3 pt-2">
-        <button type="submit" class="btn btn-primary flex-1 justify-center">Simpan & Sambungkan</button>
-        <button type="button" id="cfgCancel" class="btn btn-ghost">Batal</button>
-      </div>
-      <p class="text-xs text-slate-500">Tips: Buat bucket <b>bukti_digital</b> dan <b>dokumen_template</b> (public) di Storage.</p>
-    </form>
-  </div>
-</div>
-
-<!-- Auth Modal -->
-<div id="authModal" class="modal-backdrop hidden">
-  <div class="glass rounded-2xl shadow-soft w-full max-w-md p-0 overflow-hidden animate-in">
-    <div class="grid grid-cols-2">
-      <button id="tabLogin" class="py-3 font-semibold bg-white">Masuk</button>
-      <button id="tabRegister" class="py-3 font-semibold bg-slate-100 text-slate-500">Daftar</button>
+    <div id="landing-screen">
+        <nav class="top-bar no-print" style="position:sticky; top:0; left:0; right:0; backdrop-filter: blur(16px); background: rgba(2,6,23,0.8); margin-bottom:0;">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:45px; height:45px; border-radius:16px; background: #dc2626; display:flex; align-items:center; justify-content:center; font-weight:800; color:white;">S</div>
+                <div>
+                    <div style="font-weight:700; letter-spacing:.08em;">SIGAP</div>
+                    <div style="font-size:11px; color:#94a3b8; letter-spacing:.14em; text-transform:uppercase;">Sistem Pelaporan Etik & Hukum RSJD</div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:16px; font-size:0.95rem; color:#cbd5e1;">
+                <button class="hero-btn btn-secondary-hero" onclick="toggleTheme()">Theme</button>
+                <a href="#features" style="text-decoration:none;color:inherit;">Fitur</a>
+                <a href="#modules" style="text-decoration:none;color:inherit;">Modul</a>
+                <a href="#security" style="text-decoration:none;color:inherit;">Keamanan</a>
+                <a href="#contact" style="text-decoration:none;color:inherit;">Kontak</a>
+                <button class="hero-btn hero-btn btn-primary-hero" onclick="openLogin()">Masuk</button>
+            </div>
+        </nav>
+        <section class="landing-hero">
+            <div class="landing-copy">
+                <span class="eyebrow">Sistem Pelaporan Etik & Hukum</span>
+                <h1>SIGAP: Solusi <strong>Aduan Etik</strong> & Penyelesaian Hukum</h1>
+                <p>Platform terpadu untuk pelaporan aduan etik rumah sakit, verifikasi internal, eskalasi ke PIC, dan penerbitan SK resmi dalam satu alur kerja.</p>
+                <div class="hero-actions">
+                    <button class="hero-btn btn-primary-hero" onclick="openLogin()">Mulai Sekarang</button>
+                    <button class="hero-btn btn-secondary-hero" onclick="document.getElementById('features').scrollIntoView({ behavior: 'smooth' })">Pelajari Fitur</button>
+                </div>
+                <div class="stats-grid" style="margin-top: 44px;">
+                    <div class="stat-card"><h4>12 Alur Aduan</h4><p>End-to-end</p></div>
+                    <div class="stat-card"><h4>Instansi RSJD</h4><p>RSJD Atma Husada Mahakam</p></div>
+                    <div class="stat-card"><h4>Data Lokal + Supabase</h4><p>Offline Ready</p></div>
+                </div>
+            </div>
+            <div class="hero-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                    <h3>Dashboard Aduan Etik</h3>
+                    <span style="background:#0f172a; color:#22c55e; padding:6px 12px; border-radius:999px; font-size:0.82rem;">Realtime</span>
+                </div>
+                <div class="hero-card">
+                    <div class="mini-card"><div><span>Total Aduan</span><strong id="landing-total">0</strong></div><span style="color:#22c55e;" id="landing-status-total">Memuat...</span></div>
+                    <div class="mini-card"><div><span>Aduan Dalam Proses</span><strong id="landing-processing">0</strong></div><span style="color:#facc15;" id="landing-status-processing">Memuat...</span></div>
+                </div>
+                <div class="hero-stats">
+                    <p>Status Penanganan</p>
+                    <div class="meter"><div id="landing-meter"></div></div>
+                    <p style="margin-top:12px; color:#f8fafc;"><strong id="landing-percent">0%</strong> Dalam Proses</p>
+                </div>
+            </div>
+        </section>
+        <section id="features" class="feature-section">
+            <div class="landing-section-title"><h2>Fitur Unggulan SIGAP</h2><p>Dirancang untuk alur pelaporan etika, verifikasi, eskalasi, hingga penerbitan keputusan resmi.</p></div>
+            <div class="feature-grid">
+                <div class="feature-card"><div class="icon">🛡️</div><h3>Keamanan & Audit</h3><p>Role-based access, verifikasi internal, dan jejak audit untuk setiap langkah penanganan aduan.</p></div>
+                <div class="feature-card"><div class="icon">⚡</div><h3>Alur Aduan Terstruktur</h3><p>Pelapor, Verifikator, Komite, PIC, hingga Direktur bekerja dalam satu proses terintegrasi.</p></div>
+                <div class="feature-card"><div class="icon">📄</div><h3>Dokumentasi Formal</h3><p>Generate draft SK, rekap laporan, dan export A4/PDF untuk keputusan hukum dan etik.</p></div>
+            </div>
+        </section>
+        <section id="modules" class="feature-section">
+            <div class="landing-section-title"><h2>Modul Inti SIGAP</h2><p>Solusi lengkap dari pengajuan aduan hingga keputusan dan arsip SK.</p></div>
+            <div class="feature-grid">
+                <div class="feature-card"><div class="icon">📥</div><h3>Pelaporan Aduan</h3><p>Formulir aman untuk mengirim aduan etik dengan bukti dan deskripsi lengkap.</p></div>
+                <div class="feature-card"><div class="icon">✅</div><h3>Verifikasi Operator</h3><p>Operator memeriksa dan mengklasifikasikan aduan sebelum diteruskan ke komite.</p></div>
+                <div class="feature-card"><div class="icon">📤</div><h3>Eskalasi & Penugasan</h3><p>Komite meneruskan kasus ke PIC sesuai urgensi, SLA, dan dokumentasi proses.</p></div>
+            </div>
+        </section>
+        <section id="security" class="feature-section">
+            <div class="landing-section-title"><h2>Keamanan & Kontrol</h2><p>Atur siapa melihat apa melalui akses per peran, dan kelola koneksi Supabase dengan aman.</p></div>
+            <div class="feature-grid">
+                <div class="feature-card"><div class="icon">🔐</div><h3>Hak Akses Modular</h3><p>Role Pelapor, Operator, Komite, PIC, Direktur, dan Admin dikontrol secara detail.</p></div>
+                <div class="feature-card"><div class="icon">🧠</div><h3>SuperAdmin Dashboard</h3><p>Kelola hak akses, konfigurasi Supabase, dan preferensi tampilan secara terpusat.</p></div>
+                <div class="feature-card"><div class="icon">⚙️</div><h3>Parameter Sistem</h3><p>Atur kategori aduan, level eskalasi, SLA, dan detail instansi untuk operasi RSJD.</p></div>
+            </div>
+        </section>
+        <section id="contact" class="feature-section" style="padding-bottom:80px;">
+            <div class="landing-section-title"><h2>Bicara dengan kami</h2><p>Butuh demo, dukungan, atau pengaturan khusus? Hubungi tim kami untuk implementasi cepat.</p></div>
+            <div style="display:flex; justify-content:center; gap:24px; flex-wrap:wrap; margin-top:32px;">
+                <div class="stat-card" style="max-width:280px; text-align:left;"><h4>Email</h4><p style="font-size:1rem;">support@rsjdmahakam.id</p></div>
+                <div class="stat-card" style="max-width:280px; text-align:left;"><h4>Telepon</h4><p style="font-size:1rem;">+62 541 123 4567</p></div>
+                <div class="stat-card" style="max-width:280px; text-align:left;"><h4>Alamat</h4><p style="font-size:1rem;">RSJD Atma Husada Mahakam, Samarinda</p></div>
+            </div>
+        </section>
     </div>
-    <div class="p-6">
-      <form id="loginForm" class="space-y-4">
-        <div>
-          <label class="text-sm font-semibold">Email</label>
-          <input type="email" id="loginEmail" class="input mt-1" required>
+
+    <div id="login-screen">
+        <div class="login-box" id="login-form-box">
+            <div class="login-close" onclick="closeLogin()">✕</div>
+            <h2 style="margin-bottom: 5px;">SIGAP - Masuk</h2>
+            <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Masukkan email dan password Anda untuk masuk ke SIGAP.</p>
+            <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="email@rsjd.com"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+            <button class="btn-verify" onclick="submitLogin()">Masuk</button>
+            <div style="margin: 12px 0; text-align: center; color: #94a3b8; font-size: 13px;">Belum punya akun? <a href="#" onclick="toggleAuthMode('register'); return false;" style="color:#60a5fa;">Daftar</a></div>
         </div>
-        <div>
-          <label class="text-sm font-semibold">Password</label>
-          <input type="password" id="loginPass" class="input mt-1" required>
+        <div class="login-box" id="register-form-box" style="display:none;">
+            <div class="login-close" onclick="closeLogin()">✕</div>
+            <h2 style="margin-bottom: 5px;">Daftar Akun Pelapor</h2>
+            <p style="font-size: 14px; color: #94a3b8; margin-bottom: 20px;">Buat akun baru untuk pelapor dan mulai mengirim aduan.</p>
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" id="register-name" placeholder="Nama Anda"></div>
+            <div class="form-group"><label>Email</label><input type="email" id="register-email" placeholder="email@rsjd.com"></div>
+            <div class="form-group"><label>Password</label><input type="password" id="register-pass" placeholder="••••••••"></div>
+            <input type="hidden" id="register-role" value="Pelapor">
+            <button class="btn-success" onclick="submitRegister()">Daftar Akun</button>
+            <div style="margin: 12px 0; text-align: center; color: #94a3b8; font-size: 13px;">Sudah punya akun? <a href="#" onclick="toggleAuthMode('login'); return false;" style="color:#60a5fa;">Masuk</a></div>
         </div>
-        <button class="btn btn-primary w-full justify-center">Masuk</button>
-      </form>
-      <form id="registerForm" class="space-y-4 hidden">
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-sm font-semibold">Nama Lengkap</label>
-            <input id="regNama" class="input mt-1" required>
-          </div>
-          <div>
-            <label class="text-sm font-semibold">Telepon</label>
-            <input id="regTelp" class="input mt-1">
-          </div>
-        </div>
-        <div>
-          <label class="text-sm font-semibold">Email</label>
-          <input type="email" id="regEmail" class="input mt-1" required>
-        </div>
-        <div>
-          <label class="text-sm font-semibold">Password</label>
-          <input type="password" id="regPass" class="input mt-1" required minlength="6">
-        </div>
-        <button class="btn btn-primary w-full justify-center">Daftar sebagai Pelapor</button>
-        <p class="text-xs text-slate-500 text-center">Akun akan dibuat dengan role Pelapor Eksternal</p>
-      </form>
     </div>
-  </div>
-</div>
 
-<!-- Landing Page -->
-<div id="landingPage" class="">
-  <header class="sticky top-0 z-40 glass border-b border-white/50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center text-white font-black">A</div>
-        <div>
-          <div class="font-extrabold leading-none">SIM ADUAN</div>
-          <div class="text-xs text-slate-500 -mt-0.5">RSJD AHMA</div>
+    <div id="app-screen">
+        
+        <div class="top-bar no-print">
+            <div><b id="top-instansi-name">RSJD Atma Husada Mahakam</b> | SIGAP</div>
+            <div>
+                <button class="btn-admin btn-small sidebar-toggle-btn" onclick="toggleSidebar()">☰ Sidebar</button>
+                <span class="badge" id="top-role-badge">Role</span>
+                <button class="btn-submit btn-small" style="margin-left: 10px;" onclick="logout()">Keluar</button>
+            </div>
         </div>
-      </div>
-      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-700">
-        <a href="#fitur" class="hover:text-sky-600">Fitur</a>
-        <a href="#alur" class="hover:text-sky-600">Alur</a>
-        <a href="#kontak" class="hover:text-sky-600">Kontak</a>
-      </nav>
-      <div class="flex items-center gap-2">
-        <button id="btnConfig" class="btn btn-ghost text-sm hidden sm:inline-flex">Config</button>
-        <button id="btnLogin" class="btn btn-primary text-sm">Masuk</button>
-      </div>
-    </div>
-  </header>
 
-  <main>
-    <!-- Hero -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10 grid lg:grid-cols-2 gap-10 items-center">
-      <div>
-        <span class="badge badge-info">Sistem Informasi Manajemen Aduan</span>
-        <h1 class="text-4xl md:text-5xl font-black leading-tight mt-4">Layanan Aduan Cepat, Transparan & Akuntabel</h1>
-        <p class="mt-4 text-slate-600 text-lg">Kelola pengaduan pasien, keluarga, dan stakeholder RSJD AHMA dari pencatatan hingga otorisasi selesai dalam satu platform terpadu.</p>
-        <div class="mt-6 flex flex-wrap gap-3">
-          <button id="heroMasuk" class="btn btn-primary">Mulai Lapor</button>
-          <a href="#fitur" class="btn btn-ghost">Pelajari Fitur</a>
+        <div class="tab-container no-print">
+            <button class="tab-btn" data-target="pelapor" onclick="bukaTab('pelapor')">📝 Lapor</button>
+            <button class="tab-btn" data-target="operator" onclick="bukaTab('operator')">✅ Verif</button>
+            <button class="tab-btn" data-target="eskalasi" onclick="bukaTab('eskalasi')">📤 Komite</button>
+            <button class="tab-btn" data-target="pic" onclick="bukaTab('pic')">🛠️ PIC</button>
+            <button class="tab-btn" data-target="otorisasi" onclick="bukaTab('otorisasi')">🖋️ Otorisasi</button>
+            <button class="tab-btn" data-target="penetapan" onclick="bukaTab('penetapan')">📄 SK</button>
+            <button class="tab-btn" data-target="lacak" onclick="bukaTab('lacak')">🔍 Lacak</button>
+            <button class="tab-btn" data-target="dashboard" onclick="bukaTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" data-target="laporan" onclick="bukaTab('laporan')">🗂️ Laporan</button>
+            <button class="tab-btn" data-target="informasi" onclick="bukaTab('informasi')">ℹ️ Info</button>
+            <button class="tab-btn" data-target="admin" onclick="bukaTab('admin')">⚙️ Admin</button>
+            <button class="tab-btn" data-target="superadmin" onclick="bukaTab('superadmin')">🔐 C-Panel</button>
         </div>
-        <div class="mt-8 grid grid-cols-3 gap-4">
-          <div class="glass rounded-2xl p-4 text-center">
-            <div class="text-2xl font-black text-sky-600" id="statTotal">0</div>
-            <div class="text-xs text-slate-600">Total Aduan</div>
-          </div>
-          <div class="glass rounded-2xl p-4 text-center">
-            <div class="text-2xl font-black text-emerald-600" id="statSelesai">0</div>
-            <div class="text-xs text-slate-600">Selesai</div>
-          </div>
-          <div class="glass rounded-2xl p-4 text-center">
-            <div class="text-2xl font-black text-violet-600" id="statProses">0</div>
-            <div class="text-xs text-slate-600">Diproses</div>
-          </div>
+
+        <template id="header-template">
+            <div class="info-header active-header no-print">
+                Detail Informasi Terpilih:<br>
+                Pelapor: <span class="h-pelapor">-</span> | 
+                Tgl. Kejadian: <span class="h-tgl">-</span> | 
+                Terlapor: <span class="h-terlapor">-</span><br>
+                Rekomendasi PIC: <span class="h-rekomendasi highlight-rek">Memuat...</span>
+            </div>
+        </template>
+
+        <div id="section-pelapor" class="section active no-print">
+            <div class="header"><h2>Portal Aduan Aman</h2><p>Formulir Pengiriman Laporan</p></div>
+            <div class="card">
+                <div class="form-group"><label>Nama Lengkap *</label><input type="text" id="input-nama" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Email *</label><input type="email" id="input-email" required></div>
+                    <div class="form-group"><label>Nomor Kontak</label><input type="text" id="input-kontak"></div>
+                </div>
+                <hr>
+                <div class="form-row">
+                    <div class="form-group"><label>Nama Terlapor *</label><input type="text" id="input-terlapor" required></div>
+                    <div class="form-group"><label>Jabatan Terlapor</label><input type="text" id="input-jabatan"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Lokasi Kejadian *</label><input type="text" id="input-lokasi" required></div>
+                    <div class="form-group"><label>Tanggal Kejadian *</label><input type="date" id="input-tanggal" required></div>
+                </div>
+                <div class="form-group"><label>Deskripsi Kejadian *</label><textarea id="input-deskripsi" required></textarea></div>
+                <hr>
+                <div class="form-group"><label>Upload File Bukti</label><input type="file" id="input-file" onchange="validasiUkuranFile(this, 2)"><span class="file-hint">Maks. 2MB.</span></div>
+                <div class="form-group"><label>Link Cloud Drive (Opsional)</label><input type="text" id="input-link"></div>
+                <button class="btn-submit" id="btn-kirim" onclick="kirimLaporan()">Kirim Laporan</button>
+            </div>
+            <div class="card card-large">
+                <h3 style="font-size:14px; margin-top:0;">Daftar Semua Laporan Masuk</h3>
+                <div style="overflow-x:auto;">
+                    <table class="dashboard-table">
+                        <thead><tr><th>Tanggal Kejadian</th><th>ID Aduan</th><th>Pelapor</th><th>Terlapor</th><th>Status Terkini</th></tr></thead>
+                        <tbody id="ds-pelapor"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="relative">
-        <div class="absolute -inset-6 bg-gradient-to-br from-sky-400/30 to-violet-400/30 blur-3xl rounded-full"></div>
-        <div class="relative glass rounded-2xl shadow-soft p-6">
-          <img id="heroImg" src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1600&auto=format&fit=crop" class="rounded-2xl w-full h-[380px] object-cover" alt="hero">
-          <div class="absolute bottom-10 left-10 right-10 glass rounded-2xl p-4 shadow-soft">
-            <div class="text-sm font-bold">Status Realtime</div>
-            <div class="text-xs text-slate-600">Pantau progres aduan Anda kapan saja</div>
-          </div>
+
+        <div id="section-operator" class="section no-print">
+            <div class="header"><h2>Panel Verifikasi</h2><p>Verifikasi & Klasifikasi Laporan Masuk</p></div>
+            <div class="card">
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+                    <button class="btn-search btn-small" onclick="recallAduan('operator')">Recall Aduan Terkirim</button>
+                    <span id="recall-info-operator" style="font-size:12px; color:#475569;">Klik recall untuk memuat item belum selesai.</span>
+                </div>
+                <div class="form-group"><label>Pilih Aduan Masuk</label><select id="op-pilih-aduan" onchange="sinkronHeader(this.value)"></select></div>
+                <div id="header-op"></div>
+
+                <div class="form-group"><label>Kriteria Pengecekan</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" id="chk-identitas"> Identitas Valid</label>
+                        <label class="checkbox-item"><input type="checkbox" id="chk-deskripsi"> Deskripsi Jelas</label>
+                        <label class="checkbox-item"><input type="checkbox" id="chk-bukti"> Indikasi Bukti Tersedia</label>
+                    </div>
+                </div>
+                <hr>
+                <h3 style="font-size: 14px; color:#1a365d; margin-top:0;">Klasifikasi Aduan (Diisi Operator)</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Kategori Utama</label>
+                        <select id="op-kategori" class="dyn-kategori_aduan"></select>
+                    </div>
+                    <div class="form-group"><label>Sub Kategori</label><input type="text" id="op-subkategori" placeholder="Contoh: Suap, Pelecehan"></div>
+                </div>
+                <hr>
+                <div class="form-group"><label>Hasil Verifikasi</label>
+                    <select id="op-hasil" class="dyn-hasil_verifikasi"></select>
+                </div>
+                <div class="form-group"><label>Catatan Verifikator</label><textarea id="op-catatan"></textarea></div>
+                <button class="btn-verify" onclick="simpanVerifikasi()">Simpan Verifikasi & Klasifikasi</button>
+            </div>
+            <div class="card card-large">
+                <h3 style="font-size:14px; margin-top:0;">Datasheet: Antrean Menunggu & Telah Diverifikasi</h3>
+                <div style="overflow-x:auto;">
+                    <table class="dashboard-table">
+                        <thead><tr><th>Tanggal Kejadian</th><th>Kategori</th><th>Pelapor</th><th>Terlapor</th><th>Status Verifikasi</th></tr></thead>
+                        <tbody id="ds-operator"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Fitur -->
-    <section id="fitur" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div class="text-center max-w-2xl mx-auto">
-        <h2 class="text-3xl font-black">Fitur Unggulan</h2>
-        <p class="text-slate-600 mt-2">Dirancang untuk mempercepat respon dan meningkatkan kepuasan layanan.</p>
-      </div>
-      <div id="fiturGrid" class="grid md:grid-cols-3 gap-6 mt-10">
-        <!-- dynamic -->
-      </div>
-    </section>
+        <div id="section-eskalasi" class="section no-print">
+            <div class="header"><h2>Panel Eskalasi</h2><p>Teruskan Aduan Terverifikasi ke PIC</p></div>
+            <div class="card">
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+                    <button class="btn-search btn-small" onclick="recallAduan('eskalasi')">Recall Aduan Diverifikasi</button>
+                    <span id="recall-info-eskalasi" style="font-size:12px; color:#475569;">Klik recall untuk muat antrean eskalasi.</span>
+                </div>
+                <div class="form-group"><label>Pilih Aduan (Terverifikasi)</label><select id="esk-pilih-aduan" onchange="sinkronHeader(this.value)"></select></div>
+                <div id="header-esk"></div>
 
-    <!-- Alur -->
-    <section id="alur" class="bg-white/60 border-y border-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 class="text-3xl font-black text-center">Alur Penanganan Aduan</h2>
-        <div class="grid md:grid-cols-5 gap-4 mt-10">
-          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">📝</div><div class="font-bold mt-2">Pencatatan</div><div class="text-xs text-slate-600">Pelapor kirim aduan</div></div>
-          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">🔍</div><div class="font-bold mt-2">Verifikasi</div><div class="text-xs text-slate-600">Validasi & klasifikasi</div></div>
-          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">⚙️</div><div class="font-bold mt-2">Penanganan</div><div class="text-xs text-slate-600">Tindak lanjut unit</div></div>
-          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">✅</div><div class="font-bold mt-2">Otorisasi</div><div class="text-xs text-slate-600">Persetujuan pimpinan</div></div>
-          <div class="glass rounded-2xl p-5 text-center"><div class="text-3xl">📢</div><div class="font-bold mt-2">Selesai</div><div class="text-xs text-slate-600">Notifikasi ke pelapor</div></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Level Eskalasi</label>
+                        <select id="esk-level" class="dyn-eskalasi"></select>
+                    </div>
+                    <div class="form-group"><label>Nama PIC Tujuan</label>
+                        <select id="esk-nama" class="dyn-pic"></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Tingkat Urgensi</label>
+                        <select id="esk-urgensi" class="dyn-urgensi"></select>
+                    </div>
+                    <div class="form-group"><label>Target SLA (Hari)</label>
+                        <select id="esk-waktu" class="dyn-sla_hari"></select>
+                    </div>
+                </div>
+                <div class="form-group"><label>Instruksi</label><textarea id="esk-deskripsi"></textarea></div>
+                <button class="btn-escalate" onclick="simpanEskalasi()">Distribusikan Laporan</button>
+            </div>
+            <div class="card card-large">
+                <h3 style="font-size:14px; margin-top:0;">Datasheet: Antrean Eskalasi & Terdistribusi</h3>
+                <div style="overflow-x:auto;">
+                    <table class="dashboard-table">
+                        <thead><tr><th>Tanggal Kejadian</th><th>Pelapor</th><th>Terlapor</th><th>Level Urgensi</th><th>Status Distribusi</th></tr></thead>
+                        <tbody id="ds-eskalasi"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Kontak -->
-    <section id="kontak" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div class="glass rounded-2xl p-8 md:p-12 grid md:grid-cols-2 gap-10 items-center">
-        <div>
-          <h3 class="text-2xl font-black">Butuh Bantuan?</h3>
-          <p class="text-slate-600 mt-2">Tim layanan pelanggan RSJD AHMA siap membantu 24/7.</p>
-          <div class="mt-6 space-y-3 text-sm">
-            <div>📞 (024) 123-4567</div>
-            <div>✉️ aduan@rsjd-ahma.go.id</div>
-            <div>📍 Jl. Kesehatan No.1, Semarang</div>
-          </div>
-        <form class="space-y-3" onsubmit="event.preventDefault(); toast('Pesan terkirim (demo)')">
-          <input class="input" placeholder="Nama Anda">
-          <input class="input" placeholder="Email">
-          <textarea class="input h-24" placeholder="Pesan singkat"></textarea>
-          <button class="btn btn-primary w-full justify-center">Kirim Pesan</button>
-        </form>
-      </div>
-    </section>
-  </main>
+        <div id="section-pic" class="section no-print">
+            <div class="header"><h2>Proses Penanganan Laporan</h2><p>Tindak Lanjut & Keputusan PIC</p></div>
+            <div class="card">
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+                    <button class="btn-search btn-small" onclick="recallAduan('pic')">Recall Aduan PIC</button>
+                    <span id="recall-info-pic" style="font-size:12px; color:#475569;">Klik recall untuk muat tugas PIC belum selesai.</span>
+                </div>
+                <div class="form-group"><label>Pilih Laporan Ditugaskan</label><select id="pic-pilih-aduan" onchange="sinkronHeader(this.value)"></select></div>
+                <div id="header-pic"></div>
 
-  <footer class="border-t border-white/60 py-8 text-center text-sm text-slate-600">
-    © <span id="year"></span> RSJD AHMA — SIM Aduan v1.0
-  </footer>
-</div>
-
-<!-- App Layout -->
-<div id="appLayout" class="hidden min-h-screen">
-  <div class="flex">
-    <aside id="sidebar" class="fixed left-0 top-0 h-screen w-[280px] glass border-r border-white/50 p-4 flex flex-col gap-4 overflow-y-auto scroll-thin">
-      <div class="flex items-center gap-3 px-2">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center text-white font-black">A</div>
-        <div>
-          <div class="font-extrabold leading-none">SIM ADUAN</div>
-          <div class="text-xs text-slate-500 -mt-0.5">RSJD AHMA</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Tanggal Mulai</label><input type="date" id="pic-tgl-mulai" required></div>
+                    <div class="form-group"><label>Tanggal Selesai</label><input type="date" id="pic-tgl-selesai"></div>
+                </div>
+                <div class="form-group"><label>To-Do List</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" class="pic-todo" value="Pemanggilan/Menghadirkan Terlapor"> Pemanggilan Terlapor</label>
+                        <label class="checkbox-item"><input type="checkbox" class="pic-todo" value="Pemeriksaan Terlapor"> Pemeriksaan Terlapor</label>
+                        <label class="checkbox-item"><input type="checkbox" class="pic-todo" value="Sidang Etik"> Sidang Etik</label>
+                        <label class="checkbox-item"><input type="checkbox" class="pic-todo" value="Membuat Rekomendasi/Hasil"> Membuat Rekomendasi Akhir</label>
+                    </div>
+                </div>
+                <div class="form-group"><label>Tanggapan Proses</label><textarea id="pic-tanggapan-proses"></textarea></div>
+                <div class="form-group"><label>Keputusan/Rekomendasi Akhir *</label><textarea id="pic-tanggapan-akhir" placeholder="Sanksi teguran tertulis / pencabutan izin..." required></textarea></div>
+                <hr>
+                <div class="form-group"><label>Upload Dokumentasi Sidang</label><input type="file" id="pic-input-file" accept="image/*,.pdf,.docx" onchange="validasiUkuranFile(this, 5)"><span class="file-hint">Maks. 5MB.</span></div>
+                <button class="btn-pic" id="btn-pic-simpan" onclick="simpanPenanganan()">Simpan & Ajukan Otorisasi</button>
+            </div>
+            <div class="card card-large">
+                <h3 style="font-size:14px; margin-top:0;">Datasheet: Tugas Berjalan & Selesai Ditangani</h3>
+                <div style="overflow-x:auto;">
+                    <table class="dashboard-table">
+                        <thead><tr><th>ID Aduan</th><th>Pelapor</th><th>Terlapor</th><th>Status Penanganan</th></tr></thead>
+                        <tbody id="ds-pic"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="glass rounded-2xl p-3">
-        <div class="text-xs text-slate-500">Masuk sebagai</div>
-        <div id="sbName" class="font-bold truncate">-</div>
-        <div id="sbRole" class="text-xs badge badge-info w-fit mt-1">-</div>
-      </div>
-      <nav id="sbNav" class="flex-1 space-y-1"></nav>
-      <button id="btnLogout" class="sidebar-link !text-red-600 hover:!bg-red-50">🚪 Keluar</button>
-    </aside>
-    <main class="flex-1 ml-[280px] min-h-screen">
-      <header class="sticky top-0 z-30 glass border-b border-white/50">
-        <div class="h-16 px-6 flex items-center justify-between">
-          <div>
-            <h1 id="pageTitle" class="text-xl font-black">Dashboard</h1>
-            <div id="pageSub" class="text-xs text-slate-500 -mt-0.5">Ringkasan aktivitas</div>
-          </div>
-          <div class="flex items-center gap-3">
-            <button id="btnNotif" class="relative btn-ghost !p-3">
-              🔔
-              <span id="notifCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] min-w-[18px] h-[18px] rounded-full flex items-center justify-center hidden">0</span>
-            </button>
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-violet-600 flex items-center justify-center text-white font-bold" id="avatar">A</div>
-          </div>
+
+        <div id="section-otorisasi" class="section no-print">
+            <div class="header"><h2>Panel Otorisasi Pimpinan</h2><p>Pengesahan Direktur</p></div>
+            <div class="card">
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+                    <button class="btn-search btn-small" onclick="recallAduan('otorisasi')">Recall Aduan Otorisasi</button>
+                    <span id="recall-info-otorisasi" style="font-size:12px; color:#475569;">Klik recall untuk muat dokumen yang menunggu otorisasi.</span>
+                </div>
+                <div class="form-group"><label>Pilih Laporan</label><select id="ot-pilih-aduan" onchange="sinkronHeader(this.value)"></select></div>
+                <div id="header-ot"></div>
+
+                <div class="form-group"><label>Keputusan Penetapan *</label>
+                    <select id="ot-keputusan"><option value="Disetujui - Terbitkan SK">Disetujui - Terbitkan SK</option><option value="Dikembalikan untuk Direvisi">Kembalikan ke PIC</option><option value="Ditolak">Ditolak</option></select>
+                </div>
+                <div class="form-group"><label>Catatan Final</label><textarea id="ot-catatan"></textarea></div>
+                <div class="form-group">
+                    <div class="checkbox-group"><label class="checkbox-item"><input type="checkbox" id="ot-approved"> <b style="color:#d97706;">Sahkan Penanganan</b></label></div>
+                </div>
+                <button class="btn-otorisasi" onclick="simpanOtorisasi()">Sahkah Laporan</button>
+            </div>
+            <div class="card card-large">
+                <h3 style="font-size:14px; margin-top:0;">Datasheet: Antrean Menunggu Pengesahan & Telah Disahkan</h3>
+                <div style="overflow-x:auto;">
+                    <table class="dashboard-table">
+                        <thead><tr><th>Tanggal Pengajuan</th><th>Pelapor</th><th>Terlapor</th><th>Status Otorisasi</th></tr></thead>
+                        <tbody id="ds-otorisasi"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </header>
-      <div class="p-6 max-w-[1400px] mx-auto">
-        <div id="moduleContainer" class="animate-in"></div>
-      </div>
-    </main>
-  </div>
-</div>
 
-<!-- Generic Modal -->
-<div id="genericModal" class="modal-backdrop hidden">
-  <div class="glass rounded-2xl shadow-soft w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
-    <div class="p-5 border-b border-white/60 flex items-center justify-between">
-      <h3 id="gmTitle" class="text-lg font-bold">Modal</h3>
-      <button id="gmClose" class="btn btn-ghost !p-2">✕</button>
+        <div id="section-penetapan" class="section no-print">
+            <div class="header"><h2>Panel Penetapan SK</h2><p>Penerbitan Surat Keputusan</p></div>
+            <div class="card">
+                <div style="background: #f8fafc; padding: 15px; border-radius: 5px; border: 1px solid #cbd5e1; margin-bottom: 20px;">
+                    <label>Pengaturan Kop Surat Default</label>
+                    <div class="form-row" style="margin-bottom: 0;">
+                        <div class="form-group"><input type="file" id="kop-input" accept="image/*" style="background: white;"></div>
+                        <button class="btn-admin" style="width: auto; margin-top: 0;" onclick="simpanKopSurat()">Simpan Kop</button>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+                    <button class="btn-search btn-small" onclick="recallAduan('penetapan')">Recall Aduan SK</button>
+                    <span id="recall-info-penetapan" style="font-size:12px; color:#475569;">Klik recall untuk muat laporan persiapan SK.</span>
+                </div>
+                <div class="form-group"><label>Pilih Laporan (Disahkan)</label><select id="pen-pilih-aduan" onchange="sinkronHeader(this.value); muatPreviewSK(this.value);"></select></div>
+                <div id="header-pen"></div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nomor SK Penetapan *</label>
+                        <div class="form-row" style="margin-bottom: 0; gap: 5px;">
+                            <input type="text" id="pen-no-sk" placeholder="0000/ETIK-RSJDAHM/2026" oninput="muatPreviewSK(document.getElementById('pen-pilih-aduan').value)" required>
+                            <button class="btn-auto" onclick="generateAutoSK()">Auto</button>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Tanggal Penetapan SK *</label><input type="date" id="pen-tgl" onchange="muatPreviewSK(document.getElementById('pen-pilih-aduan').value)" required></div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group"><label>Hal / Subjek</label><input type="text" value="Keputusan" readonly></div>
+                    <div class="form-group"><label>Tingkat Kerahasiaan</label><select id="pen-kerahasiaan"><option value="Terbatas">Terbatas</option></select></div>
+                </div>
+
+                <hr>
+                <h3 style="font-size: 14px; color:#1a365d; margin-top:0;">Penandatangan:</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Nama Pejabat</label><input type="text" value="dr. Indah Puspitasari, MARS" readonly></div>
+                    <div class="form-group"><label>Jabatan</label><input type="text" value="Direktur" readonly></div>
+                </div>
+                <div class="form-group"><label>Tempat Ditetapkan</label><input type="text" value="Samarinda" readonly></div>
+
+                <hr>
+                <label>Preview Surat Keputusan (Otomatis)</label>
+                <div id="preview-sk-content" class="sk-preview"></div>
+                
+                <div class="form-row">
+                    <button class="btn-verify" onclick="downloadRTF('preview-sk-content', 'sk_penetapan.rtf')">⬇ Download Draft (.rtf)</button>
+                    <button class="btn-pdf" onclick="downloadPDF('preview-sk-content', 'sk_penetapan.pdf')">⬇ Download Draft (.pdf)</button>
+                </div>
+
+                <hr>
+                <div class="form-group"><label>Upload Scan SK Bertanda Tangan (Final)</label><input type="file" id="pen-file" accept="image/*,.pdf" onchange="validasiUkuranFile(this, 5)"><span class="file-hint">Maks. 5MB.</span></div>
+                <button class="btn-admin" id="btn-pen-simpan" onclick="simpanPenetapan()">Terbitkan & Arsipkan SK</button>
+            </div>
+            <div class="card card-large">
+                <h3 style="font-size:14px; margin-top:0;">Datasheet: Antrean Penerbitan SK Final</h3>
+                <div style="overflow-x:auto;">
+                    <table class="dashboard-table">
+                        <thead><tr><th>Tanggal Pengajuan</th><th>Pelapor</th><th>Terlapor</th><th>Status SK</th></tr></thead>
+                        <tbody id="ds-penetapan"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-lacak" class="section no-print">
+            <div class="header"><h2>Lacak Laporan</h2><p>Pantau Status Terkini Aduan Anda</p></div>
+            <div class="card">
+                <div class="form-row">
+                    <div class="form-group" style="flex:3;">
+                        <input type="text" id="lacak-id" placeholder="Cari: NamaPelapor-Tanggal-NamaTerlapor (atau UUID)" required>
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <button class="btn-search" onclick="cariStatusLaporan()">Cari</button>
+                    </div>
+                </div>
+                <hr>
+                <div id="lacak-hasil" style="display: none;">
+                    <h3 id="l-kategori" style="color: #1a365d; margin-bottom: 5px;">-</h3>
+                    <p style="font-size: 12px; color: #64748b; margin-top: 0;">Tanggal Masuk: <span id="l-tgl">-</span></p>
+                    <ul class="timeline" id="l-timeline"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-dashboard" class="section no-print">
+            <div class="header"><h2>Dashboard Statistik</h2><p>Infografis Data Aduan Terkini</p></div>
+            <div class="card card-large">
+                <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 20px;">
+                    <div class="stat-box" style="background:#e0f2fe; color:#0369a1;">
+                        <h3 id="dash-tot">0</h3><p>Total Laporan Masuk</p>
+                    </div>
+                    <div class="stat-box" style="background:#fef9c3; color:#854d0e;">
+                        <h3 id="dash-pros">0</h3><p>Sedang Diproses</p>
+                    </div>
+                    <div class="stat-box" style="background:#dcfce7; color:#166534;">
+                        <h3 id="dash-sel">0</h3><p>Selesai Ditangani</p>
+                    </div>
+                </div>
+                <div style="background: rgba(15,23,42,0.04); border-radius: 20px; padding: 18px; margin-bottom: 24px;">
+                    <h3 style="font-size:14px; margin-bottom:12px;">Distribusi Aduan per Kategori</h3>
+                    <canvas id="dashboard-chart" width="760" height="260" style="width:100%; height:260px; display:block;"></canvas>
+                </div>
+                <h3 style="font-size:14px; margin-bottom:10px;">Distribusi Berdasarkan Kategori Utama:</h3>
+                <table class="dashboard-table">
+                    <thead><tr><th>Kategori Pelanggaran</th><th>Jumlah Laporan</th></tr></thead>
+                    <tbody id="dash-kat-body"><tr><td colspan="2" style="text-align:center;">Memuat data...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="section-laporan" class="section">
+            <div class="header no-print"><h2>Laporan Rekapitulasi Data</h2><p>Cetak Laporan Riwayat Penanganan</p></div>
+            <div class="card card-large no-print">
+                <h3 style="font-size: 14px; margin-bottom:10px;">Filter Pencarian</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Periode Waktu</label><select id="lap-filter-waktu"><option value="semua">Semua Waktu</option><option value="bulanan">Bulan Ini</option><option value="semester">Semester Ini</option><option value="tahunan">Tahun Ini</option></select></div>
+                    <div class="form-group"><label>Kategori</label><select id="lap-filter-kategori" class="dyn-kategori_aduan"><option value="">Semua Kategori</option></select></div>
+                    <div class="form-group"><label>Status</label><select id="lap-filter-status"><option value="">Semua Status</option><option value="Terkirim">Terkirim / Baru</option><option value="Proses PIC / Dieskalasi">Dalam Proses PIC</option><option value="Selesai (SK Diterbitkan)">Selesai</option></select></div>
+                    <div class="form-group"><button class="btn-verify" style="margin-top:22px;" onclick="muatLaporanFormal()">Terapkan Filter</button></div>
+                </div>
+                <hr>
+                <h3 style="font-size: 14px; margin-bottom:10px;">Pengaturan Format Cetak (A4)</h3>
+                <div class="form-row">
+                    <div class="form-group"><label>Dibuat Oleh (Jabatan)</label><input type="text" id="lap-jabatan" placeholder="Contoh: Ketua Komite Etik"></div>
+                    <div class="form-group"><label>Nama Pejabat</label><input type="text" id="lap-nama" placeholder="Contoh: Dr. Budi Santoso"></div>
+                    <div class="form-group"><label>NIP</label><input type="text" id="lap-nip" placeholder="Nomor Induk Pegawai"></div>
+                </div>
+                <button class="btn-otorisasi" style="margin-bottom: 20px;" onclick="cetakLaporan()">🖨️ Cetak Laporan Resmi (A4)</button>
+            </div>
+
+            <div id="print-area" class="card card-large" style="box-shadow: none;">
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 3px double #000; padding-bottom: 15px;">
+                    <h3 style="margin: 0; font-size: 16px;">LAPORAN REKAPITULASI RIWAYAT PENANGANAN ADUAN</h3>
+                    <h4 style="margin: 5px 0 0 0; font-size: 14px;" id="print-instansi-name">SISTEM PELAPORAN ETIK & HUKUM TERPADU (SIGAP)</h4>
+                    <p style="margin: 5px 0 0 0; font-size: 12px;">Periode: <span id="lap-periode-text">Semua Waktu</span></p>
+                </div>
+                
+                <table class="dashboard-table">
+                    <thead><tr><th>Tgl Laporan</th><th>ID / Kode</th><th>Pelapor</th><th>Terlapor</th><th>Kategori & Urgensi</th><th>Status Akhir</th><th>Rekomendasi / Hasil</th></tr></thead>
+                    <tbody id="lap-tbody"><tr><td colspan="7" style="text-align:center;">Gunakan tombol Terapkan Filter untuk memuat data.</td></tr></tbody>
+                </table>
+
+                <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
+                    <div style="text-align: center; width: 250px; font-size: 13px;">
+                        <p style="margin: 0;">Samarinda, <span id="sign-tanggal">...</span></p>
+                        <p style="margin: 5px 0 60px 0;" id="sign-jabatan">Dibuat Oleh,</p>
+                        <p style="margin: 0; font-weight: bold; text-decoration: underline;" id="sign-nama">Nama Pejabat</p>
+                        <p style="margin: 5px 0 0 0;">NIP. <span id="sign-nip">-</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-informasi" class="section no-print">
+            <div class="header"><h2>Pusat Informasi & Layanan</h2><p>Edukasi, Publikasi, dan Layanan Pengguna</p></div>
+            
+            <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center; max-width:950px; margin:0 auto;">
+                <div style="flex:1; min-width:300px;">
+                    <div class="card" style="margin-bottom:15px; padding:15px;">
+                        <h3 style="font-size:15px; margin-top:0; border-bottom:1px solid #ccc; padding-bottom:5px;">Download Publikasi Edukasi</h3>
+                        <p style="font-size:11px; color:#64748b;">Daftar brosur, aturan, dan prosedur terkait etik dan disiplin instansi.</p>
+                        <ul class="param-list" id="list-publikasi"><li><span>Brosur Etik RSJD.pdf</span> <button class="btn-primary btn-small">Download</button></li></ul>
+                    </div>
+                    <div class="card" style="padding:15px;">
+                        <h3 style="font-size:15px; margin-top:0; border-bottom:1px solid #ccc; padding-bottom:5px;">Korespondensi / Hubungi Kami</h3>
+                        <div class="form-group"><label>Nama Anda</label><input type="text" id="kor-nama" placeholder="Nama Lengkap"></div>
+                        <div class="form-group"><label>Pesan / Pertanyaan</label><textarea id="kor-pesan" placeholder="Tuliskan pertanyaan Anda..."></textarea></div>
+                        <button class="btn-verify" onclick="kirimKorespondensi()">Kirim Pesan</button>
+                    </div>
+                </div>
+                <div class="card" style="flex:1; min-width:300px; padding:15px; height:fit-content;">
+                    <h3 style="font-size:15px; margin-top:0; border-bottom:1px solid #ccc; padding-bottom:5px;">Survey Kepuasan Layanan</h3>
+                    <p style="font-size:12px;">Bantu kami meningkatkan kualitas layanan aduan dengan mengisi survey ini.</p>
+                    
+                    <div class="form-group"><label>Penilaian (Rating)</label>
+                        <select id="srv-rating">
+                            <option value="5">⭐⭐⭐⭐⭐ - Sangat Baik</option>
+                            <option value="4">⭐⭐⭐⭐ - Baik</option>
+                            <option value="3">⭐⭐⭐ - Cukup</option>
+                            <option value="2">⭐⭐ - Kurang</option>
+                            <option value="1">⭐ - Sangat Kurang</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Ulasan / Saran Membangun</label><textarea id="srv-ulasan" placeholder="Saran Anda sangat berarti bagi kami..."></textarea></div>
+                    <button class="btn-success" onclick="kirimSurvey()">Kirim Survey Penilaian</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-admin" class="section card card-large no-print">
+            <div class="header"><h2>Administrator Panel</h2><p>Pengaturan Parameter & Manajemen Media</p></div>
+            
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px; background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    <h3 style="margin-top:0; font-size:15px;">Manajemen Parameter (Reference Tables)</h3>
+                    <div class="form-row">
+                        <div class="form-group"><label>Pilih Tabel/Kategori</label><select id="adm-param-pilih" onchange="loadParamValues()"><option value="kategori_aduan">Kategori Aduan</option><option value="pic">Daftar PIC</option><option value="eskalasi">Level Eskalasi</option><option value="urgensi">Tingkat Urgensi</option><option value="sla_hari">SLA (Hari)</option></select></div>
+                    </div>
+                    <ul class="param-list" id="adm-param-list" style="background: white; border: 1px solid #ccc; height: 150px; overflow-y: auto; margin-bottom: 10px;"></ul>
+                    <div class="form-row">
+                        <div class="form-group"><input type="text" id="adm-param-baru" placeholder="Tambah opsi baru..."></div>
+                        <button class="btn-verify btn-small" style="height: 40px; margin-top:0;" onclick="tambahParameter()">+ Tambah</button>
+                    </div>
+                </div>
+                <div style="flex: 1; min-width: 250px; background: #e0f2fe; padding: 15px; border-radius: 6px; border: 1px solid #bae6fd;">
+                    <h3 style="margin-top:0; font-size:15px; color:#0369a1;">Upload Publikasi & Edukasi</h3>
+                    <div class="form-group"><label>Judul Dokumen</label><input type="text" id="adm-pub-judul" placeholder="Cth: Alur Layanan Aduan"></div>
+                        <div class="form-group"><label>Jenis File</label>
+                        <select id="adm-pub-jenis"><option>Brosur</option><option>Leaflet</option><option>Aturan/Kebijakan</option><option>Prosedur/Alur</option></select>
+                    </div>
+                    <div class="form-group"><label>Pilih File (PDF/Gambar/Video)</label>
+                        <input type="file" id="adm-pub-file" accept="image/*,.pdf,video/*" onchange="validasiUkuranFile(this, 5)" style="background:white;">
+                        <span class="file-hint">Maks. Ukuran 5 MB</span>
+                    </div>
+                    <button class="btn-success" onclick="uploadPublikasi(this)">Upload & Publikasikan</button>
+                </div>
+                <div style="flex: 1; min-width: 250px;">
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+                        <h3 style="margin-top:0; font-size:15px;">Pengaturan Instansi</h3>
+                        <div class="form-group"><label>Nama Instansi Default</label><input type="text" id="adm-instansi-nama" value="RSJD Atma Husada Mahakam"></div>
+                        <button class="btn-verify" onclick="simpanPengaturanInstansi()">Simpan Perubahan</button>
+                    </div>
+                    <div style="background: #fef2f2; padding: 15px; border-radius: 6px; border: 1px solid #fca5a5;">
+                        <h3 style="margin-top:0; font-size:15px; color:#991b1b;">Data Ekspor (Backup)</h3>
+                        <p style="font-size: 11px; margin-top: 0; color:#b91c1c;">Backup seluruh data aduan ke JSON.</p>
+                        <button class="btn-admin" onclick="exportDataDB()">Ekspor Data (.json)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-superadmin" class="section card card-large no-print">
+            <div class="header"><h2>SuperAdmin Control Panel</h2><p>Konfigurasi Akses Modul & Database</p></div>
+            
+            <div style="background: #1e293b; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 style="margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px;">Konfigurasi Supabase API</h3>
+                <div class="form-group"><label style="color:#cbd5e1;">Supabase URL</label><input type="text" id="sa-supa-url" style="background:#0f172a; color:white; border-color:#334155;"></div>
+                <div class="form-group"><label style="color:#cbd5e1;">Supabase Anon Key</label><input type="password" id="sa-supa-key" style="background:#0f172a; color:white; border-color:#334155;"></div>
+                <button class="btn-escalate" onclick="simpanConfigSupabase()">Update & Reload Koneksi</button>
+            </div>
+            <div style="background: #0f172a; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 style="margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px;">Pengaturan Sidebar</h3>
+                <div class="form-group"><label style="color:#cbd5e1;">Mode Sidebar</label>
+                    <select id="sa-sidebar-mode" style="background:#0f172a; color:white; border-color:#334155;">
+                        <option value="expanded">Expanded</option>
+                        <option value="collapsed">Collapsed</option>
+                    </select>
+                </div>
+                <button class="btn-admin" onclick="simpanSidebarPref()">Simpan Sidebar</button>
+            </div>
+            <h3 style="font-size: 15px; margin-bottom: 15px;">Matriks Hak Akses (Ceklist Interaktif)</h3>
+            <p style="font-size: 12px; color: #64748b; margin-top:-10px;">Centang modul yang diizinkan untuk masing-masing Role, lalu klik tombol Simpan di bagian bawah.</p>
+            
+            <div id="checklist-akses-container"></div>
+
+            <div class="card" style="background:#111827; color:white; padding:20px; margin-top: 20px;">
+                <h3 style="margin-top:0;">Manajemen Pengguna</h3>
+                <p style="font-size:13px; color:#cbd5e1; margin-bottom:12px;">Lihat, aktifkan/nonaktifkan, dan hapus profil pengguna.</p>
+                <button class="btn-search btn-small" onclick="muatUserManagement()">Muat Daftar Pengguna</button>
+                <div style="overflow-x:auto; margin-top:16px;">
+                    <table class="dashboard-table" id="user-management-table">
+                        <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead>
+                        <tbody><tr><td colspan="5" style="text-align:center;">Klik Muat Daftar Pengguna untuk menampilkan.</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <button class="btn-verify" style="margin-top: 20px;" onclick="simpanChecklistHakAkses()">Simpan Konfigurasi Hak Akses</button>
+        </div>
+
     </div>
-    <div id="gmBody" class="p-5 overflow-y-auto scroll-thin"></div>
-  </div>
-</div>
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    <script>
+        // INISIALISASI SUPABASE
+        let SUPABASE_URL = localStorage.getItem('supa_url') || 'https://slkijpnmzjwpbzxshyux.supabase.co';
+        let SUPABASE_KEY = localStorage.getItem('supa_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsa2lqcG5temp3cGJ6eHNoeXV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5Nzg1OTQsImV4cCI6MjA5NTU1NDU5NH0.hPAYlNmJFo1M4-J76hKeAv6LnQgpUHO2-6qoniPjyao';
+        let klienSupabase = null;
 
-const ROLES = ['Super Admin','Admin RS','Kepala Bagian','Verifikator','Petugas Penanganan','Otorisator','Staf','Pelapor Internal','Pelapor Eksternal','Auditor','Viewer'];
-const MODULES = [
-  {key:'dashboard', label:'Dashboard', icon:'📊', roles:ROLES},
-  {key:'pencatatan', label:'Pencatatan Aduan', icon:'📝', roles:['Super Admin','Admin RS','Staf','Pelapor Internal','Pelapor Eksternal']},
-  {key:'daftar', label:'Daftar Aduan', icon:'📋', roles:ROLES},
-  {key:'verifikasi', label:'Verifikasi', icon:'🔍', roles:['Super Admin','Admin RS','Verifikator']},
-  {key:'penanganan', label:'Penanganan', icon:'⚙️', roles:['Super Admin','Admin RS','Petugas Penanganan']},
-  {key:'otorisasi', label:'Otorisasi', icon:'✅', roles:['Super Admin','Kepala Bagian','Otorisator']},
-  {key:'log', label:'Log Aktivitas', icon:'🕒', roles:['Super Admin','Admin RS','Auditor']},
-  {key:'notifikasi', label:'Notifikasi', icon:'🔔', roles:ROLES},
-  {key:'parameter', label:'Parameter Umum', icon:'🧩', roles:['Super Admin']},
-  {key:'kategori', label:'Kategori & Sub', icon:'🗂️', roles:['Super Admin','Admin RS']},
-  {key:'template', label:'Dokumen Template', icon:'📄', roles:['Super Admin','Admin RS']},
-  {key:'konten', label:'Manajemen Konten', icon:'🎨', roles:['Super Admin','Admin RS']},
-  {key:'users', label:'Manajemen User', icon:'👥', roles:['Super Admin']},
-  {key:'pengaturan', label:'Pengaturan', icon:'⚙️', roles:ROLES},
-];
+        // Persist defaults into localStorage so the SuperAdmin config fields are pre-filled
+        try {
+            if (!localStorage.getItem('supa_url')) localStorage.setItem('supa_url', SUPABASE_URL);
+            if (!localStorage.getItem('supa_key')) localStorage.setItem('supa_key', SUPABASE_KEY);
+        } catch (e) { console.warn('Could not save Supabase config to localStorage:', e); }
 
-let supabase = null;
-let state = { user:null, profile:null, notifUnRead:0 };
-const $ = s=>document.querySelector(s);
-const $$ = s=>document.querySelectorAll(s);
+        function initSupabase() {
+            try {
+                if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                    throw new Error('Supabase library tidak tersedia');
+                }
+                klienSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            } catch (err) {
+                console.warn('Supabase init failed:', err);
+                showToast('Supabase offline atau gagal dimuat. Navigasi akan berjalan dengan fallback lokal.', 'error');
+                klienSupabase = null;
+            }
+        }
 
-function toast(msg,type='info'){
-  const el=document.createElement('div');
-  el.className=`glass rounded-2xl px-4 py-3 shadow-soft text-sm font-semibold ${type==='error'?'text-red-700':type==='success'?'text-emerald-700':'text-slate-800'}`;
-  el.textContent=msg;
-  $('#toast').appendChild(el);
-  setTimeout(()=>el.remove(),4000);
-}
-function show(el){el.classList.remove('hidden')}
-function hide(el){el.classList.add('hidden')}
-function openGM(title,html){$('#gmTitle').textContent=title;$('#gmBody').innerHTML=html;show($('#genericModal'))}
-function closeGM(){hide($('#genericModal'))}
-$('#gmClose').onclick=closeGM;
+        let currentUserRole = null;
+        let systemParameters = {};
+        let dataAduanGlobal = [];
 
-function loadConfig(){
-  const cfg=localStorage.getItem('simaduan_cfg');
-  if(!cfg) return null;
-  try{return JSON.parse(cfg)}catch{return null}
-}
-function saveConfig(cfg){localStorage.setItem('simaduan_cfg',JSON.stringify(cfg))}
-async function initSupabase(cfg){
-  supabase = createClient(cfg.url, cfg.key);
-  const { data:{session} } = await supabase.auth.getSession();
-  if(session) await afterLogin(session.user);
-  updateNotifCount();
-}
-async function afterLogin(user){
-  state.user=user;
-  const { data:prof } = await supabase.from('users').select('*').eq('id',user.id).maybeSingle();
-  if(!prof){
-    // create minimal profile for new auth user
-    const { data:ins } = await supabase.from('users').insert({id:user.id,email:user.email,nama:user.user_metadata?.nama||user.email.split('@')[0],role:'Pelapor Eksternal',aktif:true}).select().single();
-    state.profile=ins;
-  }else state.profile=prof;
-  $('#sbName').textContent=state.profile.nama;
-  $('#sbRole').textContent=state.profile.role;
-  $('#avatar').textContent=state.profile.nama.charAt(0).toUpperCase();
-  hide($('#landingPage'));
-  show($('#appLayout'));
-  renderSidebar();
-  navigate('dashboard');
-}
-function renderSidebar(){
-  const nav=$('#sbNav');
-  nav.innerHTML='';
-  const role=state.profile?.role;
-  MODULES.filter(m=>m.roles.includes(role)||m.roles.includes('*')).forEach(m=>{
-    const a=document.createElement('button');
-    a.className='sidebar-link w-full text-left';
-    a.dataset.key=m.key;
-    a.innerHTML=`<span class="text-lg">${m.icon}</span><span>${m.label}</span>`;
-    a.onclick=()=>navigate(m.key);
-    nav.appendChild(a);
-  });
-}
-function setActiveSidebar(key){
-  $$('#sbNav .sidebar-link').forEach(b=>b.classList.toggle('active',b.dataset.key===key));
-}
-async function navigate(key){
-  if(!state.profile) return;
-  setActiveSidebar(key);
-  const mod=MODULES.find(m=>m.key===key);
-  $('#pageTitle').textContent=mod.label;
-  const container=$('#moduleContainer');
-  container.innerHTML=`<div class="glass rounded-2xl p-10 text-center">Memuat...</div>`;
-  try{
-    const html=await renderModule(key);
-    container.innerHTML=html;
-    if(moduleInit[key]) await moduleInit[key]();
-  }catch(e){
-    console.error(e);
-    container.innerHTML=`<div class="glass rounded-2xl p-10 text-center text-red-600">Gagal memuat: ${e.message}</div>`;
-  }
-}
+        // Utility: generate short id
+        function genId() { return 'ad_' + Math.random().toString(36).substr(2, 9); }
 
-// ---------- MODULES ----------
-const moduleInit={};
+        // LocalStorage helpers for offline/testing
+        function getLocalAduan() { try { return JSON.parse(localStorage.getItem('sigap_aduan') || '[]'); } catch (e) { return []; } }
+        function saveLocalAduan(arr) { try { localStorage.setItem('sigap_aduan', JSON.stringify(arr)); } catch (e) { console.error('saveLocalAduan', e); } }
 
-async function renderModule(key){
-  switch(key){
-    case 'dashboard': return dashboardView();
-    case 'pencatatan': return pencatatanView();
-    case 'daftar': return daftarView();
-    case 'verifikasi': return verifikasiView();
-    case 'penanganan': return penangananView();
-    case 'otorisasi': return otorisasiView();
-    case 'log': return logView();
-    case 'notifikasi': return notifikasiView();
-    case 'parameter': return parameterView();
-    case 'kategori': return kategoriView();
-    case 'template': return templateView();
-    case 'konten': return kontenView();
-    case 'users': return usersView();
-    case 'pengaturan': return pengaturanView();
-  }
-  return '<div>Not implemented</div>';
-}
+        // Small toast helper
+        function showToast(msg, type='info') {
+            const t = document.createElement('div'); t.className = 'app-toast'; t.innerText = msg;
+            t.style.position = 'fixed'; t.style.right = '20px'; t.style.bottom = '20px'; t.style.background = type==='error' ? '#dc2626' : (type==='success' ? '#16a34a' : '#0ea5e9'); t.style.color='white'; t.style.padding='10px 14px'; t.style.borderRadius='8px'; t.style.boxShadow='0 6px 18px rgba(2,6,23,0.2)'; t.style.zIndex = 99999; document.body.appendChild(t);
+            setTimeout(()=>{ t.style.opacity='0'; setTimeout(()=>t.remove(),300); }, 3000);
+        }
 
-// Dashboard
-async function dashboardView(){
-  return `
-  <div class="grid lg:grid-cols-4 gap-5">
-    <div class="glass rounded-2xl p-5"><div class="text-xs text-slate-500">Total Aduan</div><div id="dTotal" class="text-3xl font-black">-</div></div>
-    <div class="glass rounded-2xl p-5"><div class="text-xs text-slate-500">Terkirim</div><div id="dTerkirim" class="text-3xl font-black text-sky-600">-</div></div>
-    <div class="glass rounded-2xl p-5"><div class="text-xs text-slate-500">Proses</div><div id="dProses" class="text-3xl font-black text-amber-600">-</div></div>
-    <div class="glass rounded-2xl p-5"><div class="text-xs text-slate-500">Selesai</div><div id="dSelesai" class="text-3xl font-black text-emerald-600">-</div></div>
-  </div>
-  <div class="grid lg:grid-cols-3 gap-5 mt-5">
-    <div class="lg:col-span-2 glass rounded-2xl p-5">
-      <h3 class="font-bold mb-3">Aduan Terbaru</h3>
-      <div class="overflow-x-auto"><table class="table" id="tblRecent"></table></div>
-    </div>
-    <div class="glass rounded-2xl p-5">
-      <h3 class="font-bold mb-3">Log Aktivitas Terbaru</h3>
-      <div id="logList" class="space-y-3 max-h-[360px] overflow-y-auto scroll-thin pr-2"></div>
-    </div>
-  </div>`;
-}
-moduleInit.dashboard=async()=>{
-  const { data:aduan } = await supabase.from('aduan').select('status');
-  $('#dTotal').textContent=aduan?.length||0;
-  $('#dTerkirim').textContent=aduan?.filter(a=>a.status==='Terkirim').length||0;
-  $('#dProses').textContent=aduan?.filter(a=>['Diverifikasi','Proses','Menunggu Otorisasi'].includes(a.status)).length||0;
-  $('#dSelesai').textContent=aduan?.filter(a=>a.status==='Selesai').length||0;
-  const { data:recent } = await supabase.from('aduan').select('nomor_aduan,judul,status,created_at').order('created_at',{ascending:false}).limit(8);
-  $('#tblRecent').innerHTML=`<thead><tr><th>No</th><th>Judul</th><th>Status</th><th>Tanggal</th></tr></thead><tbody>${
-    (recent||[]).map(r=>`<tr><td>${r.nomor_aduan}</td><td class="font-semibold">${r.judul}</td><td>${badgeStatus(r.status)}</td><td>${new Date(r.created_at).toLocaleDateString('id-ID')}</td></tr>`).join('')
-  }</tbody>`;
-  const { data:logs } = await supabase.from('log_aktivitas').select('aktivitas,keterangan,created_at,users(nama)').order('created_at',{ascending:false}).limit(10);
-  $('#logList').innerHTML=(logs||[]).map(l=>`
-    <div class="p-3 rounded-xl bg-white/60 border border-white">
-      <div class="text-sm font-semibold">${l.aktivitas}</div>
-      <div class="text-xs text-slate-600">${l.keterangan||''}</div>
-      <div class="text-[11px] text-slate-500 mt-1">${l.users?.nama||'-'} • ${new Date(l.created_at).toLocaleString('id-ID')}</div>
-    </div>`).join('');
-};
+        const themePrefKey = 'sigap_theme_mode';
+        function loadTheme() {
+            const theme = localStorage.getItem(themePrefKey) || 'dark';
+            document.body.classList.toggle('light-theme', theme === 'light');
+        }
 
-// Pencatatan
-function pencatatanView(){
-  return `
-  <div class="glass rounded-2xl p-6 max-w-4xl">
-    <h3 class="text-xl font-black">Form Aduan Baru</h3>
-    <form id="formAduan" class="grid md:grid-cols-2 gap-4 mt-4">
-      <div class="md:col-span-2">
-        <label class="text-sm font-semibold">Judul Aduan</label>
-        <input name="judul" class="input mt-1" required>
-      </div>
-      <div>
-        <label class="text-sm font-semibold">Kategori</label>
-        <select name="kategori_id" id="fKategori" class="input select mt-1" required></select>
-      </div>
-      <div>
-        <label class="text-sm font-semibold">Sub Kategori</label>
-        <select name="sub_kategori_id" id="fSub" class="input select mt-1" required></select>
-      </div>
-      <div>
-        <label class="text-sm font-semibold">Prioritas</label>
-        <select name="prioritas" class="input select mt-1"><option>Rendah</option><option>Sedang</option><option>Tinggi</option><option>Kritis</option></select>
-      </div>
-      <div>
-        <label class="text-sm font-semibold">Lokasi Kejadian</label>
-        <input name="lokasi" class="input mt-1">
-      </div>
-      <div class="md:col-span-2">
-        <label class="text-sm font-semibold">Deskripsi</label>
-        <textarea name="deskripsi" class="input mt-1 h-32" required></textarea>
-      </div>
-      <div class="md:col-span-2">
-        <label class="text-sm font-semibold">Bukti Digital (max 5 file)</label>
-        <input type="file" id="fBukti" multiple accept="image/*,application/pdf" class="input mt-1">
-      </div>
-      <div class="md:col-span-2 flex gap-3 pt-2">
-        <button class="btn btn-primary">Kirim Aduan</button>
-        <button type="reset" class="btn btn-ghost">Reset</button>
-      </div>
-    </form>
-  </div>`;
-}
-moduleInit.pencatatan=async()=>{
-  const { data:kats } = await supabase.from('kategori_aduan').select('id,nama').eq('aktif',true);
-  $('#fKategori').innerHTML=`<option value="">Pilih</option>`+(kats||[]).map(k=>`<option value="${k.id}">${k.nama}</option>`).join('');
-  $('#fKategori').onchange=async e=>{
-    const { data:subs } = await supabase.from('sub_kategori').select('id,nama').eq('kategori_id',e.target.value).eq('aktif',true);
-    $('#fSub').innerHTML=`<option value="">Pilih</option>`+(subs||[]).map(s=>`<option value="${s.id}">${s.nama}</option>`).join('');
-  };
-  $('#formAduan').onsubmit=async ev=>{
-    ev.preventDefault();
-    const fd=new FormData(ev.target);
-    const payload=Object.fromEntries(fd.entries());
-    try{
-      const nomor=await generateNomor();
-      const { data:ad, error:err1 } = await supabase.from('aduan').insert({
-        nomor_aduan:nomor,
-        judul:payload.judul,
-        deskripsi:payload.deskripsi,
-        kategori_id:payload.kategori_id,
-        sub_kategori_id:payload.sub_kategori_id,
-        prioritas:payload.prioritas,
-        lokasi:payload.lokasi,
-        pelapor_id:state.profile.id,
-        status:'Terkirim',
-        progress:0
-      }).select().single();
-      if(err1) throw err1;
-      // upload bukti
-      const files=$('#fBukti').files;
-      for(const f of files){
-        const url=await uploadFile('bukti_digital',f);
-        await supabase.from('aduan').update({bukti_url:supabase.storage.from('bukti_digital').getPublicUrl(url.path).data.publicUrl}).eq('id',ad.id);
-        // simplistic: store last url
-      }
-      await logActivity(ad.id,'Aduan Dibuat',`Nomor ${nomor}`);
-      await createNotifForRole(['Verifikator','Admin RS'],'Aduan Baru',`Aduan ${nomor} perlu verifikasi`);
-      toast('Aduan berhasil dikirim','success');
-      ev.target.reset();
-    }catch(e){toast(e.message,'error')}
-  };
-};
+        function toggleTheme() {
+            const isLight = !document.body.classList.contains('light-theme');
+            document.body.classList.toggle('light-theme', isLight);
+            localStorage.setItem(themePrefKey, isLight ? 'light' : 'dark');
+            showToast('Mode tema diubah ke ' + (isLight ? 'Terang' : 'Gelap'), 'success');
+        }
 
-// Daftar
-function daftarView(){
-  return `
-  <div class="glass rounded-2xl p-5">
-    <div class="flex flex-wrap gap-3 items-center mb-4">
-      <input id="qSearch" class="input max-w-xs" placeholder="Cari nomor/judul...">
-      <select id="qStatus" class="input select max-w-[200px]"><option value="">Semua Status</option>${['Terkirim','Diverifikasi','Proses','Menunggu Otorisasi','Selesai','Ditolak'].map(s=>`<option>${s}</option>`).join('')}</select>
-      <button id="btnRefresh" class="btn btn-ghost">Refresh</button>
-    </div>
-    <div class="overflow-x-auto"><table class="table" id="tblDaftar"></table></div>
-  </div>`;
-}
-moduleInit.daftar=async()=>{
-  const load=async()=>{
-    let q=supabase.from('aduan').select('id,nomor_aduan,judul,status,prioritas,progress,created_at,kategori_aduan(nama),users(nama)').order('created_at',{ascending:false}).limit(200);
-    const s=$('#qSearch').value.trim();
-    if(s) q=q.or(`nomor_aduan.ilike.%${s}%,judul.ilike.%${s}%`);
-    const st=$('#qStatus').value;
-    if(st) q=q.eq('status',st);
-    const { data } = await q;
-    $('#tblDaftar').innerHTML=`<thead><tr><th>Nomor</th><th>Judul</th><th>Kategori</th><th>Pelapor</th><th>Prioritas</th><th>Status</th><th>Progress</th><th>Tanggal</th></tr></thead><tbody>${
-      (data||[]).map(r=>`<tr class="cursor-pointer hover:bg-sky-50" data-id="${r.id}"><td class="font-mono text-xs">${r.nomor_aduan}</td><td class="font-semibold">${r.judul}</td><td>${r.kategori_aduan?.nama||'-'}</td><td>${r.users?.nama||'-'}</td><td>${r.prioritas||'-'}</td><td>${badgeStatus(r.status)}</td><td>${r.progress||0}%</td><td>${new Date(r.created_at).toLocaleDateString('id-ID')}</td></tr>`).join('')
-    }</tbody>`;
-    $('#tblDaftar tbody').onclick=e=>{
-      const tr=e.target.closest('tr'); if(!tr) return;
-      openDetailAduan(tr.dataset.id);
-    };
-  };
-  $('#qSearch').oninput=debounce(load,400);
-  $('#qStatus').onchange=load;
-  $('#btnRefresh').onclick=load;
-  load();
-};
+        async function loadLandingStats() {
+            let total = 0;
+            let processing = 0;
+            const local = getLocalAduan();
+            if (klienSupabase) {
+                try {
+                    const { data, error } = await klienSupabase.from('aduan').select('status');
+                    if (!error && data) {
+                        total = data.length;
+                        processing = data.filter(item => ['Diverifikasi', 'Proses PIC / Dieskalasi', 'Menunggu Otorisasi', 'Menunggu Penerbitan SK'].includes(item.status)).length;
+                    }
+                } catch (e) {
+                    console.warn('Gagal memuat landing stats dari Supabase', e);
+                }
+            }
+            if (local.length > total) total = local.length;
+            processing = Math.max(processing, local.filter(item => ['Diverifikasi', 'Proses PIC / Dieskalasi', 'Menunggu Otorisasi', 'Menunggu Penerbitan SK'].includes(item.status)).length);
+            const percent = total ? Math.round((processing / total) * 100) : 0;
+            document.getElementById('landing-total').innerText = total;
+            document.getElementById('landing-status-total').innerText = total === 0 ? 'Belum ada laporan' : `${total} laporan`;
+            document.getElementById('landing-processing').innerText = processing;
+            document.getElementById('landing-status-processing').innerText = processing === 0 ? 'Tidak ada proses' : `${processing} sedang ditangani`;
+            document.getElementById('landing-meter').style.width = percent + '%';
+            document.getElementById('landing-percent').innerText = percent + '%';
+        }
 
-// Verifikasi
-function verifikasiView(){
-  return `<div class="glass rounded-2xl p-5"><div class="overflow-x-auto"><table class="table" id="tblVerif"></table></div></div>`;
-}
-moduleInit.verifikasi=async()=>{
-  const { data } = await supabase.from('aduan').select('id,nomor_aduan,judul,created_at,users(nama),kategori_aduan(nama)').eq('status','Terkirim').order('created_at');
-  $('#tblVerif').innerHTML=`<thead><tr><th>Nomor</th><th>Judul</th><th>Kategori</th><th>Pelapor</th><th>Tanggal</th><th>Aksi</th></tr></thead><tbody>${
-    (data||[]).map(r=>`<tr><td class="font-mono text-xs">${r.nomor_aduan}</td><td>${r.judul}</td><td>${r.kategori_aduan?.nama||''}</td><td>${r.users?.nama||''}</td><td>${new Date(r.created_at).toLocaleDateString('id-ID')}</td><td><button data-id="${r.id}" class="btn btn-primary !py-1 !px-3 text-sm btnVerif">Verifikasi</button></td></tr>`).join('')
-  }</tbody>`;
-  $('#tblVerif').onclick=e=>{
-    const b=e.target.closest('.btnVerif'); if(!b) return;
-    openVerifForm(b.dataset.id);
-  };
-};
-async function openVerifForm(id){
-  const { data:ad } = await supabase.from('aduan').select('*').eq('id',id).single();
-  openGM('Verifikasi Aduan',`
-    <div class="space-y-3">
-      <div><b>${ad.nomor_aduan}</b> - ${ad.judul}</div>
-      <form id="fVerif" class="space-y-3">
-        <label class="text-sm font-semibold">Hasil Verifikasi</label>
-        <select name="hasil" class="input select"><option>Valid</option><option>Tidak Valid</option></select>
-        <label class="text-sm font-semibold">Catatan</label>
-        <textarea name="catatan" class="input h-24"></textarea>
-        <label class="text-sm font-semibold">Rekomendasi</label>
-        <input name="rekomendasi" class="input">
-        <button class="btn btn-primary">Simpan Verifikasi</button>
-      </form>
-    </div>`);
-  $('#fVerif').onsubmit=async ev=>{
-    ev.preventDefault();
-    const fd=Object.fromEntries(new FormData(ev.target).entries());
-    const status=fd.hasil==='Valid'?'Diverifikasi':'Ditolak';
-    await supabase.from('verifikasi').insert({aduan_id:id,verifikator_id:state.profile.id,hasil_verifikasi:fd.hasil,catatan:fd.catatan,rekomendasi:fd.rekomendasi});
-    await supabase.from('aduan').update({status,progress:status==='Diverifikasi'?10:0}).eq('id',id);
-    await logActivity(id,'Verifikasi',fd.hasil);
-    toast('Verifikasi disimpan','success'); closeGM(); navigate('verifikasi');
-  };
-}
+        function drawBarChart(canvas, labels, values) {
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 40;
+            const maxVal = Math.max(...values, 1);
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = document.body.classList.contains('light-theme') ? '#1f2937' : '#f8fafc';
+            ctx.font = '14px Inter, sans-serif';
+            const barWidth = (width - padding * 2) / values.length * 0.7;
+            values.forEach((value, index) => {
+                const barHeight = Math.round((value / maxVal) * (height - padding * 2));
+                const x = padding + index * ((width - padding * 2) / values.length) + ((width - padding * 2) / values.length - barWidth) / 2;
+                const y = height - padding - barHeight;
+                ctx.fillStyle = ['#60a5fa', '#f97316', '#22c55e', '#e11d48', '#a855f7'][index % 5];
+                ctx.fillRect(x, y, barWidth, barHeight);
+                ctx.fillStyle = document.body.classList.contains('light-theme') ? '#1f2937' : '#f8fafc';
+                ctx.fillText(value, x, y - 8);
+                const text = labels[index];
+                ctx.save();
+                ctx.translate(x + barWidth / 2, height - padding + 16);
+                ctx.rotate(-Math.PI/4);
+                ctx.fillText(text, 0, 0);
+                ctx.restore();
+            });
+        }
 
-// Penanganan
-function penangananView(){
-  return `<div class="glass rounded-2xl p-5"><div class="overflow-x-auto"><table class="table" id="tblPen"></table></div></div>`;
-}
-moduleInit.penanganan=async()=>{
-  const { data } = await supabase.from('aduan').select('id,nomor_aduan,judul,status,progress').in('status',['Diverifikasi','Proses']).order('created_at');
-  $('#tblPen').innerHTML=`<thead><tr><th>Nomor</th><th>Judul</th><th>Status</th><th>Progress</th><th>Aksi</th></tr></thead><tbody>${
-    (data||[]).map(r=>`<tr><td class="font-mono text-xs">${r.nomor_aduan}</td><td>${r.judul}</td><td>${badgeStatus(r.status)}</td><td>${r.progress||0}%</td><td><button data-id="${r.id}" class="btn btn-primary !py-1 !px-3 text-sm btnTahap">Tambah Tahap</button></td></tr>`).join('')
-  }</tbody>`;
-  $('#tblPen').onclick=e=>{
-    const b=e.target.closest('.btnTahap'); if(!b) return;
-    openTahapForm(b.dataset.id);
-  };
-};
-function openTahapForm(id){
-  openGM('Tambah Tahap Penanganan',`
-    <form id="fTahap" class="space-y-3">
-      <label class="text-sm font-semibold">Deskripsi Tahap</label>
-      <textarea name="deskripsi" class="input h-24" required></textarea>
-      <div class="grid grid-cols-2 gap-3">
-        <div><label class="text-sm font-semibold">Progress (%)</label><input type="number" name="progress" min="0" max="100" class="input"></div>
-        <div><label class="text-sm font-semibold">Estimasi Selesai</label><input type="date" name="estimasi" class="input"></div>
-      </div>
-      <button class="btn btn-primary">Simpan</button>
-    </form>`);
-  $('#fTahap').onsubmit=async ev=>{
-    ev.preventDefault();
-    const fd=Object.fromEntries(new FormData(ev.target).entries());
-    const { data:cnt } = await supabase.from('penanganan_tahap').select('id',{count:'exact',head:true}).eq('aduan_id',id);
-    await supabase.from('penanganan_tahap').insert({aduan_id:id,petugas_id:state.profile.id,tahap_ke:(cnt||0)+1,deskripsi:fd.deskripsi,progress:parseInt(fd.progress)||0,estimasi_selesai:fd.estimasi||null});
-    await supabase.from('aduan').update({status:'Proses',progress:parseInt(fd.progress)||0}).eq('id',id);
-    await logActivity(id,'Penanganan','Tahap ditambahkan');
-    toast('Tahap disimpan','success'); closeGM(); navigate('penanganan');
-  };
-}
+        async function renderDashboardChart() {
+            const canvas = document.getElementById('dashboard-chart');
+            if (!canvas) return;
+            let categories = [];
+            let values = [];
+            try {
+                const { data, error } = await klienSupabase.from('aduan').select('kategori');
+                if (!error && data) {
+                    const counts = {};
+                    data.forEach(item => { const key = item.kategori || 'Belum Diklasifikasi'; counts[key] = (counts[key] || 0) + 1; });
+                    categories = Object.keys(counts).slice(0, 6);
+                    values = categories.map(cat => counts[cat]);
+                }
+            } catch (e) {
+                console.warn('Gagal memuat chart Supabase', e);
+            }
+            if (!categories.length) {
+                const local = getLocalAduan();
+                const counts = {};
+                local.forEach(item => { const key = item.kategori || 'Belum Diklasifikasi'; counts[key] = (counts[key] || 0) + 1; });
+                categories = Object.keys(counts).slice(0, 6);
+                values = categories.map(cat => counts[cat]);
+            }
+            drawBarChart(canvas, categories, values);
+        }
 
-// Otorisasi
-function otorisasiView(){
-  return `<div class="glass rounded-2xl p-5"><div class="overflow-x-auto"><table class="table" id="tblOto"></table></div></div>`;
-}
-moduleInit.otorisasi=async()=>{
-  const { data } = await supabase.from('aduan').select('id,nomor_aduan,judul').eq('status','Menunggu Otorisasi');
-  $('#tblOto').innerHTML=`<thead><tr><th>Nomor</th><th>Judul</th><th>Aksi</th></tr></thead><tbody>${
-    (data||[]).map(r=>`<tr><td class="font-mono text-xs">${r.nomor_aduan}</td><td>${r.judul}</td><td><button data-id="${r.id}" class="btn btn-primary !py-1 !px-3 text-sm btnOto">Proses</button></td></tr>`).join('')
-  }</tbody>`;
-  $('#tblOto').onclick=e=>{
-    const b=e.target.closest('.btnOto'); if(!b) return;
-    openOtoForm(b.dataset.id);
-  };
-};
-function openOtoForm(id){
-  openGM('Otorisasi Aduan',`
-    <form id="fOto" class="space-y-3">
-      <label class="text-sm font-semibold">Keputusan</label>
-      <select name="keputusan" class="input select"><option>Setuju</option><option>Tolak</option></select>
-      <label class="text-sm font-semibold">Catatan</label>
-      <textarea name="catatan" class="input h-24"></textarea>
-      <button class="btn btn-primary">Simpan</button>
-    </form>`);
-  $('#fOto').onsubmit=async ev=>{
-    ev.preventDefault();
-    const fd=Object.fromEntries(new FormData(ev.target).entries());
-    await supabase.from('otorisasi').insert({aduan_id:id,otorisator_id:state.profile.id,keputusan:fd.keputusan,catatan:fd.catatan});
-    const newStatus=fd.keputusan==='Setuju'?'Selesai':'Ditolak';
-    await supabase.from('aduan').update({status:newStatus,progress:newStatus==='Selesai'?100:0}).eq('id',id);
-    await logActivity(id,'Otorisasi',fd.keputusan);
-    toast('Otorisasi disimpan','success'); closeGM(); navigate('otorisasi');
-  };
-}
+        async function muatUserManagement() {
+            const tbody = document.querySelector('#user-management-table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat data pengguna...</td></tr>';
+            if (!klienSupabase) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Supabase tidak tersedia.</td></tr>';
+            const { data, error } = await klienSupabase.from('profiles').select('*').order('created_at', { ascending: false });
+            if (error || !data) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Gagal memuat pengguna.</td></tr>';
+            if (!data.length) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Belum ada pengguna terdaftar.</td></tr>';
+            tbody.innerHTML = '';
+            data.forEach(user => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${user.name || '-'}</td>
+                        <td>${user.email || '-'}</td>
+                        <td>${user.role || '-'}</td>
+                        <td>${user.is_active ? 'Aktif' : 'Nonaktif'}</td>
+                        <td style="white-space:nowrap;">
+                            <button class="btn-small" onclick="toggleUserActive('${user.id}', ${user.is_active})">${user.is_active ? 'Nonaktifkan' : 'Aktifkan'}</button>
+                            <button class="btn-small" onclick="hapusUser('${user.id}')">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
 
-// Log
-function logView(){
-  return `<div class="glass rounded-2xl p-5">
-    <div class="flex gap-3 mb-3"><input id="logQ" class="input max-w-xs" placeholder="Filter aduan id/nomor"><button id="logRefresh" class="btn btn-ghost">Refresh</button></div>
-    <div class="overflow-x-auto"><table class="table" id="tblLog"></table></div>
-  </div>`;
-}
-moduleInit.log=async()=>{
-  const load=async()=>{
-    let q=supabase.from('log_aktivitas').select('id,aktivitas,keterangan,created_at,aduan_id,users(nama),aduan(nomor_aduan)').order('created_at',{ascending:false}).limit(200);
-    $('#tblLog').innerHTML='<tbody><tr><td>Memuat...</td></tr></tbody>';
-    const { data } = await q;
-    $('#tblLog').innerHTML=`<thead><tr><th>Waktu</th><th>Aduan</th><th>Aktivitas</th><th>User</th><th>Keterangan</th></tr></thead><tbody>${
-      (data||[]).map(l=>`<tr><td class="text-xs">${new Date(l.created_at).toLocaleString('id-ID')}</td><td class="font-mono text-xs">${l.aduan?.nomor_aduan||l.aduan_id||'-'}</td><td>${l.aktivitas}</td><td>${l.users?.nama||'-'}</td><td>${l.keterangan||''}</td></tr>`).join('')
-    }</tbody>`;
-  };
-  $('#logRefresh').onclick=load;
-  load();
-};
+        async function toggleUserActive(userId, currentState) {
+            if (!confirm('Ubah status akun?')) return;
+            await klienSupabase.from('profiles').update({ is_active: !currentState }).eq('id', userId);
+            await muatUserManagement();
+        }
 
-// Notifikasi
-function notifikasiView(){
-  return `<div class="glass rounded-2xl p-5"><div id="notifList" class="space-y-3"></div></div>`;
-}
-moduleInit.notifikasi=async()=>{
-  const { data } = await supabase.from('notifikasi').select('*').eq('user_id',state.profile.id).order('created_at',{ascending:false}).limit(100);
-  $('#notifList').innerHTML=(data||[]).map(n=>`
-    <div class="p-4 rounded-xl border ${n.is_read?'bg-white/40':'bg-sky-50 border-sky-200'}">
-      <div class="font-bold">${n.judul}</div>
-      <div class="text-sm text-slate-700">${n.pesan||''}</div>
-      <div class="text-xs text-slate-500 mt-1">${new Date(n.created_at).toLocaleString('id-ID')}</div>
-      ${!n.is_read?`<button data-id="${n.id}" class="text-xs text-sky-700 font-semibold mt-1 btnRead">Tandai dibaca</button>`:''}
-    </div>`).join('')||'<div class="text-slate-500">Tidak ada notifikasi</div>';
-  $('#notifList').onclick=async e=>{
-    const b=e.target.closest('.btnRead'); if(!b) return;
-    await supabase.from('notifikasi').update({is_read:true,read_at:new Date().toISOString()}).eq('id',b.dataset.id);
-    navigate('notifikasi'); updateNotifCount();
-  };
-};
+        async function hapusUser(userId) {
+            if (!confirm('Hapus pengguna ini dari profil?')) return;
+            await klienSupabase.from('profiles').delete().eq('id', userId);
+            await muatUserManagement();
+        }
 
-// Parameter Umum CRUD
-function parameterView(){return crudTemplate('parameter_umum','Parameter Umum',['kunci','nilai','deskripsi','tipe']); }
-moduleInit.parameter=()=>initCrud('parameter_umum',['kunci','nilai','deskripsi','tipe']);
+        // KONFIGURASI HAK AKSES DEFAULT (Disimpan di LocalStorage)
+        let aksesConfigGlobal = JSON.parse(localStorage.getItem('akses_config_sigap')) || {
+            'Pelapor': ['pelapor', 'lacak', 'dashboard', 'informasi'],
+            'Operator': ['pelapor', 'operator', 'lacak', 'dashboard', 'informasi'],
+            'Komite': ['eskalasi', 'dashboard', 'informasi'],
+            'PIC': ['pic', 'dashboard', 'informasi'],
+            'Direktur': ['otorisasi', 'dashboard', 'informasi'],
+            'Administrator': ['penetapan', 'laporan', 'admin', 'dashboard', 'informasi']
+        };
 
-// Kategori
-function kategoriView(){
-  return `<div class="grid lg:grid-cols-2 gap-5">
-    <div class="glass rounded-2xl p-5"><h3 class="font-bold mb-3">Kategori Aduan</h3><div id="katWrap"></div></div>
-    <div class="glass rounded-2xl p-5"><h3 class="font-bold mb-3">Sub Kategori</h3><div id="subWrap"></div></div>
-  </div>`;
-}
-moduleInit.kategori=async()=>{
-  await initCrudInline('kategori_aduan','katWrap',['nama','deskripsi','aktif'],{aktif:'checkbox'});
-  await initCrudInline('sub_kategori','subWrap',['kategori_id','nama','deskripsi','aktif'],{kategori_id:'select_kategori',aktif:'checkbox'});
-};
+        const daftarSemuaModul = [
+            { id: 'pelapor', nama: '1. Lapor & Datasheet' },
+            { id: 'operator', nama: '2. Panel Verifikasi' },
+            { id: 'eskalasi', nama: '3. Panel Eskalasi' },
+            { id: 'pic', nama: '4. Penanganan PIC' },
+            { id: 'otorisasi', nama: '5. Otorisasi Pimpinan' },
+            { id: 'penetapan', nama: '6. Penetapan SK' },
+            { id: 'lacak', nama: '7. Lacak Status' },
+            { id: 'dashboard', nama: '8. Dashboard Infografis' },
+            { id: 'laporan', nama: '9. Cetak Laporan (A4)' },
+            { id: 'informasi', nama: '10. Info & Survey' },
+            { id: 'admin', nama: '11. Pengaturan Admin' }
+        ];
 
-// Template
-function templateView(){ return crudTemplate('dokumen_template','Dokumen Template',['nama','kategori','deskripsi','aktif'],true); }
-moduleInit.template=()=>initCrud('dokumen_template',['nama','kategori','deskripsi','file_url','aktif'],{file_url:'file',aktif:'checkbox'},'dokumen_template');
+        const sidebarPrefKey = 'sigap_sidebar_collapsed';
+        const recallStageConfig = {
+            operator: { select: 'op-pilih-aduan', status: 'Terkirim', info: 'recall-info-operator' },
+            eskalasi: { select: 'esk-pilih-aduan', status: 'Diverifikasi', info: 'recall-info-eskalasi' },
+            pic: { select: 'pic-pilih-aduan', status: 'Proses PIC / Dieskalasi', info: 'recall-info-pic' },
+            otorisasi: { select: 'ot-pilih-aduan', status: 'Menunggu Otorisasi', info: 'recall-info-otorisasi' },
+            penetapan: { select: 'pen-pilih-aduan', status: 'Menunggu Penerbitan SK', info: 'recall-info-penetapan' }
+        };
 
-// Konten
-function kontenView(){ return crudTemplate('konten_landing','Manajemen Konten',['section','judul','subjudul','konten','gambar_url','urutan','aktif'],true); }
-moduleInit.konten=()=>initCrud('konten_landing',['section','judul','subjudul','konten','gambar_url','urutan','aktif'],{konten:'textarea',gambar_url:'file',aktif:'checkbox'},'dokumen_template');
+        document.addEventListener("DOMContentLoaded", async () => {
+            initSupabase();
+            const temp = document.getElementById('header-template').innerHTML;
+            document.querySelectorAll('#header-op, #header-esk, #header-pic, #header-ot, #header-pen').forEach(el => el.innerHTML = temp);
+            renderChecklistSuperAdmin();
+            applySidebarState();
+            loadTheme();
+            toggleAuthMode('login');
+            await loadSession();
+        });
 
-// Users
-function usersView(){ return crudTemplate('users','Manajemen User',['nama','email','role','unit_kerja','telepon','aktif']); }
-moduleInit.users=()=>initCrud('users',['nama','email','role','unit_kerja','telepon','aktif'],{role:'select_role',aktif:'checkbox'});
+        function validasiUkuranFile(input, maxMb) {
+            if (input.files[0] && input.files[0].size > maxMb * 1024 * 1024) { alert("Ukuran file melebihi " + maxMb + "MB!"); input.value = ""; }
+        }
 
-// Pengaturan
-function pengaturanView(){
-  return `<div class="grid lg:grid-cols-2 gap-5">
-    <div class="glass rounded-2xl p-6">
-      <h3 class="font-bold">Ubah Password</h3>
-      <form id="fPass" class="space-y-3 mt-3">
-        <input type="password" name="pass" placeholder="Password baru (min 6)" class="input" required minlength="6">
-        <button class="btn btn-primary">Simpan Password</button>
-      </form>
-    </div>
-    <div class="glass rounded-2xl p-6">
-      <h3 class="font-bold">Konfigurasi Supabase</h3>
-      <p class="text-sm text-slate-600">Hanya Super Admin</p>
-      <button id="btnReconfig" class="btn btn-ghost mt-3">Buka Config</button>
-    </div>
-  </div>`;
-}
-moduleInit.pengaturan=()=>{
-  $('#fPass').onsubmit=async e=>{
-    e.preventDefault();
-    const pass=e.target.pass.value;
-    const { error } = await supabase.auth.updateUser({password:pass});
-    if(error) toast(error.message,'error'); else toast('Password diperbarui','success');
-  };
-  $('#btnReconfig').onclick=()=>{ if(state.profile.role!=='Super Admin') return toast('Hanya Super Admin','error'); show($('#configModal')); };
-};
+        // ---------------- AUTH & ROLE CHECKLIST MANAGEMENT ----------------
+        async function submitLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-pass').value;
+            if (!email || !password) return alert('Isi email dan password terlebih dulu.');
+            if (!klienSupabase) return alert('Supabase tidak tersedia. Coba lagi nanti.');
+            const { data, error } = await klienSupabase.auth.signInWithPassword({ email, password });
+            if (error) return alert('Login gagal: ' + error.message);
+            if (!data || !data.session) return alert('Login gagal, session tidak ditemukan.');
+            await onLoginSuccess(data.user);
+        }
 
-// ---------- Helpers ----------
-function badgeStatus(s){
-  const map={Terkirim:'badge-info',Diverifikasi:'badge-warning',Proses:'badge-warning','Menunggu Otorisasi':'badge-warning',Selesai:'badge-success',Ditolak:'badge-danger'};
-  return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
-}
-function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
-async function generateNomor(){
-  const now=new Date();
-  const prefix=`ADU/${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
-  const { data } = await supabase.from('aduan').select('nomor_aduan').ilike('nomor_aduan',`${prefix}%`).order('nomor_aduan',{ascending:false}).limit(1);
-  let seq=1;
-  if(data && data.length){ const last=data[0].nomor_aduan.split('/').pop(); seq=parseInt(last)+1; }
-  return `${prefix}/${String(seq).padStart(4,'0')}`;
-}
-async function uploadFile(bucket,file){
-  const path=`${Date.now()}_${file.name.replace(/\s+/g,'_')}`;
-  const { data, error } = await supabase.storage.from(bucket).upload(path,file,{upsert:false});
-  if(error) throw error;
-  const { data:url } = supabase.storage.from(bucket).getPublicUrl(path);
-  return {path, url:url.publicUrl};
-}
-async function logActivity(aduan_id,aktivitas,keterangan){
-  await supabase.from('log_aktivitas').insert({aduan_id,user_id:state.profile.id,aktivitas,keterangan});
-}
-async function createNotifForRole(roles,judul,pesan){
-  const { data:users } = await supabase.from('users').select('id').in('role',roles);
-  if(!users) return;
-  const rows=users.map(u=>({user_id:u.id,judul,pesan,is_read:false}));
-  await supabase.from('notifikasi').insert(rows);
-}
-async function updateNotifCount(){
-  if(!supabase || !state.profile) return;
-  const { count } = await supabase.from('notifikasi').select('id',{count:'exact',head:true}).eq('user_id',state.profile.id).eq('is_read',false);
-  state.notifUnRead=count||0;
-  const el=$('#notifCount');
-  if(count>0){el.textContent=count;show(el)} else hide(el);
-}
-async function openDetailAduan(id){
-  const { data } = await supabase.from('aduan').select('*,kategori_aduan(nama),sub_kategori(nama),users(nama)').eq('id',id).single();
-  if(!data) return;
-  openGM('Detail Aduan',`
-    <div class="space-y-3 text-sm">
-      <div class="grid grid-cols-2 gap-3">
-        <div><b>Nomor:</b> ${data.nomor_aduan}</div>
-        <div><b>Status:</b> ${badgeStatus(data.status)}</div>
-        <div><b>Kategori:</b> ${data.kategori_aduan?.nama||'-'}</div>
-        <div><b>Sub:</b> ${data.sub_kategori?.nama||'-'}</div>
-        <div><b>Pelapor:</b> ${data.users?.nama||'-'}</div>
-        <div><b>Prioritas:</b> ${data.prioritas||'-'}</div>
-      </div>
-      <div><b>Judul:</b> ${data.judul}</div>
-      <div><b>Deskripsi:</b><div class="p-3 bg-white rounded-xl mt-1">${data.deskripsi||''}</div></div>
-    </div>`);
-}
+        async function submitRegister() {
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-pass').value;
+            const role = document.getElementById('register-role').value;
+            if (!name || !email || !password) return alert('Lengkapi semua kolom pendaftaran.');
+            if (!klienSupabase) return alert('Supabase tidak tersedia. Coba lagi nanti.');
+            const { data, error } = await klienSupabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+            if (error) return alert('Pendaftaran gagal: ' + error.message);
+            if (data?.user?.id) {
+                await klienSupabase.from('profiles').upsert([{ id: data.user.id, email, role, name, is_active: true }]);
+            }
+            alert('Pendaftaran berhasil. Silakan login setelah memverifikasi email jika diperlukan.');
+            toggleAuthMode('login');
+        }
 
-// Generic CRUD
-function crudTemplate(table,title,fields,hasFile=false){
-  return `<div class="glass rounded-2xl p-5">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="font-bold text-lg">${title}</h3>
-      <button class="btn btn-primary !py-2 !px-4 text-sm" id="btnAdd">+ Tambah</button>
-    </div>
-    <div class="overflow-x-auto"><table class="table" id="tblCrud"></table></div>
-  </div>`;
-}
-async function initCrud(table,fields,fieldTypes={},bucket=null){
-  const container=$('#tblCrud');
-  async function load(){
-    const { data } = await supabase.from(table).select('*').order('created_at',{ascending:false}).limit(200);
-    container.innerHTML=`<thead><tr>${fields.map(f=>`<th>${f}</th>`).join('')}<th>Aksi</th></tr></thead><tbody>${
-      (data||[]).map(r=>`<tr><td>${fields.map(f=>formatCell(r[f],fieldTypes[f])).join('</td><td>')}</td><td>
-        <button data-id="${r.id}" class="text-sky-700 font-semibold text-sm mr-2 btnEdit">Edit</button>
-        <button data-id="${r.id}" class="text-red-600 font-semibold text-sm btnDel">Hapus</button>
-      </td></tr>`).join('')
-    }</tbody>`;
-  }
-  function formHtml(row={}){
-    return `<form id="crudForm" class="space-y-3">
-      ${fields.map(f=>{
-        const type=fieldTypes[f];
-        const val=row[f]??'';
-        if(type==='textarea') return `<div><label class="text-sm font-semibold">${f}</label><textarea name="${f}" class="input h-24">${val}</textarea></div>`;
-        if(type==='checkbox') return `<label class="flex items-center gap-2"><input type="checkbox" name="${f}" ${val?'checked':''}> ${f}</label>`;
-        if(type==='select_role') return `<div><label class="text-sm font-semibold">${f}</label><select name="${f}" class="input select">${ROLES.map(r=>`<option ${val===r?'selected':''}>${r}</option>`).join('')}</select></div>`;
-        if(type==='select_kategori') return `<div><label class="text-sm font-semibold">${f}</label><select name="${f}" class="input select" id="selKat"></select></div>`;
-        if(type==='file') return `<div><label class="text-sm font-semibold">${f}</label><input type="file" name="${f}_file" class="input"><input type="hidden" name="${f}" value="${val}"><div class="text-xs text-slate-500 mt-1">${val?`Current: ${val.slice(0,60)}...`:''}</div></div>`;
-        return `<div><label class="text-sm font-semibold">${f}</label><input name="${f}" value="${val}" class="input"></div>`;
-      }).join('')}
-      <button class="btn btn-primary">Simpan</button>
-    </form>`;
-  }
-  $('#btnAdd').onclick=()=>{ openGM('Tambah',formHtml()); bindForm(); };
-  container.onclick=async e=>{
-    const edit=e.target.closest('.btnEdit'); const del=e.target.closest('.btnDel');
-    if(edit){
-      const { data } = await supabase.from(table).select('*').eq('id',edit.dataset.id).single();
-      openGM('Edit',formHtml(data)); bindForm(data.id);
-    }
-    if(del){
-      if(!confirm('Hapus data?')) return;
-      await supabase.from(table).delete().eq('id',del.dataset.id);
-      toast('Dihapus','success'); load();
-    }
-  };
-  async function bindForm(id=null){
-    if(fieldTypes.kategori_id==='select_kategori'){
-      const { data:kats } = await supabase.from('kategori_aduan').select('id,nama');
-      $('#selKat').innerHTML=(kats||[]).map(k=>`<option value="${k.id}">${k.nama}</option>`).join('');
-    }
-    $('#crudForm').onsubmit=async ev=>{
-      ev.preventDefault();
-      const fd=new FormData(ev.target);
-      const payload={};
-      for(const f of fields){
-        const type=fieldTypes[f];
-        if(type==='checkbox') payload[f]=fd.get(f)==='on';
-        else if(type==='file'){
-          const file=fd.get(`${f}_file`);
-          if(file && file.size>0 && bucket){
-            const up=await uploadFile(bucket,file);
-            payload[f]=up.url;
-          }else payload[f]=fd.get(f);
-        }else payload[f]=fd.get(f);
-      }
-      if(id) await supabase.from(table).update(payload).eq('id',id);
-      else await supabase.from(table).insert(payload);
-      toast('Disimpan','success'); closeGM(); load();
-    };
-  }
-  load();
-}
-function formatCell(v,type){
-  if(type==='checkbox') return v? '✓':'-';
-  if(typeof v==='string' && v.startsWith('http')) return `<a href="${v}" target="_blank" class="text-sky-700 underline">file</a>`;
-  return v??'';
-}
-async function initCrudInline(table,wrapId,fields,fieldTypes){
-  const wrap=document.getElementById(wrapId);
-  wrap.innerHTML=`<div class="space-y-2" id="${wrapId}_list"></div><button class="btn btn-ghost !py-1 !px-3 text-sm mt-2" id="${wrapId}_add">+ Tambah</button>`;
-  const list=document.getElementById(`${wrapId}_list`);
-  async function load(){
-    const { data } = await supabase.from(table).select('*').order('created_at');
-    list.innerHTML=(data||[]).map(r=>`<div class="p-3 rounded-xl bg-white/70 border flex justify-between items-center"><div><div class="font-semibold">${r.nama||r.kunci||r.section}</div><div class="text-xs text-slate-600">${r.deskripsi||''}</div></div><div class="flex gap-2"><button data-id="${r.id}" class="text-xs btnEdit">Edit</button><button data-id="${r.id}" class="text-xs text-red-600 btnDel">Hapus</button></div></div>`).join('');
-  }
-  document.getElementById(`${wrapId}_add`).onclick=()=>openGM('Tambah',form());
-  list.onclick=async e=>{
-    const id=e.target.dataset.id;
-    if(e.target.classList.contains('btnDel')){ await supabase.from(table).delete().eq('id',id); load(); }
-    if(e.target.classList.contains('btnEdit')){ const { data }=await supabase.from(table).select('*').eq('id',id).single(); openGM('Edit',form(data)); }
-  };
-  function form(row={}){ return `<form id="inlineForm" class="space-y-3">${fields.map(f=>`<input name="${f}" placeholder="${f}" value="${row[f]||''}" class="input">`).join('')}<button class="btn btn-primary">Simpan</button></form>`; }
-  document.addEventListener('submit',async e=>{
-    if(e.target.id!=='inlineForm') return;
-    e.preventDefault();
-    const fd=Object.fromEntries(new FormData(e.target).entries());
-    if(rowId){ await supabase.from(table).update(fd).eq('id',rowId); }else await supabase.from(table).insert(fd);
-  });
-  load();
-}
+        function toggleAuthMode(mode) {
+            document.getElementById('login-form-box').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('register-form-box').style.display = mode === 'register' ? 'block' : 'none';
+        }
 
-// Landing dynamic
-async function loadLanding(){
-  if(!supabase) return;
-  try{
-    const { data:konten } = await supabase.from('konten_landing').select('*').eq('aktif',true).order('urutan');
-    if(konten && konten.length){
-      const hero=konten.find(k=>k.section==='hero');
-      if(hero){ $('#heroImg').src=hero.gambar_url||$('#heroImg').src; }
-      const fitur=konten.filter(k=>k.section==='fitur');
-      if(fitur.length){
-        $('#fiturGrid').innerHTML=fitur.map(f=>`<div class="glass rounded-2xl p-6"><div class="text-3xl">${f.gambar_url||'✨'}</div><h4 class="font-bold mt-3">${f.judul}</h4><p class="text-sm text-slate-600 mt-1">${f.konten||''}</p></div>`).join('');
-      }
-    }
-    const { data:stats } = await supabase.from('aduan').select('status');
-    if(stats){
-      $('#statTotal').textContent=stats.length;
-      $('#statSelesai').textContent=stats.filter(s=>s.status==='Selesai').length;
-      $('#statProses').textContent=stats.filter(s=>['Proses','Diverifikasi','Menunggu Otorisasi'].includes(s.status)).length;
-    }
-  }catch(e){ console.log(e) }
-}
+        async function onLoginSuccess(user) {
+            const profile = await getProfile(user.id);
+            if (profile?.is_active === false) return alert('Akun ini tidak aktif. Hubungi administrator.');
+            currentUserRole = profile?.role || 'Pelapor';
+            document.getElementById('top-role-badge').innerText = currentUserRole;
+            document.getElementById('landing-screen').style.display = 'none';
+            document.getElementById('app-screen').style.display = 'block';
+            closeLogin();
+            applySidebarState();
+            terapkanHakAkses(currentUserRole);
+            await inisialisasiSistem();
+        }
 
-// Init
-document.getElementById('year').textContent=new Date().getFullYear();
-const cfg=loadConfig();
-if(!cfg){ show($('#configModal')); }
-else{ initSupabase(cfg).then(loadLanding); }
+        async function getProfile(userId) {
+            if (!klienSupabase) return null;
+            const { data, error } = await klienSupabase.from('profiles').select('*').eq('id', userId).single();
+            if (error) { console.warn('Profil tidak dapat dimuat:', error); return null; }
+            return data;
+        }
 
-$('#configForm').onsubmit=e=>{
-  e.preventDefault();
-  const cfg={url:$('#cfgUrl').value.trim(),key:$('#cfgKey').value.trim()};
-  saveConfig(cfg); hide($('#configModal')); initSupabase(cfg).then(loadLanding);
-};
-$('#cfgCancel').onclick=()=>hide($('#configModal'));
-$('#btnConfig').onclick=()=>show($('#configModal'));
-$('#btnLogin').onclick=()=>show($('#authModal'));
-$('#heroMasuk').onclick=()=>show($('#authModal'));
-$('#tabLogin').onclick=()=>{show($('#loginForm'));hide($('#registerForm'));$('#tabLogin').classList.add('bg-white');$('#tabRegister').classList.remove('bg-white');}
-$('#tabRegister').onclick=()=>{hide($('#loginForm'));show($('#registerForm'));$('#tabRegister').classList.add('bg-white');$('#tabLogin').classList.remove('bg-white');}
-$('#authModal').onclick=e=>{ if(e.target.id==='authModal') hide($('#authModal')); };
+        async function loadSession() {
+            if (!klienSupabase) return;
+            const { data, error } = await klienSupabase.auth.getSession();
+            if (error || !data?.session) return;
+            await onLoginSuccess(data.session.user);
+        }
 
-$('#loginForm').onsubmit=async e=>{
-  e.preventDefault();
-  if(!supabase) return toast('Config Supabase dulu','error');
-  const email=$('#loginEmail').value; const pass=$('#loginPass').value;
-  const { data, error } = await supabase.auth.signInWithPassword({email,password:pass});
-  if(error) return toast(error.message,'error');
-  hide($('#authModal'));
-  await afterLogin(data.user);
-};
-$('#registerForm').onsubmit=async e=>{
-  e.preventDefault();
-  if(!supabase) return toast('Config Supabase dulu','error');
-  const email=$('#regEmail').value; const pass=$('#regPass').value; const nama=$('#regNama').value; const telp=$('#regTelp').value;
-  const { data, error } = await supabase.auth.signUp({email,password:pass,options:{data:{nama}}});
-  if(error) return toast(error.message,'error');
-  // insert profile
-  await supabase.from('users').insert({id:data.user.id,email,nama,telepon:telp,role:'Pelapor Eksternal',aktif:true});
-  toast('Registrasi berhasil, silakan login','success');
-  $('#tabLogin').click();
-};
-$('#btnLogout').onclick=async()=>{ await supabase.auth.signOut(); location.reload(); };
-$('#btnNotif').onclick=()=>navigate('notifikasi');
-window.addEventListener('hashchange',()=>{ const h=location.hash.replace('#',''); if(h) navigate(h); });
+        function openLogin() {
+            toggleAuthMode('login');
+            console.log('openLogin() called');
+            const loginScreen = document.getElementById('login-screen');
+            if (loginScreen) {
+                loginScreen.classList.add('show-modal');
+                loginScreen.style.pointerEvents = 'auto';
+                showToast('Form login ditampilkan.', 'success');
+            } else {
+                console.error('openLogin: login-screen element tidak ditemukan');
+            }
+        }
 
-</script>
-<script>(function(){document.addEventListener("click",function(e){var a=e.target.closest("[data-product-id]");if(!a)return;e.preventDefault();var pid=a.getAttribute("data-product-id");if(pid)parent.postMessage({type:"ecto-artifact-link-click",productId:pid},"*")})})();</script>
+        function closeLogin() {
+            const loginScreen = document.getElementById('login-screen');
+            if (loginScreen) {
+                loginScreen.classList.remove('show-modal');
+                loginScreen.style.pointerEvents = 'none';
+            }
+        }
+
+        function logout() {
+            currentUserRole = null;
+            document.getElementById('landing-screen').style.display = 'block';
+            document.getElementById('app-screen').style.display = 'none';
+            const loginScreen = document.getElementById('login-screen');
+            if (loginScreen) {
+                loginScreen.classList.remove('show-modal');
+                loginScreen.style.pointerEvents = 'none';
+            }
+        }
+
+        function terapkanHakAkses(role) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.style.display = 'none');
+            
+            // Baca akses dari config, khusus SuperAdmin bypass semuanya
+            let tabAktif = [];
+            if(role === 'SuperAdmin') {
+                tabAktif = daftarSemuaModul.map(m => m.id);
+                tabAktif.push('superadmin'); // Tab eksklusif
+            } else {
+                tabAktif = aksesConfigGlobal[role] || [];
+            }
+
+            tabAktif.forEach(tab => {
+                const btn = document.querySelector(`.tab-btn[data-target="${tab}"]`);
+                if(btn) btn.style.display = 'block';
+            });
+
+            // Buka tab pertama yang tersedia
+            if(tabAktif.length > 0) bukaTab(tabAktif[0]);
+        }
+
+        // FUNGSI RENDER CHECKLIST INTERAKTIF (SUPERADMIN)
+        function renderChecklistSuperAdmin() {
+            const container = document.getElementById('checklist-akses-container');
+            container.innerHTML = '';
+
+            const rolesToManage = ['Pelapor', 'Operator', 'Komite', 'PIC', 'Direktur', 'Administrator'];
+
+            rolesToManage.forEach(role => {
+                let htmlGrid = '';
+                const hakSaatIni = aksesConfigGlobal[role] || [];
+
+                daftarSemuaModul.forEach(modul => {
+                    const isChecked = hakSaatIni.includes(modul.id) ? 'checked' : '';
+                    htmlGrid += `<label><input type="checkbox" class="chk-matrix" data-role="${role}" value="${modul.id}" ${isChecked}> ${modul.nama}</label>`;
+                });
+
+                container.innerHTML += `
+                    <div class="role-card">
+                        <div class="role-title">Hak Akses: ${role}</div>
+                        <div class="role-grid">${htmlGrid}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function simpanChecklistHakAkses() {
+            // Reset config sementara
+            const rolesToManage = ['Pelapor', 'Operator', 'Komite', 'PIC', 'Direktur', 'Administrator'];
+            rolesToManage.forEach(r => aksesConfigGlobal[r] = []);
+
+            // Ambil semua checklist yang dicentang
+            const checkboxes = document.querySelectorAll('.chk-matrix:checked');
+            checkboxes.forEach(cb => {
+                const role = cb.getAttribute('data-role');
+                const modulId = cb.value;
+                aksesConfigGlobal[role].push(modulId);
+            });
+
+            // Simpan ke LocalStorage
+            localStorage.setItem('akses_config_sigap', JSON.stringify(aksesConfigGlobal));
+            alert("Konfigurasi Hak Akses berhasil disimpan! Perubahan akan terlihat saat pengguna login kembali.");
+            
+            // Jika yang sedang login bukan SuperAdmin (terjadi jika fitur di-bypass), reload tab
+            if(currentUserRole !== 'SuperAdmin') { terapkanHakAkses(currentUserRole); }
+        }
+
+        // ---------------- TAB & DATASHEET MANAGEMENT ----------------
+        function bukaTab(namaTab) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('section-' + namaTab).classList.add('active');
+            
+            const tabBtn = document.querySelector(`.tab-btn[data-target="${namaTab}"]`);
+            if(tabBtn) tabBtn.classList.add('active');
+            
+            if(namaTab === 'operator') muatPilihanAduan('op-pilih-aduan', 'Terkirim', 'recall-info-operator');
+            if(namaTab === 'eskalasi') muatPilihanAduan('esk-pilih-aduan', 'Diverifikasi', 'recall-info-eskalasi');
+            if(namaTab === 'pic') muatPilihanAduan('pic-pilih-aduan', 'Proses PIC / Dieskalasi', 'recall-info-pic');
+            if(namaTab === 'otorisasi') muatPilihanAduan('ot-pilih-aduan', 'Menunggu Otorisasi', 'recall-info-otorisasi');
+            if(namaTab === 'penetapan') muatPilihanAduan('pen-pilih-aduan', 'Menunggu Penerbitan SK', 'recall-info-penetapan');
+            
+            if(namaTab === 'dashboard') muatDashboardStat();
+            if(namaTab === 'laporan') muatLaporanFormal();
+            if(namaTab === 'informasi') muatPublikasiPublik();
+            
+            if(namaTab === 'admin') loadParamValues();
+            if(namaTab === 'superadmin') {
+                document.getElementById('sa-supa-url').value = SUPABASE_URL;
+                document.getElementById('sa-supa-key').value = SUPABASE_KEY;
+                renderChecklistSuperAdmin(); // Pastikan checklist terbaru ter-render
+            }
+            
+            muatDatasheetView(namaTab);
+        }
+
+        function resetForm(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.querySelectorAll('input:not([readonly]), textarea').forEach(el => el.value = '');
+            section.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+            section.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+        }
+
+        async function muatDatasheetView(roleTab) {
+            let tbodyId = ''; let statusFilters = [];
+            if (roleTab === 'pelapor') { tbodyId = 'ds-pelapor'; statusFilters = []; } 
+            else if (roleTab === 'operator') { tbodyId = 'ds-operator'; statusFilters = ['Terkirim', 'Diverifikasi', 'Tidak Layak']; }
+            else if (roleTab === 'eskalasi') { tbodyId = 'ds-eskalasi'; statusFilters = ['Diverifikasi', 'Proses PIC / Dieskalasi']; }
+            else if (roleTab === 'pic') { tbodyId = 'ds-pic'; statusFilters = ['Proses PIC / Dieskalasi', 'Menunggu Otorisasi', 'Menunggu Penerbitan SK', 'Selesai (SK Diterbitkan)']; }
+            else if (roleTab === 'otorisasi') { tbodyId = 'ds-otorisasi'; statusFilters = ['Menunggu Otorisasi', 'Menunggu Penerbitan SK', 'Dikembalikan']; }
+            else if (roleTab === 'penetapan') { tbodyId = 'ds-penetapan'; statusFilters = ['Menunggu Penerbitan SK', 'Selesai (SK Diterbitkan)']; }
+            else return;
+
+            const tbody = document.getElementById(tbodyId);
+            if(!tbody) return;
+
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>';
+            tbody.innerHTML = '';
+            try {
+                let query = klienSupabase.from('aduan').select('id, created_at, tanggal_kejadian, nama_pelapor, nama_terlapor, kategori, urgensi, status').order('created_at', { ascending: false });
+                if (statusFilters.length > 0) { query = query.in('status', statusFilters); }
+                const { data } = await query;
+                if (!data || data.length === 0) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Antrean kosong.</td></tr>';
+                data.forEach(d => {
+                    const tgl = d.tanggal_kejadian || new Date(d.created_at).toLocaleDateString('id-ID');
+                    if(roleTab === 'pelapor') tbody.innerHTML += `<tr><td>${tgl}</td><td>${d.id.substring(0,8)}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td><b>${d.status}</b></td></tr>`;
+                    else if(roleTab === 'operator') tbody.innerHTML += `<tr><td>${tgl}</td><td>${d.kategori||'-'}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td><b>${d.status}</b></td></tr>`;
+                    else if(roleTab === 'eskalasi') tbody.innerHTML += `<tr><td>${tgl}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td>${d.urgensi||'-'}</td><td><b>${d.status}</b></td></tr>`;
+                    else if(roleTab === 'pic') tbody.innerHTML += `<tr><td>${d.id.substring(0,8)}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td><b>${d.status}</b></td></tr>`;
+                    else tbody.innerHTML += `<tr><td>${tgl}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td><b>${d.status}</b></td></tr>`;
+                });
+                return;
+            } catch (e) {
+                // Supabase failed, fallback to localStorage
+                console.warn('Supabase error, falling back to localStorage', e);
+            }
+
+            const local = getLocalAduan();
+            const filtered = statusFilters.length ? local.filter(x => statusFilters.includes(x.status)) : local;
+            if (!filtered || filtered.length === 0) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Antrean kosong.</td></tr>';
+            filtered.forEach(d => {
+                const tgl = d.tanggal_kejadian || d.created_at || '-';
+                if(roleTab === 'pelapor') tbody.innerHTML += `<tr><td>${tgl}</td><td>${d.id.substring(0,8)}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td><b>${d.status}</b></td></tr>`;
+                else if(roleTab === 'operator') tbody.innerHTML += `<tr><td>${tgl}</td><td>${d.kategori||'-'}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td><b>${d.status}</b></td></tr>`;
+                else if(roleTab === 'eskalasi') tbody.innerHTML += `<tr><td>${tgl}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td>${d.urgensi||'-'}</td><td><b>${d.status}</b></td></tr>`;
+                else if(roleTab === 'pic') tbody.innerHTML += `<tr><td>${d.id.substring(0,8)}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td><b>${d.status}</b></td></tr>`;
+                else tbody.innerHTML += `<tr><td>${tgl}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td><b>${d.status}</b></td></tr>`;
+            });
+        }
+
+        // ---------------- DASHBOARD STATISTIK ----------------
+        async function muatDashboardStat() {
+            try {
+                const { data } = await klienSupabase.from('aduan').select('status, kategori');
+                if (data) {
+                    let tMasuk = data.length;
+                    let tSelesai = data.filter(d => d.status && d.status.includes('Selesai')).length;
+                    let tProses = tMasuk - tSelesai;
+                    document.getElementById('dash-tot').innerText = tMasuk;
+                    document.getElementById('dash-pros').innerText = tProses;
+                    document.getElementById('dash-sel').innerText = tSelesai;
+                    let rekapKat = {};
+                    data.forEach(d => { const k = d.kategori || 'Belum Diklasifikasi'; rekapKat[k] = (rekapKat[k]||0) + 1; });
+                    const tBody = document.getElementById('dash-kat-body'); tBody.innerHTML = '';
+                    for(const [kat, jml] of Object.entries(rekapKat)) {
+                        tBody.innerHTML += `<tr><td>${kat}</td><td><b>${jml} Laporan</b></td></tr>`;
+                    }
+                    return;
+                }
+            } catch (e) {
+                console.warn('Supabase unavailable for dashboard, using localStorage', e);
+            }
+            // fallback
+            const local = getLocalAduan();
+            const tMasuk = local.length; const tSelesai = local.filter(d => d.status && d.status.includes('Selesai')).length; const tProses = tMasuk - tSelesai;
+            document.getElementById('dash-tot').innerText = tMasuk; document.getElementById('dash-pros').innerText = tProses; document.getElementById('dash-sel').innerText = tSelesai;
+            const rekapKat = {}; local.forEach(d => { const k = d.kategori || 'Belum Diklasifikasi'; rekapKat[k] = (rekapKat[k]||0) + 1; });
+            const tBody = document.getElementById('dash-kat-body'); tBody.innerHTML = '';
+            for(const [kat, jml] of Object.entries(rekapKat)) { tBody.innerHTML += `<tr><td>${kat}</td><td><b>${jml} Laporan</b></td></tr>`; }
+        }
+
+        // ---------------- FITUR PUBLIKASI, KORESPONDENSI, SURVEY ----------------
+        let localPublikasi = []; 
+
+        async function uploadPublikasi(btn) {
+            const judul = document.getElementById('adm-pub-judul').value;
+            const jenis = document.getElementById('adm-pub-jenis').value;
+            const file = document.getElementById('adm-pub-file').files[0];
+            if(!judul || !file) return alert("Lengkapi judul dan file!");
+            
+            const btnEl = btn || document.querySelector('.btn-success[onclick*="uploadPublikasi"]') || document.querySelector('.btn-success');
+            if(btnEl){ btnEl.innerText = "Mengupload..."; btnEl.disabled = true; }
+            const fileName = `pub_${Date.now()}_${file.name}`;
+            let errUp = null;
+            try {
+                const res = await klienSupabase.storage.from('bukti_aduan').upload('publikasi/' + fileName, file);
+                errUp = res.error;
+            } catch (e) { errUp = e; }
+            
+            if(!errUp) {
+                const url = klienSupabase.storage.from('bukti_aduan').getPublicUrl('publikasi/' + fileName).data.publicUrl;
+                try {
+                    const { error: errDb } = await klienSupabase.from('publikasi_edukasi').insert([{ judul, jenis, url_file: url }]);
+                    if(errDb) { localPublikasi.push({ judul, jenis, url_file: url }); }
+                } catch (e) { localPublikasi.push({ judul, jenis, url_file: url }); }
+                alert("File berhasil dipublikasikan!");
+                document.getElementById('adm-pub-judul').value = ''; document.getElementById('adm-pub-file').value = '';
+            } else { alert("Gagal mengupload file: " + (errUp.message || errUp)); }
+            if(btnEl){ btnEl.innerText = "Upload & Publikasikan"; btnEl.disabled = false; }
+        }
+
+        async function muatPublikasiPublik() {
+            const ul = document.getElementById('list-publikasi'); ul.innerHTML = '<li>Memuat...</li>';
+            let list = localPublikasi;
+            const { data, error } = await klienSupabase.from('publikasi_edukasi').select('*');
+            if(!error && data) list = data;
+
+            ul.innerHTML = '';
+            if(list.length === 0) return ul.innerHTML = '<li><span style="font-size:12px; color:gray;">Belum ada dokumen publikasi.</span></li>';
+
+            list.forEach(p => {
+                ul.innerHTML += `<li><span><b>[${p.jenis}]</b> ${p.judul}</span><a href="${p.url_file}" target="_blank" class="btn-primary btn-small" style="text-decoration:none; display:inline-block; line-height:2;">Download</a></li>`;
+            });
+        }
+
+        async function kirimKorespondensi() {
+            const nama = document.getElementById('kor-nama').value;
+            const pesan = document.getElementById('kor-pesan').value;
+            if(!nama || !pesan) return alert("Isi nama dan pesan!");
+            await klienSupabase.from('korespondensi').insert([{ nama, pesan }]);
+            alert("Pesan berhasil dikirim ke Administrator!");
+            document.getElementById('kor-nama').value = ''; document.getElementById('kor-pesan').value = '';
+        }
+
+        async function kirimSurvey() {
+            const rating = document.getElementById('srv-rating').value;
+            const ulasan = document.getElementById('srv-ulasan').value;
+            if(!ulasan) return alert("Mohon isi ulasan atau saran!");
+            await klienSupabase.from('survey_kepuasan').insert([{ rating, ulasan }]);
+            alert("Terima kasih! Survey penilaian Anda telah berhasil dikirim.");
+            document.getElementById('srv-ulasan').value = '';
+        }
+
+        // ---------------- SISTEM PARAMETER & DATA (LANJUTAN) ----------------
+        async function inisialisasiSistem() {
+            let { data: set } = await klienSupabase.from('system_settings').select('*');
+            if(set) {
+                set.forEach(s => {
+                    if(s.key_name === 'instansi_nama') {
+                        document.getElementById('top-instansi-name').innerText = s.key_value;
+                        document.getElementById('print-instansi-name').innerText = s.key_value;
+                        if(document.getElementById('adm-instansi-nama')) document.getElementById('adm-instansi-nama').value = s.key_value;
+                    }
+                });
+            }
+
+            let { data: params } = await klienSupabase.from('system_params').select('*');
+            if(params && params.length > 0) {
+                params.forEach(p => { systemParameters[p.kategori] = p.opsi; });
+            } else {
+                systemParameters = {
+                    kategori_aduan: ["Etik dan Disiplin", "Etik Keperawatan", "Etik Medik", "Etik Nakes Lainnya", "Aduan Hukum"],
+                    eskalasi: ["Level Komite", "Level Direksi", "Level Eksternal"], 
+                    urgensi: ["Rendah", "Sedang", "Tinggi"],
+                    pic: ["Komite Etik", "Komite Medik", "Komite Keperawatan"], 
+                    sla_hari: ["3","7","14", "30"], 
+                    hasil_verifikasi: ["Layak Etik", "Layak Hukum", "Tidak Layak"]
+                };
+            }
+            distribusiParameter();
+            await loadLandingStats();
+            await renderDashboardChart();
+            // If no local data present (fresh), seed sample data for offline testing
+            try {
+                if (getLocalAduan().length === 0) {
+                    seedLocalData();
+                }
+            } catch (e) { console.warn('seed check failed', e); }
+        }
+
+        // Seed sample data for local testing (only used when Supabase unreachable)
+        function seedLocalData() {
+            const now = new Date();
+            const samples = [
+                { id: genId(), nama_pelapor: 'Ana Susanti', nama_terlapor: 'Dr. Budi', tanggal_kejadian: '2026-05-01', lokasi_kejadian: 'Unit A', kategori: 'Etik dan Disiplin', urgensi: 'Rendah', status: 'Terkirim', deskripsi: 'Deskripsi singkat aduan', created_at: new Date(now.getTime()-86400000*6).toISOString() },
+                { id: genId(), nama_pelapor: 'Joko Santoso', nama_terlapor: 'Ns. Siti', tanggal_kejadian: '2026-05-05', lokasi_kejadian: 'Poliklinik', kategori: 'Etik Keperawatan', urgensi: 'Sedang', status: 'Diverifikasi', deskripsi: 'Aduan kategori keperawatan', created_at: new Date(now.getTime()-86400000*5).toISOString() },
+                { id: genId(), nama_pelapor: 'Rina Marlina', nama_terlapor: 'Dr. Agus', tanggal_kejadian: '2026-05-10', lokasi_kejadian: 'IGD', kategori: 'Etik Medik', urgensi: 'Tinggi', status: 'Proses PIC / Dieskalasi', deskripsi: 'Aduan berat, perlu tindak lanjut', created_at: new Date(now.getTime()-86400000*4).toISOString() },
+                { id: genId(), nama_pelapor: 'Anton', nama_terlapor: 'Petugas X', tanggal_kejadian: '2026-05-12', lokasi_kejadian: 'Ruang Obs', kategori: 'Aduan Hukum', urgensi: 'Tinggi', status: 'Menunggu Otorisasi', deskripsi: 'Perlu otorisasi pimpinan', created_at: new Date(now.getTime()-86400000*3).toISOString() },
+                { id: genId(), nama_pelapor: 'Sari', nama_terlapor: 'Staff Y', tanggal_kejadian: '2026-05-13', lokasi_kejadian: 'Unit B', kategori: 'Etik Nakes Lainnya', urgensi: 'Sedang', status: 'Menunggu Penerbitan SK', deskripsi: 'Menunggu SK', created_at: new Date(now.getTime()-86400000*2).toISOString() },
+                { id: genId(), nama_pelapor: 'Bambang', nama_terlapor: 'Dr. C', tanggal_kejadian: '2026-05-15', lokasi_kejadian: 'Ruang Operasi', kategori: 'Etik dan Disiplin', urgensi: 'Rendah', status: 'Selesai (SK Diterbitkan)', deskripsi: 'Selesai - SK terbit', created_at: new Date(now.getTime()-86400000).toISOString() }
+            ];
+            saveLocalAduan(samples);
+            showToast('Sample data siap untuk pengujian (offline)', 'success');
+        }
+
+        function distribusiParameter() {
+            Object.keys(systemParameters).forEach(key => {
+                document.querySelectorAll(`.dyn-${key}`).forEach(sel => {
+                    const firstOpt = sel.options.length > 0 && sel.options[0].value === "" ? sel.options[0].outerHTML : "";
+                    sel.innerHTML = firstOpt;
+                    systemParameters[key].forEach(val => sel.innerHTML += `<option value="${val}">${val}</option>`);
+                });
+            });
+        }
+
+        function loadParamValues() {
+            const kat = document.getElementById('adm-param-pilih').value;
+            const ul = document.getElementById('adm-param-list'); ul.innerHTML = '';
+            const arr = systemParameters[kat] || [];
+            arr.forEach((item, index) => { ul.innerHTML += `<li>${item} <button class="btn-danger btn-small" onclick="hapusParameter('${kat}', ${index})">Hapus</button></li>`; });
+        }
+        async function tambahParameter() {
+            const kat = document.getElementById('adm-param-pilih').value;
+            const baru = document.getElementById('adm-param-baru').value.trim();
+            if(!baru) return;
+            if(!systemParameters[kat]) systemParameters[kat] = [];
+            systemParameters[kat].push(baru);
+            await klienSupabase.from('system_params').upsert([{ kategori: kat, opsi: systemParameters[kat] }]);
+            document.getElementById('adm-param-baru').value = '';
+            loadParamValues(); distribusiParameter();
+        }
+        async function hapusParameter(kat, index) {
+            systemParameters[kat].splice(index, 1);
+            await klienSupabase.from('system_params').upsert([{ kategori: kat, opsi: systemParameters[kat] }]);
+            loadParamValues(); distribusiParameter();
+        }
+        async function simpanPengaturanInstansi() {
+            const nama = document.getElementById('adm-instansi-nama').value;
+            await klienSupabase.from('system_settings').upsert([{ key_name: 'instansi_nama', key_value: nama }]);
+            document.getElementById('top-instansi-name').innerText = nama; document.getElementById('print-instansi-name').innerText = nama;
+            alert("Pengaturan Instansi Disimpan!");
+        }
+        function simpanConfigSupabase() {
+            localStorage.setItem('supa_url', document.getElementById('sa-supa-url').value);
+            localStorage.setItem('supa_key', document.getElementById('sa-supa-key').value);
+            alert("Configurasi Tersimpan. Halaman akan dimuat ulang."); location.reload();
+        }
+        async function exportDataDB() {
+            const { data } = await klienSupabase.from('aduan').select('*, verifikasi(*), proses_penanganan(*)');
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr); dlAnchorElem.setAttribute("download", "backup_sigap_" + Date.now() + ".json"); dlAnchorElem.click();
+        }
+
+        // ---------------- FUNGSI BISNIS INTI (CRUD) ----------------
+        async function muatPilihanAduan(elementId, statusFilter, infoId) {
+            const selectEl = document.getElementById(elementId);
+            const infoEl = infoId ? document.getElementById(infoId) : null;
+            selectEl.innerHTML = '<option value="">-- Pilih --</option>';
+            if(infoEl) infoEl.innerText = `Memuat aduan ${statusFilter}...`;
+            let count = 0;
+            try {
+                let { data } = await klienSupabase.from('aduan').select('id, nama_pelapor, nama_terlapor, tanggal_kejadian').eq('status', statusFilter).order('created_at', { ascending: false });
+                dataAduanGlobal = data || [];
+                count = dataAduanGlobal.length;
+                dataAduanGlobal?.forEach(item => selectEl.innerHTML += `<option value="${item.id}">[#${item.id.substring(0,6)}] ${item.nama_pelapor}</option>`);
+            } catch (e) {
+                console.warn('Supabase error in muatPilihanAduan, using localStorage', e);
+                const local = getLocalAduan().filter(a => !statusFilter || a.status === statusFilter);
+                dataAduanGlobal = local;
+                count = local.length;
+                local.forEach(item => selectEl.innerHTML += `<option value="${item.id}">[#${item.id.substring(0,6)}] ${item.nama_pelapor}</option>`);
+            }
+            if(infoEl) infoEl.innerText = count > 0 ? `${count} aduan ${statusFilter} siap diproses.` : `Tidak ada aduan ${statusFilter} saat ini.`;
+            document.querySelectorAll('.active-header').forEach(el => el.style.display = 'none');
+            if(document.getElementById('preview-sk-content')) document.getElementById('preview-sk-content').style.display = 'none';
+        }
+
+        async function sinkronHeader(aduan_id) {
+            const infoBoxes = document.querySelectorAll('.active-header');
+            if(!aduan_id) { infoBoxes.forEach(el => el.style.display = 'none'); return; }
+            const aduan = dataAduanGlobal.find(x => x.id === aduan_id);
+            if(aduan) {
+                let rek_text = "Belum ada rekomendasi";
+                try {
+                    let { data: proses } = await klienSupabase.from('proses_penanganan').select('tanggapan_akhir').eq('aduan_id', aduan_id).single();
+                    rek_text = proses ? proses.tanggapan_akhir : rek_text;
+                } catch (e) {
+                    console.warn('Supabase proses lookup failed, fallback to local data', e);
+                    // try local aduan record field
+                    if (aduan.tanggapan_akhir) rek_text = aduan.tanggapan_akhir;
+                }
+                infoBoxes.forEach(el => {
+                    el.style.display = 'block';
+                    el.querySelector('.h-pelapor').innerText = aduan.nama_pelapor;
+                    el.querySelector('.h-tgl').innerText = aduan.tanggal_kejadian;
+                    el.querySelector('.h-terlapor').innerText = aduan.nama_terlapor;
+                    const r = el.querySelector('.h-rekomendasi'); if(r) r.innerText = rek_text;
+                });
+            }
+        }
+
+        async function kirimLaporan() {
+            const inp = { id: genId(), nama_pelapor: document.getElementById('input-nama').value, email_pelapor: document.getElementById('input-email').value, kontak: document.getElementById('input-kontak').value, nama_terlapor: document.getElementById('input-terlapor').value, jabatan: document.getElementById('input-jabatan').value, lokasi_kejadian: document.getElementById('input-lokasi').value, tanggal_kejadian: document.getElementById('input-tanggal').value, deskripsi: document.getElementById('input-deskripsi').value, status: 'Terkirim', created_at: new Date().toISOString() };
+            try {
+                const { data, error } = await klienSupabase.from('aduan').insert([inp]).select();
+                if (error) throw error;
+                showToast("Berhasil! ID Anda: " + (data?.[0]?.id || inp.id), 'success');
+                resetForm('section-pelapor');
+                muatDatasheetView('pelapor');
+                return;
+            } catch (e) {
+                // fallback to localStorage
+                const arr = getLocalAduan(); arr.unshift(inp); saveLocalAduan(arr);
+                showToast('Terjadi gangguan koneksi — laporan disimpan lokal (ID: ' + inp.id + ')', 'info');
+                resetForm('section-pelapor'); muatDatasheetView('pelapor');
+            }
+        }
+        async function simpanVerifikasi() { await klienSupabase.from('aduan').update({ status: 'Diverifikasi', kategori: document.getElementById('op-kategori').value, subkategori: document.getElementById('op-subkategori').value }).eq('id', document.getElementById('op-pilih-aduan').value); alert('Diverifikasi!'); resetForm('section-operator'); muatPilihanAduan('op-pilih-aduan', 'Terkirim'); muatDatasheetView('operator'); }
+        async function simpanEskalasi() { await klienSupabase.from('aduan').update({ status: 'Proses PIC / Dieskalasi', urgensi: document.getElementById('esk-urgensi').value }).eq('id', document.getElementById('esk-pilih-aduan').value); alert('Dieskalasi!'); resetForm('section-eskalasi'); muatPilihanAduan('esk-pilih-aduan', 'Diverifikasi'); muatDatasheetView('eskalasi'); }
+        async function simpanPenanganan() { 
+            const id = document.getElementById('pic-pilih-aduan').value;
+            await klienSupabase.from('proses_penanganan').insert([{ aduan_id: id, tanggapan_proses: document.getElementById('pic-tanggapan-proses').value, tanggapan_akhir: document.getElementById('pic-tanggapan-akhir').value }]);
+            await klienSupabase.from('aduan').update({ status: 'Menunggu Otorisasi' }).eq('id', id); alert('Disimpan!'); resetForm('section-pic'); muatPilihanAduan('pic-pilih-aduan', 'Proses PIC / Dieskalasi'); muatDatasheetView('pic');
+        }
+        async function simpanOtorisasi() { 
+            const status = document.getElementById('ot-approved').checked ? 'Menunggu Penerbitan SK' : 'Dikembalikan';
+            await klienSupabase.from('aduan').update({ status: status }).eq('id', document.getElementById('ot-pilih-aduan').value); alert('Diotorisasi!'); resetForm('section-otorisasi'); muatPilihanAduan('ot-pilih-aduan', 'Menunggu Otorisasi', 'recall-info-otorisasi'); muatDatasheetView('otorisasi');
+        }
+
+        function recallAduan(stage) {
+            const cfg = recallStageConfig[stage];
+            if(!cfg) return;
+            muatPilihanAduan(cfg.select, cfg.status, cfg.info);
+            bukaTab(stage);
+        }
+
+        function applySidebarState() {
+            const collapsed = localStorage.getItem(sidebarPrefKey) === 'true';
+            document.body.classList.toggle('sidebar-collapsed', collapsed);
+            const select = document.getElementById('sa-sidebar-mode');
+            if(select) select.value = collapsed ? 'collapsed' : 'expanded';
+        }
+
+        function toggleSidebar() {
+            const collapsed = document.body.classList.contains('sidebar-collapsed');
+            localStorage.setItem(sidebarPrefKey, (!collapsed).toString());
+            applySidebarState();
+            showToast(collapsed ? 'Sidebar diperluas.' : 'Sidebar disembunyikan.', 'success');
+        }
+
+        function simpanSidebarPref() {
+            const mode = document.getElementById('sa-sidebar-mode').value;
+            localStorage.setItem(sidebarPrefKey, (mode === 'collapsed').toString());
+            applySidebarState();
+            alert('Pengaturan sidebar disimpan.');
+        }
+
+        // ---------------- SK, PDF, RTF DOWNLOAD ----------------
+        async function generateAutoSK() { document.getElementById('pen-no-sk').value = `000${Math.floor(Math.random()*900)+100}/ETIK-RSJD/${new Date().getFullYear()}`; muatPreviewSK(document.getElementById('pen-pilih-aduan').value); }
+        async function muatPreviewSK(id) { 
+            const div = document.getElementById('preview-sk-content');
+            if(!id) { div.style.display='none'; return;}
+            const {data: aduan} = await klienSupabase.from('aduan').select('*').eq('id',id).single();
+            const rek = document.querySelector('.active-header .h-rekomendasi').innerText;
+            const tgl = document.getElementById('pen-tgl').value || "................";
+            
+            const { data: kopUrl } = klienSupabase.storage.from('bukti_aduan').getPublicUrl('system/kop_default.png');
+            
+            div.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="${kopUrl.publicUrl}" style="width:100%; max-height:120px; object-fit:contain; border-bottom:3px double #000; padding-bottom:10px; margin-bottom:15px;" onerror="this.style.display='none'">
+                    <h3 style="margin: 0; text-decoration: underline; font-size: 15px;">SURAT KEPUTUSAN PENETAPAN</h3>
+                    <p style="margin: 5px 0 0 0;">Nomor: ${document.getElementById('pen-no-sk').value}</p>
+                </div>
+                <table class="sk-table">
+                    <tr><td>MENIMBANG</td><td>:</td><td>1. Bahwa berdasarkan data aduan masuk pada sistem aplikasi tanggal ${aduan.tanggal_kejadian} terkait dugaan pelanggaran.<br>2. Bahwa setelah dilakukan proses verifikasi serta rangkaian penanganan aduan, dipandang perlu menetapkan keputusan sanksi.</td></tr>
+                    <tr><td>MENGINGAT</td><td>:</td><td>1. Peraturan internal Organisasi/Instansi.<br>2. Panduan standardisasi operasional penanganan aduan SIGAP.</td></tr>
+                </table>
+                <p style="text-align:center; font-weight:bold; margin: 15px 0;">MEMUTUSKAN:</p><p style="margin:0;">MENETAPKAN :</p>
+                <table class="sk-table">
+                    <tr><td>PERTAMA</td><td>:</td><td>Menyatakan bahwa Terlapor di bawah ini:<br>- Nama Terlapor: ${aduan.nama_terlapor}<br>- Jabatan: ${aduan.jabatan || '-'}<br>- Lokasi/Unit Kerja: ${aduan.lokasi_kejadian}<br><br>Dinyatakan terbukti secara sah dan meyakinkan melakukan pemenuhan unsur kategori perkara ${aduan.kategori || 'Pelanggaran'} dengan tingkat urgensi penanganan ${aduan.urgensi || 'Ringan'}.</td></tr>
+                    <tr><td>KEDUA</td><td>:</td><td>Hasil Ketetapan Eksekusi/Tindak Lanjut:<br><b>"${rek}"</b></td></tr>
+                    <tr><td>KETIGA</td><td>:</td><td>Keputusan penetapan ini bersifat mutlak mengikat, diterbitkan secara resmi melalui otorisasi kelembagaan.</td></tr>
+                </table>
+                <table style="width: 100%; margin-top: 30px;">
+                    <tr><td style="width: 60%;"></td><td style="text-align:center;">Ditetapkan di: Samarinda<br>Pada Tanggal: ${tgl}<br>DIREKTUR,<br><br><br><br><b><u>dr. Indah Puspitasari, MARS</u></b><br>NIP. 196705301998032003</td></tr>
+                </table>`;
+            div.style.display='block';
+        }
+
+        function downloadRTF(id, filename) { 
+            const content = document.getElementById(id).innerHTML;
+            if(!content) return alert("Preview SK belum termuat!");
+            const preHtml = ['<','html','>','<','head','>','<','meta charset="utf-8"','>','<','title','>','SK','<','/title','>','<','/head','>','<','body','>'].join('');
+            const postHtml = ['<','/body','>','<','/html','>'].join('');
+            const blob = new Blob(['\ufeff', preHtml + content + postHtml], { type: 'application/rtf' }); 
+            const url = URL.createObjectURL(blob); 
+            const a = document.createElement("a"); a.href = url; a.download = filename; 
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        function downloadPDF(id, filename) { 
+            const element = document.getElementById(id);
+            if(!element || element.style.display === 'none') return alert("Preview SK belum termuat!");
+            html2pdf().set({margin:0.5, filename:filename, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'in', format:'letter', orientation:'portrait'}}).from(element).save(); 
+        }
+        
+        async function simpanPenetapan() { await klienSupabase.from('aduan').update({ status: 'Selesai (SK Diterbitkan)' }).eq('id', document.getElementById('pen-pilih-aduan').value); alert('SK Terbit!'); resetForm('section-penetapan'); document.getElementById('preview-sk-content').style.display='none'; muatPilihanAduan('pen-pilih-aduan', 'Menunggu Penerbitan SK'); muatDatasheetView('penetapan'); }
+
+        // ---------------- TAB LAPORAN FORMAL (CETAK) ----------------
+        async function muatLaporanFormal() {
+            const fKat = document.getElementById('lap-filter-kategori').value;
+            const fStatus = document.getElementById('lap-filter-status').value;
+            
+            const tbody = document.getElementById('lap-tbody'); tbody.innerHTML = '';
+            try {
+                let query = klienSupabase.from('aduan').select('id, created_at, tanggal_kejadian, nama_pelapor, nama_terlapor, kategori, urgensi, status, proses_penanganan(tanggapan_akhir)').order('created_at', { ascending: false });
+                if(fKat) query = query.eq('kategori', fKat);
+                if(fStatus) query = query.eq('status', fStatus);
+                const { data } = await query;
+                if(!data || data.length===0) return tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data</td></tr>';
+                const selWaktu = document.getElementById('lap-filter-waktu'); document.getElementById('lap-periode-text').innerText = selWaktu.options[selWaktu.selectedIndex].text;
+                data.forEach(d => {
+                    const rek = (d.proses_penanganan && d.proses_penanganan.length > 0) ? d.proses_penanganan[0].tanggapan_akhir : "-";
+                    const tgl = new Date(d.created_at).toLocaleDateString('id-ID');
+                    const urg = d.urgensi || "-";
+                    tbody.innerHTML += `<tr><td>${tgl}</td><td style="font-size:10px;">${d.id.substring(0,8).toUpperCase()}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td>${d.kategori||'-'}<br><small>(${urg})</small></td><td><b>${d.status}</b></td><td>${rek}</td></tr>`;
+                });
+                return;
+            } catch (e) {
+                console.warn('Supabase unavailable for laporan formal, using localStorage', e);
+            }
+            // fallback: use local aduan
+            const local = getLocalAduan();
+            if(!local || local.length===0) return tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data</td></tr>';
+            const selWaktu = document.getElementById('lap-filter-waktu'); document.getElementById('lap-periode-text').innerText = selWaktu.options[selWaktu.selectedIndex].text;
+            local.forEach(d => {
+                const rek = d.tanggapan_akhir || '-';
+                const tgl = new Date(d.created_at).toLocaleDateString('id-ID');
+                const urg = d.urgensi || '-';
+                tbody.innerHTML += `<tr><td>${tgl}</td><td style="font-size:10px;">${d.id.substring(0,8).toUpperCase()}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td>${d.kategori||'-'}<br><small>(${urg})</small></td><td><b>${d.status}</b></td><td>${rek}</td></tr>`;
+            });
+        }
+
+        function cetakLaporan() {
+            document.getElementById('sign-jabatan').innerText = document.getElementById('lap-jabatan').value || '...';
+            document.getElementById('sign-nama').innerText = document.getElementById('lap-nama').value || '...';
+            document.getElementById('sign-nip').innerText = document.getElementById('lap-nip').value || '...';
+            document.getElementById('sign-tanggal').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+            window.print();
+        }
+        
+        async function cariStatusLaporan() {
+            const query = document.getElementById('lacak-id').value.toLowerCase().trim();
+            if(!query) return alert("Masukkan ID Laporan!");
+            const { data } = await klienSupabase.from('aduan').select('*');
+            const found = data.find(item => item.id.toLowerCase().includes(query) || `${item.nama_pelapor}-${item.tanggal_kejadian}-${item.nama_terlapor}`.toLowerCase().includes(query));
+            if(!found) return alert("Laporan tidak ditemukan!");
+            
+            document.getElementById('l-kategori').innerText = found.kategori || "Aduan Masuk";
+            document.getElementById('l-tgl').innerText = new Date(found.created_at).toLocaleString('id-ID');
+            
+            const steps = [
+                { nama: 'Diterima', kode: ['Terkirim', 'Diverifikasi', 'Proses PIC / Dieskalasi', 'Menunggu Otorisasi', 'Menunggu Penerbitan SK', 'Selesai (SK Diterbitkan)'] },
+                { nama: 'Diverifikasi', kode: ['Diverifikasi', 'Proses PIC / Dieskalasi', 'Menunggu Otorisasi', 'Menunggu Penerbitan SK', 'Selesai (SK Diterbitkan)'] },
+                { nama: 'Dieskalasi', kode: ['Proses PIC / Dieskalasi', 'Menunggu Otorisasi', 'Menunggu Penerbitan SK', 'Selesai (SK Diterbitkan)'] },
+                { nama: 'Selesai PIC', kode: ['Menunggu Otorisasi', 'Menunggu Penerbitan SK', 'Selesai (SK Diterbitkan)'] },
+                { nama: 'Diotorisasi', kode: ['Menunggu Penerbitan SK', 'Selesai (SK Diterbitkan)'] },
+                { nama: 'SK Terbit', kode: ['Selesai (SK Diterbitkan)'] }
+            ];
+            const ul = document.getElementById('l-timeline'); ul.innerHTML = '';
+            steps.forEach(langkah => {
+                const isDone = langkah.kode.includes(found.status);
+                ul.innerHTML += `<li class="${isDone ? 'done' : ''}">${langkah.nama} <span class="timeline-date">${isDone ? 'Selesai' : 'Menunggu'}</span></li>`;
+            });
+            document.getElementById('lacak-hasil').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
