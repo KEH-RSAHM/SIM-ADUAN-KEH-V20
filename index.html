@@ -159,9 +159,9 @@
 
         /* Data Table */
         .dashboard-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
-        .dashboard-table th, .dashboard-table td { border: 1px solid #cbd5e1; padding: 8px; text-align: left; }
+        .dashboard-table th, .dashboard-table td { border: 1px solid #334155; padding: 8px; text-align: left; color: var(--text); }
         .dashboard-table th { background-color: #f8fafc; color: #1a365d; }
-        .dashboard-table tr:nth-child(even) { background-color: #fcfcfc; }
+        .dashboard-table tr:nth-child(even) { background-color: #1e293b; } /* dark mode */
 
         /* Dashboard Infografis */
         .stat-box { flex: 1; padding: 20px; border-radius: 8px; text-align: center; min-width: 150px; }
@@ -257,114 +257,11 @@ input::placeholder, textarea::placeholder { opacity: 1; }
 
 /* === END CONTRAST OVERRIDES === */
 
-
-        /* Enhanced Tab Navigation */
-        .tab-container {
-            display: flex;
-            gap: 8px;
-            padding: 12px;
-            background: rgba(15,23,42,0.6);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.06);
-            overflow-x: auto;
-            scrollbar-width: none;
-        }
-        .tab-container::-webkit-scrollbar { display: none; }
-        .tab-btn {
-            position: relative;
-            padding: 10px 18px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: #cbd5e1;
-            font-weight: 600;
-            font-size: 13px;
-            white-space: nowrap;
-            transition: all 0.25s ease;
-            cursor: pointer;
-        }
-        .tab-btn:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-1px);
-            color: #fff;
-        }
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary, #dc2626), var(--primary-dark, #b91c1c));
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-        }
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 6px;
-            height: 6px;
-            background: var(--primary, #dc2626);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--primary, #dc2626);
-        }
-        :root {
-            --primary: #dc2626;
-            --primary-dark: #b91c1c;
-            --accent: #f87171;
-        }
-        body.theme-ocean { --primary: #0ea5e9; --primary-dark: #0284c7; --accent: #7dd3fc; }
-        body.theme-emerald { --primary: #10b981; --primary-dark: #059669; --accent: #6ee7b7; }
-        body.theme-violet { --primary: #8b5cf6; --primary-dark: #7c3aed; --accent: #c4b5fd; }
-        body.theme-amber { --primary: #f59e0b; --primary-dark: #d97706; --accent: #fcd34d; }
-        body.theme-red { --primary: #dc2626; --primary-dark: #b91c1c; --accent: #f87171; }
-        .btn-submit, .btn-admin, .tab-btn.active, .top-bar div:first-child div:first-child {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
-        }
-        .header h2 { color: var(--primary); }
-        .badge { background: var(--primary); }
-
-
-        /* Light Mode */
-        body.light-mode {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-            color: #0f172a;
-        }
-        body.light-mode .top-bar,
-        body.light-mode .tab-container {
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(0,0,0,0.06);
-        }
-        body.light-mode .card,
-        body.light-mode .header,
-        body.light-mode .section {
-            background: #ffffff;
-            color: #0f172a;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-        }
-        body.light-mode .tab-btn {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: #475569;
-        }
-        body.light-mode .tab-btn:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-        }
-        body.light-mode input,
-        body.light-mode select,
-        body.light-mode textarea {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            color: #0f172a;
-        }
-        body.light-mode .header h2 { color: var(--primary); }
-        body.light-mode #top-account-info { color: #475569 !important; }
-
-</style>
+.badge-dikembalikan{background:#fed7aa;color:#9a3412} .badge{padding:2px 6px;border-radius:10px;font-size:11px}</style>
 </head>
+
+
+
 <body>
 
     <div id="landing-screen">
@@ -416,7 +313,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 </div>
             </div>
         </section>
-        <section id="features" class="feature-section">
+        <section id="publikasi" class="feature-section"><div class="landing-section-title"><h2>Publikasi & Edukasi</h2></div><div id="publikasi-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-width:1000px;margin:auto"></div></section><section id="features" class="feature-section">
             <div class="landing-section-title"><h2>Fitur Unggulan SIGAP</h2><p>Dirancang untuk alur pelaporan etika, verifikasi, eskalasi, hingga penerbitan keputusan resmi.</p></div>
             <div class="feature-grid">
                 <div class="feature-card"><div class="icon">🛡️</div><h3>Keamanan & Audit</h3><p>Role-based access, verifikasi internal, dan jejak audit untuk setiap langkah penanganan aduan.</p></div>
@@ -447,7 +344,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 <div class="stat-card" style="max-width:280px; text-align:left;"><h4>Telepon</h4><p style="font-size:1rem;">+62 541 123 4567</p></div>
                 <div class="stat-card" style="max-width:280px; text-align:left;"><h4>Alamat</h4><p style="font-size:1rem;">RSJD Atma Husada Mahakam, Samarinda</p></div>
             </div>
-        </section>
+        <div style="margin-top:15px;text-align:center"><a href="https://instagram.com" target="_blank" style="margin:0 8px">Instagram</a><a href="https://youtube.com" target="_blank" style="margin:0 8px">YouTube</a><a href="https://spotify.com" target="_blank" style="margin:0 8px">Spotify</a></div></section>
     </div>
 
     <div id="login-screen">
@@ -479,7 +376,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             <div><b id="top-instansi-name">RSJD Atma Husada Mahakam</b> | SIGAP</div>
             <div>
                 <button class="btn-admin btn-small sidebar-toggle-btn" onclick="toggleSidebar()">☰ Sidebar</button>
-                <button id="mode-toggle" title="Ganti mode gelap/terang" style="background:#1e293b; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:4px 10px; font-size:12px; margin-right:8px; cursor:pointer;">🌙</button><select id="theme-selector" style="background:#1e293b; color:#e2e8f0; border:1px solid #334155; border-radius:8px; padding:4px 8px; font-size:12px; margin-right:8px;"><option value="red">Nuansa Merah</option><option value="ocean">Ocean Blue</option><option value="emerald">Emerald</option><option value="violet">Violet</option><option value="amber">Amber</option></select><span id="top-account-info" style="font-size:12px; color:#94a3b8; margin-right:8px;"></span><span class="badge" id="top-role-badge">Role</span>
+                <span class="badge" id="top-role-badge">Role</span>
                 <button class="btn-submit btn-small" style="margin-left: 10px;" onclick="logout()">Keluar</button>
             </div>
         </div>
@@ -526,7 +423,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                         <div class="form-group"><label>Lokasi Kejadian *</label><input type="text" id="input-lokasi" placeholder="Lokasi kejadian" required></div>
                         <div class="form-group"><label>Tanggal Kejadian *</label><input type="date" id="input-tanggal" required></div>
                     </div>
-                    <div class="form-group"><label>Sub Kategori</label><select id="input-subkategori" class="dyn-sub_kategori"><option value="">Pilih Sub Kategori</option></select></div>
+                    <!-- Sub Kategori dipindah ke Verifikasi Operator -->
                 </div>
                 <div>
                     <div class="form-group"><label>Deskripsi Kejadian *</label><textarea id="input-deskripsi" placeholder="Jelaskan kronologi, pihak terlibat, dampak..." required style="min-height:140px;"></textarea></div>
@@ -539,7 +436,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 <h3 style="font-size:14px; margin-top:0;">Daftar Semua Laporan Masuk</h3>
                 <div style="overflow-x:auto;">
                     <table class="dashboard-table">
-                        <thead><tr><th>Tanggal Kejadian</th><th>ID Aduan</th><th>Pelapor</th><th>Terlapor</th><th>Status Terkini</th><th>Aksi</th></tr></thead>
+                        <thead><tr><th>Tanggal</th><th>ID</th><th>Pelapor</th><th>Terlapor</th><th>Sub Kategori</th><th>Status</th><th>Aksi</th></tr></thead>
                         <tbody id="ds-pelapor"></tbody>
                     </table>
                 </div>
@@ -569,7 +466,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                     <div class="form-group"><label>Kategori Utama</label>
                         <select id="op-kategori" class="dyn-kategori_aduan"></select>
                     </div>
-                    <div class="form-group"><label>Sub Kategori</label><input type="text" id="op-subkategori" placeholder="Contoh: Suap, Pelecehan"></div>
+                    <div class="form-group"><label>Sub Kategori</label><select id="op-subkategori" class="dyn-sub_kategori"><option value="">Pilih Sub Kategori</option></select></div>
                 </div>
                 <hr>
                 <div class="form-group"><label>Hasil Verifikasi</label>
@@ -785,7 +682,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
         </div>
 
         <div id="section-dashboard" class="section no-print">
-            <div class="header"><h2>Dashboard Statistik</h2><p>Infografis Data Aduan Terkini</p><button class="hero-btn btn-secondary-hero" onclick="toggleTheme()" style="margin-top:12px;">Ubah Tema</button><select id="dash-filter-subkategori" class="dyn-sub_kategori" onchange="renderDashboardChart()" style="margin-top:12px; padding:8px; border-radius:6px; margin-left:10px;"><option value="">Semua Sub Kategori</option></select></div>
+            <div class="header"><h2>Dashboard Statistik</h2><p>Infografis Data Aduan Terkini</p><button class="hero-btn btn-secondary-hero" onclick="toggleTheme()" style="margin-top:12px;">Ubah Tema</button></div>
             <div class="card card-large">
                 <div style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom: 20px;">
                     <div class="stat-box" style="background:#e0f2fe; color:#0369a1;">
@@ -910,7 +807,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 <div style="flex: 1; min-width: 250px; background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0;">
                     <h3 style="margin-top:0; font-size:15px;">Manajemen Parameter (Reference Tables)</h3>
                     <div class="form-row">
-                        <div class="form-group"><label>Pilih Tabel/Kategori</label><select id="adm-param-pilih" onchange="loadParamValues()"><option value="kategori_aduan">Kategori Aduan</option><option value="pic">Daftar PIC</option><option value="eskalasi">Level Eskalasi</option><option value="urgensi">Tingkat Urgensi</option><option value="sla_hari">SLA (Hari)</option><option value="sub_kategori">Sub Kategori</option></select></div>
+                        <div class="form-group"><label>Pilih Tabel/Kategori</label><select id="adm-param-pilih" onchange="loadParamValues()"><option value="kategori_aduan">Kategori Aduan</option><option value="pic">Daftar PIC</option><option value="eskalasi">Level Eskalasi</option><option value="urgensi">Tingkat Urgensi</option><option value="sla_hari">SLA (Hari)</option><option value="sub_kategori">Sub Kategori</option><option value="hasil_verifikasi">Hasil Verifikasi</option></select></div>
                     </div>
                     <ul class="param-list" id="adm-param-list" style="background: white; border: 1px solid #ccc; height: 150px; overflow-y: auto; margin-bottom: 10px;"></ul>
                     <div class="form-row">
@@ -928,7 +825,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                         <input type="file" id="adm-pub-file" accept="image/*,.pdf,video/*" onchange="validasiUkuranFile(this, 5)" style="background:white;">
                         <span class="file-hint">Maks. Ukuran 5 MB</span>
                     </div>
-                    <button class="btn-success" onclick="uploadPublikasi(this)">Upload & Publikasikan</button>
+                    <button class="btn-success" onclick="uploadPublikasi(this)">Upload & Publikasikan onclick="uploadPub()"></button>
                 </div>
                 <div style="flex: 1; min-width: 250px;">
                     <div style="background: #f8fafc; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
@@ -939,7 +836,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                     <div style="background: #fef2f2; padding: 15px; border-radius: 6px; border: 1px solid #fca5a5;">
                         <h3 style="margin-top:0; font-size:15px; color:#991b1b;">Data Ekspor (Backup)</h3>
                         <p style="font-size: 11px; margin-top: 0; color:#b91c1c;">Backup seluruh data aduan ke JSON.</p>
-                        <button class="btn-admin" onclick="exportDataDB()">Ekspor Data (.json)</button>
+                        <button class="btn-admin" onclick="exportDataDB('json')">JSON</button> <button class="btn-admin" onclick="exportDataDB('txt')">TXT</button> <button class="btn-admin" onclick="exportDataDB('xlsx')">XLSX</button>
                     </div>
                 </div>
             </div>
@@ -989,13 +886,14 @@ input::placeholder, textarea::placeholder { opacity: 1; }
     <script>
         // INISIALISASI SUPABASE
         let SUPABASE_URL = localStorage.getItem('supa_url') || 'https://slkijpnmzjwpbzxshyux.supabase.co';
-        let SUPABASE_KEY = localStorage.getItem('supa_key') || 'Ganti dengan key ANON Anda';
+        let SUPABASE_KEY = localStorage.getItem('supa_key') || '';
         let klienSupabase = null;
 
         // Persist defaults into localStorage so the SuperAdmin config fields are pre-filled
         try {
             if (!localStorage.getItem('supa_url')) localStorage.setItem('supa_url', SUPABASE_URL);
-            if (!localStorage.getItem('supa_key')) localStorage.setItem('supa_key', SUPABASE_KEY);
+            // Jangan simpan key kosong ke localStorage
+            if (SUPABASE_KEY && !localStorage.getItem('supa_key')) localStorage.setItem('supa_key', SUPABASE_KEY);
         } catch (e) { console.warn('Could not save Supabase config to localStorage:', e); }
 
         function initSupabase() {
@@ -1003,22 +901,39 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 if (!window.supabase || typeof window.supabase.createClient !== 'function') {
                     throw new Error('Supabase library tidak tersedia');
                 }
+                // Validasi API key - ini penyebab "Invalid API key"
+                if (!SUPABASE_KEY || SUPABASE_KEY.length < 20 || SUPABASE_KEY.includes('Ganti')) {
+                    throw new Error('Supabase Anon Key belum dikonfigurasi. Buka SuperAdmin > Konfigurasi Supabase API untuk mengatur key yang valid.');
+                }
                 klienSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('Supabase initialized successfully');
             } catch (err) {
                 console.warn('Supabase init failed:', err);
-                showToast('Supabase offline atau gagal dimuat. Navigasi akan berjalan dengan fallback lokal.', 'error');
+                showToast(err.message || 'Supabase offline. Aplikasi berjalan dengan data lokal.', 'error');
                 klienSupabase = null;
             }
         }
 
         let currentUserRole = null;
-        let systemParameters = {};
-        let editingId = null;
         let currentUserProfile = null;
+        let inactivityTimer = null;
+        const INACTIVITY_LIMIT = 60 * 1000; // 30 detik
+        let systemParameters = {};
+        // Default parameters jika belum ada di DB
+        const defaultParams = {
+            kategori_aduan: ['Masalah Etik dan Disiplin', 'Pelanggaran Hukum', 'Maladministrasi'],
+            sub_kategori: ['Suap', 'Pelecehan', 'Gratifikasi', 'Penyalahgunaan Wewenang', 'Lainnya'],
+            hasil_verifikasi: ['Diterima - Lanjut Proses', 'Ditolak - Data Tidak Lengkap', 'Ditolak - Bukan Kewenangan', 'Perlu Klarifikasi'],
+            pic: ['Dr. A', 'Dr. B'],
+            eskalasi: ['Level 1', 'Level 2'],
+            urgensi: ['Rendah', 'Sedang', 'Tinggi'],
+            sla_hari: ['3', '7', '14']
+        };
+        let editingId = null;
         let dataAduanGlobal = [];
 
         // Utility: generate short id
-        function genId() { return 'ad_' + Math.random().toString(36).substr(2, 9); }
+        function genId() { return crypto.randomUUID(); }
 
         // LocalStorage helpers for offline/testing
         function getLocalAduan() { try { return JSON.parse(localStorage.getItem('sigap_aduan') || '[]'); } catch (e) { return []; } }
@@ -1048,8 +963,6 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             let total = 0;
             let processing = 0;
             const local = getLocalAduan();
-                    const filterSub2 = document.getElementById('dash-filter-subkategori')?.value || '';
-                    const procLocal = filterSub2 ? procLocal.filter(d => d.sub_kategori === filterSub2) : local;
             if (klienSupabase) {
                 try {
                     const { data, error } = await klienSupabase.from('aduan').select('status');
@@ -1061,8 +974,8 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                     console.warn('Gagal memuat landing stats dari Supabase', e);
                 }
             }
-            if (procLocal.length > total) total = procLocal.length;
-            processing = Math.max(processing, procLocal.filter(item => ['Diverifikasi', 'Proses PIC / Dieskalasi', 'Menunggu Otorisasi', 'Menunggu Penerbitan SK'].includes(item.status)).length);
+            if (local.length > total) total = local.length;
+            processing = Math.max(processing, local.filter(item => ['Diverifikasi', 'Proses PIC / Dieskalasi', 'Menunggu Otorisasi', 'Menunggu Penerbitan SK'].includes(item.status)).length);
             const percent = total ? Math.round((processing / total) * 100) : 0;
             document.getElementById('landing-total').innerText = total;
             document.getElementById('landing-status-total').innerText = total === 0 ? 'Belum ada laporan' : `${total} laporan`;
@@ -1134,7 +1047,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             try {
                 const { data, error } = await klienSupabase.from('aduan').select('kategori,status,created_at');
                 let rows = [];
-                if (!error && data && procData.length) {
+                if (!error && data && data.length) {
                     rows = data;
                 } else {
                     rows = getLocalAduan();
@@ -1255,9 +1168,9 @@ input::placeholder, textarea::placeholder { opacity: 1; }
         const recallStageConfig = {
             operator: { select: 'op-pilih-aduan', status: 'Terkirim', info: 'recall-info-operator' },
             eskalasi: { select: 'esk-pilih-aduan', status: 'Diverifikasi', info: 'recall-info-eskalasi' },
-            pic: { select: 'pic-pilih-aduan', status: 'Proses PIC / Dieskalasi', info: 'recall-info-pic' },
+            pic: { select: 'pic-pilih-aduan', status: ['Proses PIC / Dieskalasi','Dikembalikan'], info: 'recall-info-pic' },
             otorisasi: { select: 'ot-pilih-aduan', status: 'Menunggu Otorisasi', info: 'recall-info-otorisasi' },
-            penetapan: { select: 'pen-pilih-aduan', status: ['Menunggu Penerbitan SK','Selesai (SK Diterbitkan)'], info: 'recall-info-penetapan' }
+            penetapan: { select: 'pen-pilih-aduan', status: 'Menunggu Penerbitan SK', info: 'recall-info-penetapan' }
         };
 
         document.addEventListener("DOMContentLoaded", async () => {
@@ -1268,6 +1181,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             applySidebarState();
             loadTheme();
             toggleAuthMode('login');
+            setupInactivityListeners();
             await loadSession();
         });
 
@@ -1280,48 +1194,11 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-pass').value;
             if (!email || !password) return alert('Isi email dan password terlebih dulu.');
-            if (!klienSupabase) return alert('Supabase tidak tersedia. Coba lagi nanti.');
+            if (!klienSupabase) return alert('Supabase tidak tersedia atau API Key belum dikonfigurasi.\n\nSolusi:\n1. Login sebagai SuperAdmin (jika sudah ada)\n2. Buka menu C-Panel > Konfigurasi Supabase API\n3. Masukkan URL dan Anon Key yang valid dari Supabase');
             const { data, error } = await klienSupabase.auth.signInWithPassword({ email, password });
             if (error) return alert('Login gagal: ' + error.message);
             if (!data || !data.session) return alert('Login gagal, session tidak ditemukan.');
             await onLoginSuccess(data.user);
-        }
-
-        function updateActiveAccountHeaders() {
-            if (!currentUserProfile) return;
-            const infoHtml = `<div style="font-size:12px; color:#94a3b8; margin-top:6px;">Aktif sebagai: <b>${currentUserProfile.name || currentUserProfile.email}</b> (${currentUserProfile.email}) - ${currentUserProfile.role}</div>`;
-            document.querySelectorAll('.section .header').forEach(h => {
-                // avoid duplicate
-                if (!h.querySelector('.active-account-info')) {
-                    const div = document.createElement('div');
-                    div.className = 'active-account-info';
-                    div.innerHTML = infoHtml;
-                    h.appendChild(div);
-                }
-            });
-            const topInfo = document.getElementById('top-account-info');
-            if (topInfo) {
-                topInfo.innerHTML = `<b>${currentUserProfile.name || currentUserProfile.email}</b> <span style="opacity:.7">${currentUserProfile.email}</span>`;
-            }
-        }
-
-        function autoFillPelaporForm() {
-            if (!currentUserProfile) return;
-            const namaEl = document.getElementById('input-nama');
-            const emailEl = document.getElementById('input-email');
-            if (namaEl && emailEl) {
-                // If role is Pelapor, auto-fill and make readonly
-                if (currentUserProfile.role === 'Pelapor') {
-                    namaEl.value = currentUserProfile.name || '';
-                    emailEl.value = currentUserProfile.email || '';
-                    namaEl.readOnly = true;
-                    emailEl.readOnly = true;
-                } else {
-                    // Operator or others can edit
-                    namaEl.readOnly = false;
-                    emailEl.readOnly = false;
-                }
-            }
         }
 
         async function submitRegister() {
@@ -1330,7 +1207,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             const password = document.getElementById('register-pass').value;
             const role = document.getElementById('register-role').value;
             if (!name || !email || !password) return alert('Lengkapi semua kolom pendaftaran.');
-            if (!klienSupabase) return alert('Supabase tidak tersedia. Coba lagi nanti.');
+            if (!klienSupabase) return alert('Supabase tidak tersedia atau API Key belum dikonfigurasi.\n\nSolusi:\n1. Login sebagai SuperAdmin (jika sudah ada)\n2. Buka menu C-Panel > Konfigurasi Supabase API\n3. Masukkan URL dan Anon Key yang valid dari Supabase');
             const { data, error } = await klienSupabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
             if (error) return alert('Pendaftaran gagal: ' + error.message);
             if (data?.user?.id) {
@@ -1349,6 +1226,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             const profile = await getProfile(user.id);
             if (profile?.is_active === false) return alert('Akun ini tidak aktif. Hubungi administrator.');
             currentUserRole = profile?.role || 'Pelapor';
+            currentUserProfile = profile; // simpan untuk auto-fill
             document.getElementById('top-role-badge').innerText = currentUserRole;
             document.getElementById('landing-screen').style.display = 'none';
             document.getElementById('app-screen').style.display = 'block';
@@ -1356,6 +1234,26 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             applySidebarState();
             terapkanHakAkses(currentUserRole);
             await inisialisasiSistem();
+            // Auto-fill identitas pelapor
+            setTimeout(() => isiIdentitasPelapor(), 300);
+            // Start inactivity timer
+            resetInactivityTimer();
+        }
+
+        function isiIdentitasPelapor() {
+            if (!currentUserProfile) return;
+            const namaEl = document.getElementById('input-nama');
+            const emailEl = document.getElementById('input-email');
+            if (namaEl && emailEl) {
+                namaEl.value = currentUserProfile.name || '';
+                emailEl.value = currentUserProfile.email || '';
+                // Kunci kecuali Operator
+                const isOperator = currentUserRole === 'Operator';
+                namaEl.readOnly = !isOperator;
+                emailEl.readOnly = !isOperator;
+                namaEl.style.backgroundColor = isOperator ? '' : 'rgba(100,116,139,0.2)';
+                emailEl.style.backgroundColor = isOperator ? '' : 'rgba(100,116,139,0.2)';
+            }
         }
 
         async function getProfile(userId) {
@@ -1363,6 +1261,25 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             const { data, error } = await klienSupabase.from('profiles').select('*').eq('id', userId).single();
             if (error) { console.warn('Profil tidak dapat dimuat:', error); return null; }
             return data;
+        }
+
+        
+        function resetInactivityTimer() {
+            if (inactivityTimer) clearTimeout(inactivityTimer);
+            if (!currentUserRole) return; // tidak login
+            inactivityTimer = setTimeout(() => {
+                alert('Sesi berakhir karena tidak aktif selama 30 detik. Silakan login kembali.');
+                logout();
+                // hapus jejak
+                if (klienSupabase) klienSupabase.auth.signOut();
+                localStorage.removeItem('supa_session');
+            }, INACTIVITY_LIMIT);
+        }
+
+        function setupInactivityListeners() {
+            ['mousemove','keydown','click','scroll','touchstart'].forEach(evt => {
+                document.addEventListener(evt, resetInactivityTimer, { passive: true });
+            });
         }
 
         async function loadSession() {
@@ -1395,6 +1312,8 @@ input::placeholder, textarea::placeholder { opacity: 1; }
 
         function logout() {
             currentUserRole = null;
+            currentUserProfile = null;
+            if (inactivityTimer) clearTimeout(inactivityTimer);
             document.getElementById('landing-screen').style.display = 'block';
             document.getElementById('app-screen').style.display = 'none';
             const loginScreen = document.getElementById('login-screen');
@@ -1471,7 +1390,11 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             if(currentUserRole !== 'SuperAdmin') { terapkanHakAkses(currentUserRole); }
         }
 
-        // ---------------- TAB & DATASHEET MANAGEMENT ----------------
+        
+async function uploadPub(){const f=document.getElementById('adm-pub-file').files[0];const j=document.getElementById('adm-pub-judul').value;const t=document.getElementById('adm-pub-jenis').value;if(!f||!j)return alert('Lengkapi');const p=`publikasi/${Date.now()}_${f.name}`;await klienSupabase.storage.from('publikasi').upload(p,f);const url=klienSupabase.storage.from('publikasi').getPublicUrl(p).data.publicUrl;await klienSupabase.from('publikasi').insert([{judul:j,jenis:t,file_url:url}]);alert('OK');loadPub();}
+async function loadPub(){const c=document.getElementById('publikasi-list');if(!c)return;const {data}=await klienSupabase.from('publikasi').select('*').order('created_at',{ascending:false}).limit(6);c.innerHTML=(data||[]).map(d=>`<div style="background:#fff;padding:12px;border:1px solid #e2e8f0;border-radius:6px"><div style="font-size:12px;color:#64748b">${d.jenis}</div><div style="font-weight:600">${d.judul}</div><a href="${d.file_url}" target="_blank" style="font-size:12px;color:#2563eb">Download</a></div>`).join('');}
+
+// ---------------- TAB & DATASHEET MANAGEMENT ----------------
         function bukaTab(namaTab) {
             document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -1508,8 +1431,6 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             } catch(e){}
             if (!data) {
                 const local = getLocalAduan();
-                    const filterSub2 = document.getElementById('dash-filter-subkategori')?.value || '';
-                    const procLocal = filterSub2 ? procLocal.filter(d => d.sub_kategori === filterSub2) : local;
                 data = local.find(x => x.id === id);
             }
             if (!data) return alert('Data tidak ditemukan');
@@ -1572,9 +1493,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             }
 
             const local = getLocalAduan();
-                    const filterSub2 = document.getElementById('dash-filter-subkategori')?.value || '';
-                    const procLocal = filterSub2 ? procLocal.filter(d => d.sub_kategori === filterSub2) : local;
-            const filtered = statusFilters.length ? procLocal.filter(x => statusFilters.includes(x.status)) : local;
+            const filtered = statusFilters.length ? local.filter(x => statusFilters.includes(x.status)) : local;
             if (!filtered || filtered.length === 0) return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Antrean kosong.</td></tr>';
             filtered.forEach(d => {
                 const tgl = d.tanggal_kejadian || d.created_at || '-';
@@ -1591,9 +1510,6 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             try {
                 const { data } = await klienSupabase.from('aduan').select('status, kategori');
                 if (data) {
-                    const filterSub = document.getElementById('dash-filter-subkategori')?.value || '';
-                    const procData = filterSub ? data.filter(d => d.sub_kategori === filterSub) : data;
-
                     let tMasuk = data.length;
                     let tSelesai = data.filter(d => d.status && d.status.includes('Selesai')).length;
                     let tProses = tMasuk - tSelesai;
@@ -1613,11 +1529,9 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             }
             // fallback
             const local = getLocalAduan();
-                    const filterSub2 = document.getElementById('dash-filter-subkategori')?.value || '';
-                    const procLocal = filterSub2 ? procLocal.filter(d => d.sub_kategori === filterSub2) : local;
-            const tMasuk = procLocal.length; const tSelesai = procLocal.filter(d => d.status && d.status.includes('Selesai')).length; const tProses = tMasuk - tSelesai;
+            const tMasuk = local.length; const tSelesai = local.filter(d => d.status && d.status.includes('Selesai')).length; const tProses = tMasuk - tSelesai;
             document.getElementById('dash-tot').innerText = tMasuk; document.getElementById('dash-pros').innerText = tProses; document.getElementById('dash-sel').innerText = tSelesai;
-            const rekapKat = {}; procLocal.forEach(d => { const k = d.kategori || 'Belum Diklasifikasi'; rekapKat[k] = (rekapKat[k]||0) + 1; });
+            const rekapKat = {}; local.forEach(d => { const k = d.kategori || 'Belum Diklasifikasi'; rekapKat[k] = (rekapKat[k]||0) + 1; });
             const tBody = document.getElementById('dash-kat-body'); tBody.innerHTML = '';
             for(const [kat, jml] of Object.entries(rekapKat)) { tBody.innerHTML += `<tr><td>${kat}</td><td><b>${jml} Laporan</b></td></tr>`; }
         }
@@ -1775,15 +1689,21 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             alert("Pengaturan Instansi Disimpan!");
         }
         function simpanConfigSupabase() {
-            localStorage.setItem('supa_url', document.getElementById('sa-supa-url').value);
-            localStorage.setItem('supa_key', document.getElementById('sa-supa-key').value);
-            alert("Configurasi Tersimpan. Halaman akan dimuat ulang."); location.reload();
-        }
-        async function exportDataDB() {
-            const { data } = await klienSupabase.from('aduan').select('*, verifikasi(*), proses_penanganan(*)');
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr); dlAnchorElem.setAttribute("download", "backup_sigap_" + Date.now() + ".json"); dlAnchorElem.click();
+            const url = document.getElementById('sa-supa-url').value.trim();
+            const key = document.getElementById('sa-supa-key').value.trim();
+            
+            if (!url || !key) {
+                return alert('URL dan Anon Key harus diisi!');
+            }
+            if (key.length < 20) {
+                return alert('Anon Key tidak valid. Pastikan Anda menyalin key lengkap dari Supabase Dashboard > Settings > API');
+            }
+            
+            localStorage.setItem('supa_url', url);
+            localStorage.setItem('supa_key', key);
+            alert("Konfigurasi tersimpan. Halaman akan dimuat ulang untuk menerapkan koneksi baru."); 
+            location.reload();
+        async function exportDataDB(fmt='json'){const {data}=await klienSupabase.from('aduan').select('*');const d=data||[];const t=Date.now();if(fmt==='json'){const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`backup_${t}.json`;a.click()}else if(fmt==='txt'){const txt=d.map(x=>`${x.id}\t${x.nama_pelapor}\t${x.status}`).join('\n');const b=new Blob([txt],{type:'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`backup_${t}.txt`;a.click()}else{const csv=['id,nama,status',...d.map(x=>`${x.id},${x.nama_pelapor},${x.status}`)].join('\n');const b=new Blob([csv],{type:'text/csv'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`backup_${t}.csv`;a.click()}}
         }
 
         // ---------------- FUNGSI BISNIS INTI (CRUD) ----------------
@@ -1791,25 +1711,19 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             const selectEl = document.getElementById(elementId);
             const infoEl = infoId ? document.getElementById(infoId) : null;
             selectEl.innerHTML = '<option value="">-- Pilih --</option>';
-            if(infoEl) infoEl.innerText = `Memuat aduan ${statusFilter}...`;
+            if(infoEl) infoEl.innerText = `Memuat aduan ${Array.isArray(statusFilter)?statusFilter.join(', '):statusFilter}...`;
             let count = 0;
             try {
-                let query = klienSupabase.from('aduan').select('id, nama_pelapor, nama_terlapor, tanggal_kejadian, status').order('created_at', { ascending: false });
-                if (Array.isArray(statusFilter)) {
-                    query = query.in('status', statusFilter);
-                } else {
-                    query = query.eq('status', statusFilter);
-                }
-                let { data } = await query;
+                let { data } = await klienSupabase.from('aduan').select('id, nama_pelapor, nama_terlapor, tanggal_kejadian').in('status', Array.isArray(statusFilter)?statusFilter:[statusFilter]).order('created_at', { ascending: false });
                 dataAduanGlobal = data || [];
                 count = dataAduanGlobal.length;
                 dataAduanGlobal?.forEach(item => selectEl.innerHTML += `<option value="${item.id}">[#${item.id.substring(0,6)}] ${item.nama_pelapor}</option>`);
             } catch (e) {
                 console.warn('Supabase error in muatPilihanAduan, using localStorage', e);
-                const local = getLocalAduan().filter(a => !statusFilter || (Array.isArray(statusFilter) ? statusFilter.includes(a.status) : a.status === statusFilter));
+                const local = getLocalAduan().filter(a => !statusFilter || a.status === statusFilter);
                 dataAduanGlobal = local;
-                count = procLocal.length;
-                procLocal.forEach(item => selectEl.innerHTML += `<option value="${item.id}">[#${item.id.substring(0,6)}] ${item.nama_pelapor}</option>`);
+                count = local.length;
+                local.forEach(item => selectEl.innerHTML += `<option value="${item.id}">[#${item.id.substring(0,6)}] ${item.nama_pelapor}</option>`);
             }
             if(infoEl) infoEl.innerText = count > 0 ? `${count} aduan ${statusFilter} siap diproses.` : `Tidak ada aduan ${statusFilter} saat ini.`;
             document.querySelectorAll('.active-header').forEach(el => el.style.display = 'none');
@@ -1842,10 +1756,133 @@ input::placeholder, textarea::placeholder { opacity: 1; }
 
         async function kirimLaporan() {
             const subKat = document.getElementById('input-subkategori') ? document.getElementById('input-subkategori').value : '';
-            const inp = { id: editingId || genId(), nama_pelapor: document.getElementById('input-nama').value, email_pelapor: document.getElementById('input-email').value, kontak: document.getElementById('input-kontak').value, nama_terlapor: document.getElementById('input-terlapor').value, jabatan: document.getElementById('input-jabatan').value, lokasi_kejadian: document.getElementById('input-lokasi').value, tanggal_kejadian: document.getElementById('input-tanggal').value, sub_kategori: subKat, deskripsi: document.getElementById('input-deskripsi').value, status: editingId ? undefined : 'Terkirim', created_at: new Date().toISOString() }
+            const linkBukti = document.getElementById('input-link') ? document.getElementById('input-link').value : '';
+            
+            // Validasi input wajib
+            const nama = document.getElementById('input-nama').value.trim();
+            const email = document.getElementById('input-email').value.trim();
+            const terlapor = document.getElementById('input-terlapor').value.trim();
+            const lokasi = document.getElementById('input-lokasi').value.trim();
+            const tanggal = document.getElementById('input-tanggal').value;
+            const deskripsi = document.getElementById('input-deskripsi').value.trim();
+            
+            if (!nama || !email || !terlapor || !lokasi || !tanggal || !deskripsi) {
+                return alert('Harap lengkapi semua field yang wajib (*)');
+            }
+            
+            const inp = { 
+                id: editingId || genId(), 
+                nama_pelapor: nama, 
+                email_pelapor: email, 
+                kontak: document.getElementById('input-kontak').value, 
+                nama_terlapor: terlapor, 
+                jabatan: document.getElementById('input-jabatan').value, 
+                lokasi_kejadian: lokasi, 
+                tanggal_kejadian: tanggal, 
+                sub_kategori: subKat, 
+                deskripsi: deskripsi,
+                link_bukti: linkBukti,
+                status: editingId ? undefined : 'Terkirim', 
+                created_at: editingId ? undefined : new Date().toISOString() 
+            };
+            
+            try {
+                if (klienSupabase) {
+                    const { error } = await klienSupabase.from('aduan').upsert([inp]);
+                    if (error) throw error;
+                } else {
+                    // Fallback ke localStorage
+                    const local = getLocalAduan();
+                    if (editingId) {
+                        const idx = local.findIndex(x => x.id === editingId);
+                        if (idx >= 0) local[idx] = { ...local[idx], ...inp };
+                    } else {
+                        local.unshift(inp);
+                    }
+                    saveLocalAduan(local);
+                }
+                
+                showToast(editingId ? 'Laporan berhasil diupdate!' : 'Laporan berhasil dikirim!', 'success');
+                resetForm('section-pelapor');
+                editingId = null;
+                document.getElementById('btn-kirim').innerText = 'Kirim Laporan';
+                await muatDatasheetView('pelapor');
+                await loadLandingStats();
+            } catch (e) {
+                console.error('Gagal menyimpan laporan:', e);
+                alert('Gagal menyimpan laporan: ' + (e.message || e));
+            }
         }
-        async function simpanVerifikasi() { await klienSupabase.from('aduan').update({ status: 'Diverifikasi', kategori: document.getElementById('op-kategori').value, subkategori: document.getElementById('op-subkategori').value }).eq('id', document.getElementById('op-pilih-aduan').value); alert('Diverifikasi!'); resetForm('section-operator'); muatPilihanAduan('op-pilih-aduan', 'Terkirim'); muatDatasheetView('operator'); }
-        async function simpanEskalasi() { await klienSupabase.from('aduan').update({ status: 'Proses PIC / Dieskalasi', urgensi: document.getElementById('esk-urgensi').value }).eq('id', document.getElementById('esk-pilih-aduan').value); alert('Dieskalasi!'); resetForm('section-eskalasi'); muatPilihanAduan('esk-pilih-aduan', 'Diverifikasi'); muatDatasheetView('eskalasi'); }
+        async function simpanVerifikasi() { 
+            try {
+                const id = document.getElementById('op-pilih-aduan').value;
+                if (!id) return alert('Pilih aduan dulu');
+                const payload = { 
+                    status: 'Diverifikasi', 
+                    kategori: document.getElementById('op-kategori').value, 
+                    sub_kategori: document.getElementById('op-subkategori').value,
+                    hasil_verifikasi: document.getElementById('op-hasil').value,
+                    catatan_verifikator: document.getElementById('op-catatan').value,
+                    diverifikasi_at: new Date().toISOString()
+                };
+                // Hapus field kosong
+                Object.keys(payload).forEach(k => !payload[k] && delete payload[k]);
+                
+                if (klienSupabase) {
+                    const { error } = await klienSupabase.from('aduan').update(payload).eq('id', id);
+                    if (error) throw error;
+                } else {
+                    // fallback local
+                    const local = getLocalAduan();
+                    const idx = local.findIndex(x => x.id === id);
+                    if (idx >= 0) local[idx] = { ...local[idx], ...payload };
+                    saveLocalAduan(local);
+                }
+                
+                showToast('Verifikasi berhasil disimpan', 'success');
+                resetForm('section-operator'); 
+                await muatPilihanAduan('op-pilih-aduan', 'Terkirim'); 
+                await muatDatasheetView('operator');
+                await muatPilihanAduan('esk-pilih-aduan', 'Diverifikasi'); // refresh eskalasi
+            } catch (e) {
+                console.error('Gagal verifikasi:', e);
+                alert('Gagal menyimpan verifikasi: ' + (e.message || e));
+            }
+        }
+        async function simpanEskalasi() { 
+            try {
+                const id = document.getElementById('esk-pilih-aduan').value;
+                if (!id) return alert('Pilih aduan dulu');
+                const payload = { 
+                    status: 'Proses PIC / Dieskalasi', 
+                    level_eskalasi: document.getElementById('esk-level').value,
+                    pic_tujuan: document.getElementById('esk-nama').value,
+                    urgensi: document.getElementById('esk-urgensi').value,
+                    target_sla: document.getElementById('esk-waktu').value,
+                    dieskalasi_at: new Date().toISOString()
+                };
+                Object.keys(payload).forEach(k => !payload[k] && delete payload[k]);
+                
+                if (klienSupabase) {
+                    const { error } = await klienSupabase.from('aduan').update(payload).eq('id', id);
+                    if (error) throw error;
+                } else {
+                    const local = getLocalAduan();
+                    const idx = local.findIndex(x => x.id === id);
+                    if (idx >= 0) local[idx] = { ...local[idx], ...payload };
+                    saveLocalAduan(local);
+                }
+                
+                showToast('Eskalasi berhasil', 'success');
+                resetForm('section-eskalasi'); 
+                await muatPilihanAduan('esk-pilih-aduan', 'Diverifikasi'); 
+                await muatDatasheetView('eskalasi');
+                await muatPilihanAduan('pic-pilih-aduan', 'Proses PIC / Dieskalasi');
+            } catch (e) {
+                console.error('Gagal eskalasi:', e);
+                alert('Gagal eskalasi: ' + (e.message || e));
+            }
+        }
         async function simpanPenanganan() { 
             const id = document.getElementById('pic-pilih-aduan').value;
             await klienSupabase.from('proses_penanganan').insert([{ aduan_id: id, tanggapan_proses: document.getElementById('pic-tanggapan-proses').value, tanggapan_akhir: document.getElementById('pic-tanggapan-akhir').value }]);
@@ -1885,12 +1922,12 @@ input::placeholder, textarea::placeholder { opacity: 1; }
         }
 
         // ---------------- SK, PDF, RTF DOWNLOAD ----------------
-        async function generateAutoSK() { document.getElementById('pen-no-sk').value = `000${Math.floor(Math.random()*900)+100}/ETIK-RSJD/${new Date().getFullYear()}`; muatPreviewSK(document.getElementById('pen-pilih-aduan').value); }
+        async function generateAutoSK() { document.getElementById('pen-no-sk').value = `${String(Math.floor(Math.random()*9000)+1000).padStart(4,'0')}/KEH/RSJDAHM/${new Date().getFullYear()}`; muatPreviewSK(document.getElementById('pen-pilih-aduan').value); }
         async function muatPreviewSK(id) { 
             const div = document.getElementById('preview-sk-content');
             if(!id) { div.style.display='none'; return;}
             const {data: aduan} = await klienSupabase.from('aduan').select('*').eq('id',id).single();
-            const rek = document.querySelector('.active-header .h-rekomendasi').innerText;
+            const {data: prosesData} = await klienSupabase.from('proses_penanganan').select('rekomendasi_pic').eq('aduan_id', id).order('created_at', {ascending:false}).limit(1).maybeSingle(); const rek = prosesData?.rekomendasi_pic || '................................';
             const tgl = document.getElementById('pen-tgl').value || "................";
             
             const { data: kopUrl } = klienSupabase.storage.from('bukti_aduan').getPublicUrl('system/kop_default.png');
@@ -1966,11 +2003,9 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             }
             // fallback: use local aduan
             const local = getLocalAduan();
-                    const filterSub2 = document.getElementById('dash-filter-subkategori')?.value || '';
-                    const procLocal = filterSub2 ? procLocal.filter(d => d.sub_kategori === filterSub2) : local;
-            if(!local || procLocal.length===0) return tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data</td></tr>';
+            if(!local || local.length===0) return tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data</td></tr>';
             const selWaktu = document.getElementById('lap-filter-waktu'); document.getElementById('lap-periode-text').innerText = selWaktu.options[selWaktu.selectedIndex].text;
-            procLocal.forEach(d => {
+            local.forEach(d => {
                 const rek = d.tanggapan_akhir || '-';
                 const tgl = formatTanggalIndo(d.created_at);
                 const urg = d.urgensi || '-';
@@ -2012,51 +2047,5 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             document.getElementById('lacak-hasil').style.display = 'block';
         }
     </script>
-
-
-<script>
-(function(){
-    function applyTheme(theme){
-        document.body.classList.remove('theme-red','theme-ocean','theme-emerald','theme-violet','theme-amber');
-        document.body.classList.add('theme-' + theme);
-        try { localStorage.setItem('sigap_theme', theme); } catch(e){}
-    }
-    function applyMode(mode){
-        if(mode === 'light'){
-            document.body.classList.add('light-mode');
-            var btn = document.getElementById('mode-toggle');
-            if(btn) btn.textContent = '☀️';
-        } else {
-            document.body.classList.remove('light-mode');
-            var btn = document.getElementById('mode-toggle');
-            if(btn) btn.textContent = '🌙';
-        }
-        try { localStorage.setItem('sigap_mode', mode); } catch(e){}
-    }
-    document.addEventListener('DOMContentLoaded', function(){
-        var sel = document.getElementById('theme-selector');
-        if(sel){
-            var saved = 'red';
-            try { saved = localStorage.getItem('sigap_theme') || 'red'; } catch(e){}
-            sel.value = saved;
-            applyTheme(saved);
-            sel.addEventListener('change', function(){ applyTheme(this.value); });
-        }
-        var modeBtn = document.getElementById('mode-toggle');
-        var savedMode = 'dark';
-        try { savedMode = localStorage.getItem('sigap_mode') || 'dark'; } catch(e){}
-        applyMode(savedMode);
-        if(modeBtn){
-            modeBtn.addEventListener('click', function(){
-                var isLight = document.body.classList.contains('light-mode');
-                applyMode(isLight ? 'dark' : 'light');
-            });
-        }
-    });
-    window.applyTheme = applyTheme;
-})();
-</script>
-
-
 </body>
 </html>
