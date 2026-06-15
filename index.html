@@ -199,13 +199,15 @@
         
         /* Main content spacing to accommodate sidebar on desktop */
         #app-screen{ padding-left: 260px; transition: padding-left .18s ease }
-        body.sidebar-collapsed .tab-container{ position: static; width: auto; height: auto; flex-direction: row; overflow-x:auto; padding:6px 10px; margin-bottom: 12px; }
+        body.sidebar-collapsed .tab-container{ position: static; width: fit-content; max-width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; justify-content: center; overflow-x: visible; padding:8px 12px; margin: 0 auto 16px auto; gap:6px; scrollbar-width: none; -ms-overflow-style: none; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        body.sidebar-collapsed .tab-container::-webkit-scrollbar{ display:none; }
+        body.sidebar-collapsed .tab-btn{ flex: 0 1 auto; white-space:nowrap; min-width: fit-content; padding: 8px 14px; text-align:center; font-size: 13px; border-radius: 6px; }
         body.sidebar-collapsed #app-screen{ padding-left: 16px }
         @media (max-width: 1024px) { #app-screen{ padding-left: 220px } }
         @media (max-width: 900px) { /* collapse to top tabs on small screens */
-            .tab-container{ position: static; width: auto; height: auto; flex-direction: row; overflow-x:auto; padding:6px 10px; margin-bottom: 12px }
+            .tab-container{ position: static; width: auto; height: auto; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; padding:6px 8px; margin-bottom: 12px; gap:4px }
             #app-screen{ padding-left: 16px }
-            .tab-btn{ white-space:nowrap; min-width: 84px; padding: 8px 12px; text-align:center }
+            .tab-btn{ white-space:nowrap; min-width: 0; padding: 6px 9px; text-align:center; font-size: 12px }
         }
         @media (max-width: 480px) { .form-row { flex-direction: column; gap: 12px; align-items: stretch;} .sk-preview{ padding: 15px; height: 48vh } .card { margin-left: 8px; margin-right:8px } .login-box{ margin: 0 16px } .top-bar{ padding:10px } }
     
@@ -337,6 +339,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
         }
         
 </style>
+<style>.d-pelapor,.d-tgl,.d-terlapor,.d-jabatan,.d-deskripsi,.d-rekomendasi,.d-keputusan{display:none !important}</style>
 </head>
 
 
@@ -484,16 +487,19 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             <div class="info-header active-header no-print">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
                     <div>
-                        <strong>Detail Aduan:</strong><br>
+                        <strong>Detail Aduan:</strong>
                         Pelapor: <span class="h-pelapor">-</span> | 
                         Tgl. Kejadian: <span class="h-tgl">-</span><br>
                         Terlapor: <span class="h-terlapor">-</span> | 
-                        Jabatan: <span class="h-jabatan">-</span>
-                    </div>
-                    <div>
+                        Jabatan: <span class="h-jabatan">-</span><br>
+                        <span style="font-size:12px;color:#475569">SLA: <b><span class="h-sla">14</span> hari</b> | Sisa: <b><span class="h-sla-sisa">-</span></b> | Status: <span class="h-sla-status">-</span></span><br>
+                        <b>Deskripsi Kejadian:</b> <span class="h-deskripsi">-</span></div>
+                    <div class="rk-header">
                         <strong>Rekomendasi & Keputusan:</strong><br>
-                        Rekomendasi PIC: <span class="h-rekomendasi highlight-rek">Memuat...</span><br>
+                        Rekomendasi PIC: <span class="h-rekomendasi highlight-rek">Belum ada rekomendasi</span><br>
                         Keputusan Otorisasi: <span class="h-keputusan" style="color:#059669;font-weight:bold;">-</span>
+                    </div>
+                    <div style="grid-column:1 / -1; border-top:1px solid rgba(0,0,0,0.1); padding-top:8px; margin-top:4px;">
                     </div>
                 </div>
             </div>
@@ -520,9 +526,12 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 </div>
                 <div>
                     <div class="form-group"><label>Deskripsi Kejadian *</label><textarea id="input-deskripsi" placeholder="Jelaskan kronologi, pihak terlibat, dampak..." required style="min-height:140px;"></textarea></div>
-                    <div class="form-group"><label>Upload File Bukti (max 2MB)</label><input type="file" id="input-file" onchange="validasiUkuranFile(this, 2)"><span class="file-hint">Maks. 2MB.</span></div>
+                    <div class="form-group"><label>Upload File Bukti (max 5MB)</label><input type="file" id="input-file" onchange="validasiUkuranFile(this, 5)"><span class="file-hint">Maks. 5MB.</span></div>
                     <div class="form-group"><label>Link Cloud Drive (Opsional)</label><input type="text" id="input-link" placeholder="https://..."></div>
-                    <button class="btn-submit" id="btn-kirim" onclick="kirimLaporan()">Kirim Laporan</button>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button type="button" class="btn-draft" onclick="kirimLaporan('Tersimpan')" style="background:#64748b; color:white; padding:10px 18px; border:none; border-radius:6px; cursor:pointer;">Simpan Draft</button>
+                <button type="button" id="btn-kirim" class="btn-submit" onclick="kirimLaporan('Terkirim')" style="background:#2563eb; color:white; padding:10px 18px; border:none; border-radius:6px; cursor:pointer; flex:1;">Kirim Laporan</button>
+            </div>
                 </div>
             </div>
             <div class="card card-large">
@@ -542,6 +551,10 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
                     <button class="btn-search btn-small" onclick="recallAduan('operator')">Recall Aduan Terkirim</button>
                     <span id="recall-info-operator" style="font-size:12px; color:#475569;">Klik recall untuk memuat item belum selesai.</span>
+                </div>
+                <div class="active-header" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;line-height:1.5;">
+                    <div><b>Rekomendasi PIC:</b> <span class="header-rekomendasi" style="color:#0369a1;">-</span></div>
+                    <div style="margin-top:4px;"><b>Keputusan Otorisasi:</b> <span class="header-keputusan" style="color:#065f46;">-</span></div>
                 </div>
                 <div class="form-group"><label>Pilih Aduan Masuk</label><select id="op-pilih-aduan" onchange="sinkronHeader(this.value)"></select></div>
                 <div id="header-op"></div>
@@ -607,6 +620,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 </div>
                 <div class="form-group"><label>Instruksi</label><textarea id="esk-deskripsi"></textarea></div>
                 <button class="btn-escalate" onclick="simpanEskalasi()">Distribusikan Laporan</button>
+                <button class="btn-admin btn-small" style="margin-left:8px;" onclick="kembalikanProses('eskalasi')">↩ Kembalikan ke Verifikasi</button>
             </div>
             <div class="card card-large">
                 <h3 style="font-size:14px; margin-top:0;">Datasheet: Antrean Eskalasi & Terdistribusi</h3>
@@ -625,6 +639,10 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
                     <button class="btn-search btn-small" onclick="recallAduan('pic')">Recall Aduan PIC</button>
                     <span id="recall-info-pic" style="font-size:12px; color:#475569;">Klik recall untuk muat tugas PIC belum selesai.</span>
+                </div>
+                <div class="active-header" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;line-height:1.5;">
+                    <div><b>Rekomendasi PIC:</b> <span class="header-rekomendasi" style="color:#0369a1;">-</span></div>
+                    <div style="margin-top:4px;"><b>Keputusan Otorisasi:</b> <span class="header-keputusan" style="color:#065f46;">-</span></div>
                 </div>
                 <div class="form-group"><label>Pilih Laporan Ditugaskan</label><select id="pic-pilih-aduan" onchange="sinkronHeader(this.value)"></select></div>
                 <div id="header-pic"></div>
@@ -646,6 +664,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 <hr>
                 <div class="form-group"><label>Upload Dokumentasi Sidang</label><input type="file" id="pic-input-file" accept="image/*,.pdf,.docx" onchange="validasiUkuranFile(this, 5)"><span class="file-hint">Maks. 5MB.</span></div>
                 <button class="btn-pic" id="btn-pic-simpan" onclick="simpanPenanganan()">Simpan & Ajukan Otorisasi</button>
+                <button class="btn-admin btn-small" style="margin-left:8px;" onclick="kembalikanProses('pic')">↩ Kembalikan ke Komite</button>
             </div>
             <div class="card card-large">
                 <h3 style="font-size:14px; margin-top:0;">Datasheet: Tugas Berjalan & Selesai Ditangani</h3>
@@ -665,17 +684,22 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                     <button class="btn-search btn-small" onclick="recallAduan('otorisasi')">Recall Aduan Otorisasi</button>
                     <span id="recall-info-otorisasi" style="font-size:12px; color:#475569;">Klik recall untuk muat dokumen yang menunggu otorisasi.</span>
                 </div>
+                <div class="active-header" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;line-height:1.5;">
+                    <div><b>Rekomendasi PIC:</b> <span class="header-rekomendasi" style="color:#0369a1;">-</span></div>
+                    <div style="margin-top:4px;"><b>Keputusan Otorisasi:</b> <span class="header-keputusan" style="color:#065f46;">-</span></div>
+                </div>
                 <div class="form-group"><label>Pilih Laporan</label><select id="ot-pilih-aduan" onchange="sinkronHeader(this.value)"></select></div>
                 <div id="header-ot"></div>
 
                 <div class="form-group"><label>Keputusan Penetapan *</label>
-                    <select id="ot-keputusan"><option value="Disetujui - Terbitkan SK">Disetujui - Terbitkan SK</option><option value="Dikembalikan untuk Direvisi">Kembalikan ke PIC</option><option value="Ditolak">Ditolak</option></select>
+                    <select id="ot-keputusan"><option value="Disetujui - Terbitkan SK">Disetujui - Terbitkan SK</option><option value="Dinyatakan terbukti secara sah dan meyakinkan">Dinyatakan terbukti secara sah dan meyakinkan</option><option value="tidak terbukti">tidak terbukti</option><option value="Dikembalikan untuk Direvisi">Kembalikan ke PIC</option><option value="Ditolak">Ditolak</option></select>
                 </div>
                 <div class="form-group"><label>Catatan Final</label><textarea id="ot-catatan"></textarea></div>
                 <div class="form-group">
                     <div class="checkbox-group"><label class="checkbox-item"><input type="checkbox" id="ot-approved"> <b style="color:#d97706;">Sahkan Penanganan</b></label></div>
                 </div>
                 <button class="btn-otorisasi" onclick="simpanOtorisasi()">Sahkan Laporan</button>
+                <button class="btn-admin btn-small" style="margin-left:8px;" onclick="kembalikanProses('otorisasi')">↩ Kembalikan ke PIC</button>
             </div>
             <div class="card card-large">
                 <h3 style="font-size:14px; margin-top:0;">Datasheet: Antrean Menunggu Pengesahan & Telah Disahkan</h3>
@@ -703,6 +727,10 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                     <button class="btn-search btn-small" onclick="recallAduan('penetapan')">Recall Aduan SK</button>
                     <span id="recall-info-penetapan" style="font-size:12px; color:#475569;">Klik recall untuk muat laporan persiapan SK.</span>
                 </div>
+                <div class="active-header" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;line-height:1.5;">
+                    <div><b>Rekomendasi PIC:</b> <span class="header-rekomendasi" style="color:#0369a1;">-</span></div>
+                    <div style="margin-top:4px;"><b>Keputusan Otorisasi:</b> <span class="header-keputusan" style="color:#065f46;">-</span></div>
+                </div>
                 <div class="form-group"><label>Pilih Laporan (Disahkan)</label><select id="pen-pilih-aduan" onchange="sinkronHeader(this.value); muatPreviewSK(this.value);"></select></div>
                 <div id="header-pen"></div>
                 
@@ -718,7 +746,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 </div>
                 
                 <div class="form-row">
-                    <div class="form-group"><label>Hal / Subjek</label><input type="text" value="Keputusan" readonly></div>
+                    <div class="form-group"><label>Hal / Subjek SK</label><input type="text" id="pen-hal-sk" placeholder="Otomatis mengikuti Amar Keputusan"></div>
                     <div class="form-group"><label>Tingkat Kerahasiaan</label><select id="pen-kerahasiaan"><option value="Terbatas">Terbatas</option></select></div>
                 </div>
 
@@ -729,7 +757,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                     <div class="form-group"><label>Jabatan</label><input type="text" value="Direktur" readonly></div>
                 </div>
                 <div class="form-group"><label>Tempat Ditetapkan</label><input type="text" value="Samarinda" readonly></div>
-                <div class="form-group"><label>Isi Keputusan / Amar Putusan *</label><textarea id="pen-isi-keputusan" placeholder="Tuliskan amar keputusan lengkap, sanksi, dan tindak lanjut yang diputuskan..." style="min-height:120px;" oninput="muatPreviewSK(document.getElementById('pen-pilih-aduan').value)" required></textarea></div>
+                <div class="form-group"><label>Isi Keputusan / Amar Putusan *</label><textarea id="pen-isi-keputusan" placeholder="Tuliskan amar keputusan lengkap, sanksi, dan tindak lanjut yang diputuskan..." style="min-height:120px;" oninput="syncHalSK(); muatPreviewSK(document.getElementById('pen-pilih-aduan').value)" required></textarea></div>
 
                 <hr>
                 <label>Preview Surat Keputusan (Otomatis)</label>
@@ -743,6 +771,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 <hr>
                 <div class="form-group"><label>Upload Scan SK Bertanda Tangan (Final)</label><input type="file" id="pen-file" accept="image/*,.pdf" onchange="validasiUkuranFile(this, 5)"><span class="file-hint">Maks. 5MB.</span></div>
                 <button class="btn-admin" id="btn-pen-simpan" onclick="simpanPenetapan()">Terbitkan & Arsipkan SK</button>
+                <button class="btn-admin btn-small" style="margin-left:8px;" onclick="kembalikanProses('penetapan')">↩ Kembalikan ke Otorisasi</button>
             </div>
             <div class="card card-large">
                 <h3 style="font-size:14px; margin-top:0;">Datasheet: Antrean Penerbitan SK Final</h3>
@@ -988,6 +1017,34 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                     <table class="dashboard-table" id="user-management-table">
                         <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead>
                         <tbody><tr><td colspan="5" style="text-align:center;">Klik Muat Daftar Pengguna untuk menampilkan.</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            
+            <!-- SuperAdmin: Manajemen Aduan Terkirim -->
+            <div class="card" style="background:#ffffff; border:1px solid #e2e8f0; padding:20px; margin-top: 20px;">
+                <h3 style="margin-top:0; color:#1e293b;">Manajemen Aduan — SuperAdmin</h3>
+                <p style="font-size:13px; color:#64748b; margin-bottom:12px;">Tampilkan aduan yang sudah Terkirim (atau status lain), lalu edit langsung di form Pelapor.</p>
+                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; align-items:center;">
+                    <select id="sa-aduan-status" style="padding:8px 12px; border-radius:6px; border:1px solid #cbd5e1; background:#fff;">
+                        <option value="Terkirim" selected>Terkirim</option>
+                        <option value="Tersimpan">Tersimpan</option>
+                        <option value="Diverifikasi">Diverifikasi</option>
+                        <option value="Proses PIC / Dieskalasi">Proses PIC</option>
+                        <option value="Menunggu Otorisasi">Menunggu Otorisasi</option>
+                        <option value="Menunggu Penerbitan SK">Menunggu SK</option>
+                        <option value="Selesai (SK Diterbitkan)">Selesai</option>
+                        <option value="Dikembalikan">Dikembalikan</option>
+                        <option value="__all__">Semua Status</option>
+                    </select>
+                    <button class="btn-search btn-small" onclick="loadAduanSuperAdmin()">Muat Aduan</button>
+                    <span id="sa-aduan-info" style="font-size:12px; color:#475569;"></span>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="dashboard-table" id="sa-aduan-table" style="width:100%; font-size:13px;">
+                        <thead><tr><th>ID</th><th>Pelapor</th><th>Terlapor</th><th>Tanggal</th><th>Status</th><th style="min-width:140px;">Aksi</th></tr></thead>
+                        <tbody><tr><td colspan="6" style="text-align:center; color:#64748b; padding:16px;">Klik Muat Aduan untuk menampilkan.</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -1593,9 +1650,9 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             const tabBtn = document.querySelector(`.tab-btn[data-target="${namaTab}"]`);
             if(tabBtn) tabBtn.classList.add('active');
             
-            if(namaTab === 'operator') muatPilihanAduan('op-pilih-aduan', 'Terkirim', 'recall-info-operator');
+            if(namaTab === 'operator') muatPilihanAduan('op-pilih-aduan', ['Terkirim', 'Tersimpan'], 'recall-info-operator');
             if(namaTab === 'eskalasi') muatPilihanAduan('esk-pilih-aduan', 'Diverifikasi', 'recall-info-eskalasi');
-            if(namaTab === 'pic') muatPilihanAduan('pic-pilih-aduan', 'Proses PIC / Dieskalasi', 'recall-info-pic');
+            if(namaTab === 'pic') muatPilihanAduan('pic-pilih-aduan', ['Proses PIC / Dieskalasi','Dikembalikan'], 'recall-info-pic');
             if(namaTab === 'otorisasi') muatPilihanAduan('ot-pilih-aduan', 'Menunggu Otorisasi', 'recall-info-otorisasi');
             if(namaTab === 'penetapan') muatPilihanAduan('pen-pilih-aduan', 'Menunggu Penerbitan SK', 'recall-info-penetapan');
             
@@ -1664,7 +1721,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>';
             tbody.innerHTML = '';
             try {
-                let query = klienSupabase.from('aduan').select('id, created_at, tanggal_kejadian, nama_pelapor, nama_terlapor, kategori, urgensi, status, email_pelapor').order('created_at', { ascending: false });
+                let query = klienSupabase.from('aduan').select('id, created_at, tanggal_kejadian, nama_pelapor, nama_terlapor, kategori, urgensi, status, email_pelapor, no_sk').order('created_at', { ascending: false });
                 if (statusFilters.length > 0) { query = query.in('status', statusFilters); }
                 // Filter khusus untuk pelapor: hanya tampilkan aduan milik sendiri
                 if (roleTab === 'pelapor' && currentUserProfile?.email) { query = query.eq('email_pelapor', currentUserProfile.email); }
@@ -1852,26 +1909,13 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             await loadPub();
             // If no local data present (fresh), seed sample data for offline testing
             try {
-                if (getLocalAduan().length === 0) {
-                    seedLocalData();
-                }
-            } catch (e) { console.warn('seed check failed', e); }
+                /* auto-seed disabled */} catch (e) { console.warn('seed check failed', e); }
         }
 
         // Seed sample data for local testing (only used when Supabase unreachable)
-        function seedLocalData() {
-            const now = new Date();
-            const samples = [
-                { id: genId(), nama_pelapor: 'Ana Susanti', nama_terlapor: 'Dr. Budi', tanggal_kejadian: '2026-05-01', lokasi_kejadian: 'Unit A', kategori: 'Etik dan Disiplin', urgensi: 'Rendah', status: 'Terkirim', deskripsi: 'Deskripsi singkat aduan', created_at: new Date(now.getTime()-86400000*6).toISOString() },
-                { id: genId(), nama_pelapor: 'Joko Santoso', nama_terlapor: 'Ns. Siti', tanggal_kejadian: '2026-05-05', lokasi_kejadian: 'Poliklinik', kategori: 'Etik Keperawatan', urgensi: 'Sedang', status: 'Diverifikasi', deskripsi: 'Aduan kategori keperawatan', created_at: new Date(now.getTime()-86400000*5).toISOString() },
-                { id: genId(), nama_pelapor: 'Rina Marlina', nama_terlapor: 'Dr. Agus', tanggal_kejadian: '2026-05-10', lokasi_kejadian: 'IGD', kategori: 'Etik Medik', urgensi: 'Tinggi', status: 'Proses PIC / Dieskalasi', deskripsi: 'Aduan berat, perlu tindak lanjut', created_at: new Date(now.getTime()-86400000*4).toISOString() },
-                { id: genId(), nama_pelapor: 'Anton', nama_terlapor: 'Petugas X', tanggal_kejadian: '2026-05-12', lokasi_kejadian: 'Ruang Obs', kategori: 'Aduan Hukum', urgensi: 'Tinggi', status: 'Menunggu Otorisasi', deskripsi: 'Perlu otorisasi pimpinan', created_at: new Date(now.getTime()-86400000*3).toISOString() },
-                { id: genId(), nama_pelapor: 'Sari', nama_terlapor: 'Staff Y', tanggal_kejadian: '2026-05-13', lokasi_kejadian: 'Unit B', kategori: 'Etik Nakes Lainnya', urgensi: 'Sedang', status: 'Menunggu Penerbitan SK', deskripsi: 'Menunggu SK', created_at: new Date(now.getTime()-86400000*2).toISOString() },
-                { id: genId(), nama_pelapor: 'Bambang', nama_terlapor: 'Dr. C', tanggal_kejadian: '2026-05-15', lokasi_kejadian: 'Ruang Operasi', kategori: 'Etik dan Disiplin', urgensi: 'Rendah', status: 'Selesai (SK Diterbitkan)', deskripsi: 'Selesai - SK terbit', created_at: new Date(now.getTime()-86400000).toISOString() }
-            ];
-            saveLocalAduan(samples);
-            showToast('Sample data siap untuk pengujian (offline)', 'success');
-        }
+        function seedLocalData() { /* disabled - no dummy data */ }
+        
+        
 
         function distribusiParameter() {
             Object.keys(systemParameters).forEach(key => {
@@ -1994,60 +2038,152 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
         async function muatPilihanAduan(elementId, statusFilter, infoId) {
             const selectEl = document.getElementById(elementId);
             const infoEl = infoId ? document.getElementById(infoId) : null;
+            if (!selectEl) return;
             selectEl.innerHTML = '<option value="">-- Pilih --</option>';
-            if(infoEl) infoEl.innerText = `Memuat aduan ${Array.isArray(statusFilter)?statusFilter.join(', '):statusFilter}...`;
+            if(infoEl) infoEl.innerText = `Memuat aduan...`;
             let count = 0;
+            const norm = s => (s||'').toString().toLowerCase().trim();
+            let statusArr = Array.isArray(statusFilter) ? statusFilter : (statusFilter ? [statusFilter] : []);
+            const statusNorm = statusArr.map(norm);
+            
             try {
-                let { data } = await klienSupabase.from('aduan').select('id, nama_pelapor, nama_terlapor, tanggal_kejadian').in('status', Array.isArray(statusFilter)?statusFilter:[statusFilter]).order('created_at', { ascending: false });
-                dataAduanGlobal = data || [];
-                count = dataAduanGlobal.length;
-                dataAduanGlobal?.forEach(item => selectEl.innerHTML += `<option value="${item.id}">[#${item.id.substring(0,6)}] ${item.nama_pelapor}</option>`);
-            } catch (e) {
-                console.warn('Supabase error in muatPilihanAduan, using localStorage', e);
-                const local = getLocalAduan().filter(a => !statusFilter || a.status === statusFilter);
-                dataAduanGlobal = local;
+                let query = klienSupabase.from('aduan').select('id, nama_pelapor, nama_terlapor, tanggal_kejadian, deskripsi, jabatan, lokasi_kejadian, kategori, urgensi, rekomendasi_pic, keputusan_otorisasi, no_sk, isi_keputusan, hal_sk, status').order('created_at', { ascending: false }).limit(300);
+                // Jangan filter terlalu strict di server untuk otorisasi / penetapan
+                const strictMode = !['ot-pilih-aduan','pen-pilih-aduan'].includes(elementId);
+                if (statusArr.length > 0 && strictMode) { query = query.in('status', statusArr); }
+                const { data, error } = await query;
+                if (error) throw error;
+                let list = data || [];
+                
+                // Filter client-side, toleran case/spasi
+                if (statusArr.length > 0) {
+                    list = list.filter(x => statusNorm.includes(norm(x.status)));
+                }
+                
+                // Fallback khusus Otorisasi: tampilkan yang sudah ada rekomendasi_pic
+                if (elementId === 'ot-pilih-aduan' && list.length === 0) {
+                    const fb = (data || []).filter(x => 
+                        x.rekomendasi_pic && String(x.rekomendasi_pic).trim() !== '' &&
+                        (!x.no_sk || String(x.no_sk).trim() === '')
+                    );
+                    if (fb.length) list = fb;
+                }
+                // Fallback khusus Penetapan SK: tampilkan yang sudah ada keputusan_otorisasi tapi belum ada no_sk
+                if (elementId === 'pen-pilih-aduan' && list.length === 0) {
+                    const fb = (data || []).filter(x => 
+                        x.keputusan_otorisasi && String(x.keputusan_otorisasi).trim() !== '' &&
+                        (!x.no_sk || String(x.no_sk).trim() === '')
+                    );
+                    if (fb.length) list = fb;
+                }
+                
+                // Dedupe
+                const seen = new Set();
+                list = list.filter(x => { if(seen.has(x.id)) return false; seen.add(x.id); return true; });
+                
+                // Merge ke global, jangan overwrite total
+                if (typeof dataAduanGlobal === 'undefined' || !Array.isArray(dataAduanGlobal)) window.dataAduanGlobal = [];
+                const merged = new Map(dataAduanGlobal.map(a => [a.id, a]));
+                list.forEach(a => merged.set(a.id, a));
+                dataAduanGlobal = Array.from(merged.values());
+                
+                count = list.length;
+                list.forEach(item => {
+                    const tgl = item.tanggal_kejadian ? new Date(item.tanggal_kejadian).toLocaleDateString('id-ID') : '-';
+                    selectEl.innerHTML += `<option value="${item.id}">[#${String(item.id).substring(0,6)}] ${item.nama_pelapor || '-'} - ${item.nama_terlapor || '-'}</option>`;
+                });
+                
+                console.log(`[muatPilihanAduan] ${elementId}:`, count, 'items, filter:', statusFilter);
+            } catch (err) {
+                console.warn('Supabase error in muatPilihanAduan, using localStorage', err);
+                let local = [];
+                try { local = typeof getLocalAduan === 'function' ? getLocalAduan() : []; } catch(e){}
+                if (statusArr.length > 0) {
+                    local = local.filter(a => statusNorm.includes(norm(a.status)));
+                }
+                // fallback sama untuk local
+                if (elementId === 'ot-pilih-aduan' && local.length === 0) {
+                    const all = typeof getLocalAduan === 'function' ? getLocalAduan() : [];
+                    local = all.filter(x => x.rekomendasi_pic && !x.no_sk);
+                }
+                if (elementId === 'pen-pilih-aduan' && local.length === 0) {
+                    const all = typeof getLocalAduan === 'function' ? getLocalAduan() : [];
+                    local = all.filter(x => x.keputusan_otorisasi && !x.no_sk);
+                }
+                const seen = new Set();
+                local = local.filter(x => { if(seen.has(x.id)) return false; seen.add(x.id); return true; });
+                // merge global
+                if (typeof dataAduanGlobal === 'undefined' || !Array.isArray(dataAduanGlobal)) window.dataAduanGlobal = [];
+                const merged = new Map(dataAduanGlobal.map(a => [a.id, a]));
+                local.forEach(a => merged.set(a.id, a));
+                dataAduanGlobal = Array.from(merged.values());
+                
                 count = local.length;
-                local.forEach(item => selectEl.innerHTML += `<option value="${item.id}">[#${item.id.substring(0,6)}] ${item.nama_pelapor}</option>`);
+                local.forEach(item => {
+                    selectEl.innerHTML += `<option value="${item.id}">[#${String(item.id).substring(0,6)}] ${item.nama_pelapor || '-'} - ${item.nama_terlapor || '-'}</option>`;
+                });
             }
-            if(infoEl) infoEl.innerText = count > 0 ? `${count} aduan ${statusFilter} siap diproses.` : `Tidak ada aduan ${statusFilter} saat ini.`;
-            document.querySelectorAll('.active-header').forEach(el => el.style.display = 'none');
-            if(document.getElementById('preview-sk-content')) document.getElementById('preview-sk-content').style.display = 'none';
+            if(infoEl) infoEl.innerText = count ? `${count} aduan ditemukan. Pilih untuk melihat detail.` : 'Tidak ada aduan pada status ini. Klik tombol Muat Ulang / cek di SuperAdmin > Manajemen Aduan.';
         }
 
         async function sinkronHeader(aduan_id) {
             const infoBoxes = document.querySelectorAll('.active-header');
             if(!aduan_id) { infoBoxes.forEach(el => el.style.display = 'none'); return; }
-            const aduan = dataAduanGlobal.find(x => x.id === aduan_id);
-            if(aduan) {
-                let rek_text = "Belum ada rekomendasi";
-                let keputusan_text = "-";
-                try {
-                    let { data: proses } = await klienSupabase.from('proses_penanganan').select('tanggapan_akhir').eq('aduan_id', aduan_id).single();
-                    rek_text = proses ? proses.tanggapan_akhir : rek_text;
-                    // Ambil keputusan otorisasi
-                    const { data: aduanFull } = await klienSupabase.from('aduan').select('keputusan_otorisasi, jabatan').eq('id', aduan_id).single();
-                    if(aduanFull) {
-                        keputusan_text = aduanFull.keputusan_otorisasi || '-';
-                        aduan.jabatan = aduanFull.jabatan || aduan.jabatan;
-                    }
-                } catch (e) {
-                    console.warn('Supabase proses lookup failed', e);
-                    if (aduan.tanggapan_akhir) rek_text = aduan.tanggapan_akhir;
-                    keputusan_text = aduan.keputusan_otorisasi || '-';
+            let aduan = (typeof dataAduanGlobal !== 'undefined' ? dataAduanGlobal.find(x => x.id === aduan_id) : null);
+            try {
+                if (typeof klienSupabase !== 'undefined' && klienSupabase) {
+                    const { data: full } = await klienSupabase.from('aduan').select('*').eq('id', aduan_id).single();
+                    if (full) aduan = full;
                 }
-                infoBoxes.forEach(el => {
-                    el.style.display = 'block';
-                    el.querySelector('.h-pelapor').innerText = aduan.nama_pelapor;
-                    el.querySelector('.h-tgl').innerText = formatTanggalIndo(aduan.tanggal_kejadian);
-                    el.querySelector('.h-terlapor').innerText = aduan.nama_terlapor;
-                    const jabatanEl = el.querySelector('.h-jabatan'); if(jabatanEl) jabatanEl.innerText = aduan.jabatan || '-';
-                    const r = el.querySelector('.h-rekomendasi'); if(r) r.innerText = rek_text;
-                    const k = el.querySelector('.h-keputusan'); if(k) k.innerText = keputusan_text;
-                });
+            } catch(e) {}
+            if(!aduan) return;
+            const rekomendasi = aduan.rekomendasi_pic || '-';
+            const keputusan = aduan.keputusan_otorisasi || aduan.isi_keputusan || '-';
+            const tgl_lapor_str = aduan.tanggal_kejadian || aduan.created_at?.substring(0,10) || '';
+            const tgl = tgl_lapor_str ? new Date(tgl_lapor_str).toLocaleDateString('id-ID') : '-';
+            const SLA_TARGET = 14;
+            let sla_sisa = '-', sla_status = '-';
+            if (tgl_lapor_str) {
+                const t1 = new Date(tgl_lapor_str);
+                const now = new Date();
+                const diff = Math.floor((now - t1) / 86400000);
+                const sisa = SLA_TARGET - diff;
+                sla_sisa = sisa >= 0 ? sisa + ' hari' : 'Terlambat ' + Math.abs(sisa) + ' hari';
+                sla_status = sisa >= 3 ? 'Aman' : sisa >= 0 ? 'Mendekati' : 'Overdue';
+            }
+            const setAll = (sel, val) => document.querySelectorAll(sel).forEach(el => el.textContent = val || '-');
+            setAll('.h-pelapor', aduan.nama_pelapor);
+            setAll('.h-tgl', tgl);
+            setAll('.h-terlapor', aduan.nama_terlapor);
+            setAll('.h-jabatan', aduan.jabatan);
+            setAll('.h-deskripsi', aduan.deskripsi);
+            setAll('.h-rekomendasi', rekomendasi);
+            setAll('.header-rekomendasi', rekomendasi);
+            setAll('.h-keputusan', keputusan);
+            setAll('.header-keputusan', keputusan);
+            setAll('.h-sla', SLA_TARGET);
+            setAll('.h-sla-sisa', sla_sisa);
+            setAll('.h-sla-status', sla_status);
+            document.querySelectorAll('.h-sla-status').forEach(el => {
+                el.style.color = sla_status === 'Overdue' ? '#dc2626' : sla_status === 'Mendekati' ? '#d97706' : '#16a34a';
+                el.style.fontWeight = '600';
+            });
+            const isSelesai = (aduan.status || '').includes('Selesai');
+            document.querySelectorAll('.rk-header').forEach(el => { el.style.display = isSelesai ? 'none' : 'block'; });
+            const tglSkEl = document.getElementById('pen-tgl');
+            if (tglSkEl && tgl_lapor_str) {
+                tglSkEl.min = tgl_lapor_str;
+                if (tglSkEl.value && tglSkEl.value < tgl_lapor_str) tglSkEl.value = '';
+            }
+            infoBoxes.forEach(el => { el.style.display = 'block'; });
+            const isiKepEl = document.getElementById('pen-isi-keputusan');
+            if (isiKepEl && !isiKepEl.value && keputusan !== '-') isiKepEl.value = keputusan;
+            if (typeof muatPreviewSK === 'function' && document.getElementById('preview-sk-content')?.style.display !== 'none') {
+                muatPreviewSK(aduan_id);
             }
         }
 
-        async function kirimLaporan() {
+        async function kirimLaporan(statusParam = 'Terkirim') {
             const subKat = document.getElementById('input-subkategori') ? document.getElementById('input-subkategori').value : '';
             const linkBukti = document.getElementById('input-link') ? document.getElementById('input-link').value : '';
             
@@ -2078,8 +2214,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             };
             
             // Hanya set status dan created_at untuk laporan baru, JANGAN untuk update
-            if (!editingId) {
-                inp.status = 'Terkirim';
+            if (!editingId || statusParam) { inp.status = statusParam || 'Terkirim';
                 inp.created_at = new Date().toISOString();
             }
             
@@ -2144,7 +2279,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                 
                 showToast('Verifikasi berhasil disimpan', 'success');
                 resetForm('section-operator'); 
-                await muatPilihanAduan('op-pilih-aduan', 'Terkirim'); 
+                await muatPilihanAduan('op-pilih-aduan', ['Terkirim', 'Tersimpan']); 
                 await muatDatasheetView('operator');
                 await muatPilihanAduan('esk-pilih-aduan', 'Diverifikasi'); // refresh eskalasi
             } catch (e) {
@@ -2187,30 +2322,64 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             }
         }
         async function simpanPenanganan() { 
-            const id = document.getElementById('pic-pilih-aduan').value;
-            await klienSupabase.from('proses_penanganan').insert([{ aduan_id: id, tanggapan_proses: document.getElementById('pic-tanggapan-proses').value, tanggapan_akhir: document.getElementById('pic-tanggapan-akhir').value }]);
-            await klienSupabase.from('aduan').update({ status: 'Menunggu Otorisasi' }).eq('id', id); alert('Disimpan!'); resetForm('section-pic'); muatPilihanAduan('pic-pilih-aduan', 'Proses PIC / Dieskalasi'); muatDatasheetView('pic');
+    const id = document.getElementById('pic-pilih-aduan').value;
+    const tanggapanProses = document.getElementById('pic-tanggapan-proses').value;
+    const tanggapanAkhir = document.getElementById('pic-tanggapan-akhir').value;
+    
+    await klienSupabase.from('proses_penanganan').insert([{ 
+        aduan_id: id, 
+        tanggapan_proses: tanggapanProses, 
+        tanggapan_akhir: tanggapanAkhir,
+        rekomendasi_pic: tanggapanAkhir
+    }]);
+    
+    await klienSupabase.from('aduan').update({ 
+        status: 'Menunggu Otorisasi',
+        rekomendasi_pic: tanggapanAkhir
+    }).eq('id', id); alert('Disimpan!'); resetForm('section-pic'); muatPilihanAduan('pic-pilih-aduan', 'Proses PIC / Dieskalasi'); muatDatasheetView('pic');
         }
         async function simpanOtorisasi() { 
+            try {
             const id = document.getElementById('ot-pilih-aduan').value;
+            if (!id) return alert('Pilih aduan dulu');
             const keputusan = document.getElementById('ot-keputusan').value;
             const catatan = document.getElementById('ot-catatan').value;
             const approved = document.getElementById('ot-approved').checked;
+            if (!approved) {
+                if (!confirm('Anda belum mencentang "Sahkan Penanganan". Lanjutkan tetap?')) return;
+            }
             const status = approved ? 'Menunggu Penerbitan SK' : 'Dikembalikan';
             
             const payload = { 
                 status: status,
                 keputusan_otorisasi: keputusan,
+                isi_keputusan: keputusan,
                 catatan_otorisasi: catatan,
                 diotorisasi_at: new Date().toISOString(),
                 diotorisasi_oleh: currentUserProfile?.name || 'Direktur'
             };
             
-            await klienSupabase.from('aduan').update(payload).eq('id', id);
-            showToast('Otorisasi berhasil disimpan!', 'success');
+            if (klienSupabase) {
+                const { error } = await klienSupabase.from('aduan').update(payload).eq('id', id);
+                if (error) throw error;
+            } else {
+                const local = getLocalAduan();
+                const idx = local.findIndex(x => x.id === id);
+                if (idx >= 0) { local[idx] = { ...local[idx], ...payload }; saveLocalAduan(local); }
+            }
+            const sel = document.getElementById('ot-pilih-aduan');
+            if (sel) { const opt = sel.querySelector(`option[value="${id}"]`); if(opt) opt.remove(); sel.value=''; }
+            dataAduanGlobal = dataAduanGlobal.filter(x => x.id !== id);
+            
+            showToast('Otorisasi berhasil disimpan! Status: ' + status, 'success');
             resetForm('section-otorisasi'); 
-            muatPilihanAduan('ot-pilih-aduan', 'Menunggu Otorisasi', 'recall-info-otorisasi'); 
-            muatDatasheetView('otorisasi');
+            document.querySelectorAll('#header-ot .active-header').forEach(el => el.style.display = 'none');
+            await muatPilihanAduan('ot-pilih-aduan', 'Menunggu Otorisasi', 'recall-info-otorisasi'); 
+            await muatDatasheetView('otorisasi');
+            } catch (e) {
+                console.error('Gagal otorisasi:', e);
+                alert('Gagal menyimpan otorisasi: ' + (e.message || e));
+            }
         }
 
         function recallAduan(stage) {
@@ -2256,51 +2425,78 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                 
                 const noSK = document.getElementById('pen-no-sk').value || '[Nomor SK]';
                 const tglSK = document.getElementById('pen-tgl').value || new Date().toISOString().split('T')[0];
-                const isiKeputusan = document.getElementById('pen-isi-keputusan').value || '[Isi keputusan akan ditampilkan di sini]';
+                const isiKeputusanDB = aduan.keputusan_otorisasi || aduan.isi_keputusan || '';
+                const isiKeputusanForm = document.getElementById('pen-isi-keputusan').value;
+                const isiKeputusan = isiKeputusanForm || isiKeputusanDB || '[Isi keputusan akan ditampilkan di sini]';
+                if (isiKeputusanDB && !isiKeputusanForm) {
+                    document.getElementById('pen-isi-keputusan').value = isiKeputusanDB;
+                }
                 
                 const tglAduan = formatTanggalPanjang(aduan.tanggal_kejadian || aduan.created_at);
                 const tglSurat = formatTanggalPanjang(tglSK);
                 const idAduan = aduan.id.substring(0,8).toUpperCase();
                 
                 preview.innerHTML = `
-                    <div style="text-align:center;margin-bottom:30px;">
+                    <div style="text-align:center;margin-bottom:30px;line-height: 1.0;">
                         <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iI2RjMjYyNiIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjMyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiPlM8L3RleHQ+PC9zdmc+" style="width:70px;height:70px;margin-bottom:10px;">
-                        <div style="font-size:14pt;font-weight:bold;">PEMERINTAH KOTA SAMARINDA</div>
+                        <div style="font-size:14pt;font-weight:bold;">PEMERINTAH PROVINSI KALIMANTAN TIMUR</div>
                         <div style="font-size:16pt;font-weight:bold;margin:4px 0;">RUMAH SAKIT JIWA DAERAH</div>
                         <div style="font-size:16pt;font-weight:bold;">ATMA HUSADA MAHAKAM</div>
                         <div style="font-size:11pt;margin-top:6px;">Jalan Kakap No. 23 Samarinda 75115 Telp. (0541) 743364</div>
                         <div style="border-bottom:3px double #000;margin-top:12px;"></div>
                     </div>
                     
-                    <div style="text-align:center;margin:30px 0;">
+                    <div style="text-align:center;margin:30px;line-height: 1.0;">
                         <h3 style="text-decoration:underline;font-size:14pt;margin:0;">SURAT KEPUTUSAN</h3>
                         <p class="nomor" style="margin:8px 0;font-size:12pt;">Nomor: ${noSK}</p>
                         <h3 style="text-decoration:underline;font-size:14pt;margin:20px 0 0;">TENTANG</h3>
                         <p style="font-weight:bold;font-size:13pt;margin:8px 0;">PENETAPAN HASIL PENANGANAN ADUAN ETIK</p>
                     </div>
                     
-                    <table class="sk-table" style="margin:20px 0;">
-                        <tr><td>Menimbang</td><td>:</td><td>a. Bahwa telah diterima aduan etik pada tanggal ${tglAduan} dengan ID ${idAduan};<br>b. Bahwa terlapor atas nama ${aduan.nama_terlapor || '-'} jabatan ${aduan.jabatan || '-'} unit ${aduan.lokasi_kejadian || '-'};<br>c. Bahwa berdasarkan hasil pemeriksaan dan sidang etik, perlu ditetapkan keputusan.</td></tr>
-                        <tr><td>Mengingat</td><td>:</td><td>1. Undang-undang Nomor 36 Tahun 2009 tentang Kesehatan;<br>2. Peraturan Menteri Kesehatan tentang Etik Rumah Sakit;</td></tr>
-                        <tr><td>Memperhatikan</td><td>:</td><td>Hasil rekomendasi PIC dan pertimbangan Komite Etik</td></tr>
+                    <table class="sk-table" style="margin:20px 0;line-height: 1.5;">
+                        <tr><td>Menimbang</td><td>:</td><td>
+                            a.</td><td>Bahwa berdasarkan data aduan masuk pada sistem aplikasi tanggal ${tglAduan} dengan ID ${idAduan};</td></tr>
+                        <tr><td></td><td> </td><td>
+                            b.</td><td>Bahwa setelah dilakukan proses verifikasi serta rangkaian penanganan aduan, dipandang perlu menetapkan keputusan dan rekomendasi akhir;</td></tr>
+                        <tr><td></td><td> </td><td>
+                            c.</td><td>Bahwa berdasarkan hasil pemeriksaan dan sidang etik, perlu ditetapkan melalui surat keputusan.;</td></tr>
+                        <tr><td>Mengingat</td><td>:</td><td>
+                            1.</td><td>Undang-undang Nomor 36 Tahun 2009 tentang Kesehatan;</td></tr>
+                        <tr><td></td><td></td><td>
+                            2.</td><td>Peraturan Menteri Kesehatan tentang Etik Rumah Sakit;</td></tr>
+                        <tr><td>Memperhatikan</td><td>:</td>
+                            <td>Hasil</td><td>rekomendasi PIC dan pertimbangan Komite Etik</td></tr>
                     </table>
                     
-                    <div style="text-align:center;margin:24px 0;font-weight:bold;font-size:13pt;">MEMUTUSKAN</div>
+                    <div style="text-align:center;margin:24px 0;font-weight:bold;font-size:13pt;line-height: 1.0;">MEMUTUSKAN</div>
                     
                     <table class="sk-table">
-                        <tr><td>Menetapkan</td><td>:</td><td></td></tr>
-                        <tr><td>KESATU</td><td>:</td><td>${isiKeputusan}</td></tr>
-                        <tr><td>KEDUA</td><td>:</td><td>Keputusan ini berlaku sejak tanggal ditetapkan</td></tr>
-                        <tr><td>KETIGA</td><td>:</td><td>Apabila di kemudian hari terdapat kekeliruan akan diperbaiki sebagaimana mestinya</td></tr>
+                        <tr><td>MENETAPKAN</td><td>:</td><td>Keputusan Hasil Penanganan Aduan Nomor : <span style="font-weight: bold;">${idAduan}</span>
+                            </td></tr>
+                        <tr><td>KESATU</td><td>:</td><td>Menyatakan bahwa Terlapor di bawah ini :
+                            <div style="margin-left:40px; line-height: 1.0;">
+                                <p>Nama       : <span style="font-weight: bold;">${aduan.nama_terlapor || '-'}</span></p>
+                                <p>Jabatan    : <span style="font-weight: bold;">${aduan.jabatan || '-'}</span></p>
+                                <p>Unit Kerja : <span style="font-weight: bold;">${aduan.lokasi_kejadian || '-'}</span></p>
+                            </div>    
+                        <tr><td></td><td></td><td>
+                            ${aduan.keputusan_otorisasi || 'Dinyatakan terbukti secara sah dan meyakinkan / tidak terbukti'} melakukan pemenuhan unsur kategori pelanggaran pada perkara ${aduan.kategori || '-'} dengan tingkat urgensi penanganan ${aduan.urgensi || '-'}
+                            </td></tr>
+                        <tr><td>KEDUA</td><td>:</td><td>
+                            <span style="font-weight: bold;">Hasil Ketetapan Eksekusi/Tindak Lanjut:</span><br>
+                            <span style="font-style: italic;">kepada terlapor sebagaimana diktum KESATU - ${isiKeputusan}</span>
+                                </td></tr>
+                        <tr><td>KETIGA</td><td>:</td><td>Keputusan ini  bersifat mutlak mengikat, diterbitkan secara resmi melalui otorisasi kelembagaan, berlaku sejak tanggal ditetapkan.
+                            </td></tr>
                     </table>
                     
                     <div style="margin-top:40px;display:flex;justify-content:flex-end;">
                         <div style="text-align:center;width:300px;">
                             <p style="margin:0;">Ditetapkan di Samarinda</p>
                             <p style="margin:0;">Pada tanggal ${tglSurat}</p>
-                            <p style="margin:16px 0 60px 0;">DIREKTUR RSJD ATMA HUSADA MAHAKAM</p>
-                            <p style="margin:0;font-weight:bold;text-decoration:underline;">dr. Indah Puspitasari, MARS</p>
-                            <p style="margin:4px 0 0;">NIP. 197512012000032001</p>
+                            <p style="margin:16px 0 60px 0;">Direktur</p>
+                            <p style="margin:0;font-weight:bold;text-decoration:underline;line-height:1.0;">dr. Indah Puspitasari, MARS</p>
+                            <p style="margin:4px 0 0;">NIP. 196705301989032003</p>
                         </div>
                     </div>
                 `;
@@ -2338,31 +2534,73 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
         
         
         async function editSK(id){
-            const {data} = await klienSupabase.from('aduan').select('*').eq('id',id).single();
-            if(!data) return alert('Data tidak ditemukan');
-            document.getElementById('pen-pilih-aduan').value = id;
+            let data = null;
+            try {
+                const { data: d } = await klienSupabase.from('aduan').select('*').eq('id', id).single();
+                if (d) data = d;
+            } catch(e){}
+            if (!data) return alert('Data tidak ditemukan');
+            if (data.status === 'Selesai (SK Diterbitkan)') {
+                try {
+                    await klienSupabase.from('aduan').update({ status: 'Menunggu Penerbitan SK' }).eq('id', id);
+                    data.status = 'Menunggu Penerbitan SK';
+                } catch(e){}
+            }
+            const sel = document.getElementById('pen-pilih-aduan');
+            if (sel && ![...sel.options].some(o => o.value === id)) {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = `[${id.substring(0,6)}] ${data.nama_pelapor} - ${data.nama_terlapor}`;
+                sel.appendChild(opt);
+            }
+            if (sel) sel.value = id;
             await sinkronHeader(id);
             document.getElementById('pen-no-sk').value = data.no_sk || '';
             document.getElementById('pen-tgl').value = data.tgl_sk || '';
-            document.getElementById('pen-isi-keputusan').value = data.isi_keputusan || '';
-            muatPreviewSK(id);
-            window.scrollTo({top:0,behavior:'smooth'});
+            const kep = document.getElementById('pen-isi-keputusan');
+            if (kep) kep.value = data.isi_keputusan || data.keputusan_otorisasi || '';
+            const tglEl = document.getElementById('pen-tgl');
+            if (tglEl && data.tanggal_kejadian) tglEl.min = data.tanggal_kejadian;
+            if (typeof bukaTab === 'function') bukaTab('penetapan');
+            if (typeof muatPilihanAduan === 'function') await muatPilihanAduan('pen-pilih-aduan', ['Menunggu Penerbitan SK']);
+            if (sel) sel.value = id;
+            if (typeof muatDatasheetView === 'function') muatDatasheetView('penetapan');
+            window.scrollTo({top:0, behavior:'smooth'});
         }
 
         async function simpanPenetapan() { 
             const id = document.getElementById('pen-pilih-aduan').value;
+            if(!id) return alert('Pilih aduan dulu');
+            const no_sk = document.getElementById('pen-no-sk').value;
+            const tgl_sk = document.getElementById('pen-tgl').value;
+            const isi_keputusan = document.getElementById('pen-isi-keputusan').value;
+            if(!no_sk || !tgl_sk) return alert('No SK dan Tanggal SK wajib diisi');
+            let aduan = (window.dataAduanGlobal || []).find(x => x.id === id);
+            const tgl_lapor = aduan?.tanggal_kejadian || '';
+            if (tgl_lapor && tgl_sk < tgl_lapor) {
+                return alert('Tanggal SK tidak boleh lebih awal dari Tanggal Kejadian (' + tgl_lapor + ')');
+            }
             const payload = { 
                 status: 'Selesai (SK Diterbitkan)',
-                no_sk: document.getElementById('pen-no-sk').value,
-                tgl_sk: document.getElementById('pen-tgl').value,
-                isi_keputusan: document.getElementById('pen-isi-keputusan').value
+                no_sk: no_sk,
+                tgl_sk: tgl_sk,
+                isi_keputusan: isi_keputusan,
+                keputusan_otorisasi: isi_keputusan
             };
-            await klienSupabase.from('aduan').update(payload).eq('id', id); 
-            alert('SK berhasil disimpan/diperbarui!'); 
-            resetForm('section-penetapan'); 
-            document.getElementById('preview-sk-content').style.display='none'; 
-            muatPilihanAduan('pen-pilih-aduan', ['Menunggu Penerbitan SK','Selesai (SK Diterbitkan)']); 
-            muatDatasheetView('penetapan'); 
+            try {
+                const { error } = await klienSupabase.from('aduan').update(payload).eq('id', id);
+                if (error) throw error;
+                alert('SK berhasil diterbitkan!');
+                if (typeof resetForm === 'function') resetForm('section-penetapan');
+                const prev = document.getElementById('preview-sk-content');
+                if (prev) prev.style.display='none';
+                if (typeof muatPilihanAduan === 'function') {
+                    await muatPilihanAduan('pen-pilih-aduan', ['Menunggu Penerbitan SK']);
+                }
+                if (typeof muatDatasheetView === 'function') muatDatasheetView('penetapan');
+            } catch(err) {
+                alert('Gagal terbitkan SK: ' + (err.message || err));
+            }
         }
 
         // ---------------- TAB LAPORAN FORMAL (CETAK) ----------------
@@ -2433,6 +2671,200 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             });
             document.getElementById('lacak-hasil').style.display = 'block';
         }
-    </script>
+    
+        // ---------------- ROLLBACK PROSES BERTAHAP ----------------
+        const alurStatusSIGAP = ['Terkirim','Diverifikasi','Proses PIC / Dieskalasi','Menunggu Otorisasi','Menunggu Penerbitan SK','Selesai (SK Diterbitkan)'];
+        function getPrevStatus(current) {
+            const i = alurStatusSIGAP.indexOf(current);
+            return i > 0 ? alurStatusSIGAP[i-1] : null;
+        }
+        async function kembalikanProses(tabKey) {
+            const mapSelect = {
+                operator: 'op-pilih-aduan',
+                eskalasi: 'esk-pilih-aduan',
+                pic: 'pic-pilih-aduan',
+                otorisasi: 'ot-pilih-aduan',
+                penetapan: 'pen-pilih-aduan'
+            };
+            const mapRecall = {
+                operator: {select:'op-pilih-aduan', status:'Terkirim', info:'recall-info-operator'},
+                eskalasi: {select:'esk-pilih-aduan', status:'Diverifikasi', info:'recall-info-eskalasi'},
+                pic: {select:'pic-pilih-aduan', status:['Proses PIC / Dieskalasi','Dikembalikan'], info:'recall-info-pic'},
+                otorisasi: {select:'ot-pilih-aduan', status:'Menunggu Otorisasi', info:'recall-info-otorisasi'},
+                penetapan: {select:'pen-pilih-aduan', status:['Menunggu Penerbitan SK','Selesai (SK Diterbitkan)'], info:'recall-info-penetapan'}
+            };
+            const selId = mapSelect[tabKey];
+            if (!selId) return alert('Tab tidak dikenal');
+            const id = document.getElementById(selId)?.value;
+            if (!id) return alert('Pilih aduan dulu di dropdown atas');
+            let aduan = dataAduanGlobal.find(x => x.id === id);
+            if (!aduan && klienSupabase) {
+                try { const {data} = await klienSupabase.from('aduan').select('*').eq('id', id).single(); aduan = data; } catch(e){}
+            }
+            if (!aduan) {
+                const local = getLocalAduan ? getLocalAduan() : [];
+                aduan = local.find(x => x.id === id);
+            }
+            if (!aduan) return alert('Data aduan tidak ditemukan');
+            const prev = getPrevStatus(aduan.status);
+            if (!prev) return alert('Aduan sudah di tahap awal "Terkirim", tidak bisa dikembalikan lagi');
+            const catatan = prompt(`Kembalikan proses aduan?\n\nPelapor: ${aduan.nama_pelapor || '-'}\nTerlapor: ${aduan.nama_terlapor || '-'}\n\nDari: ${aduan.status}\nKe   : ${prev}\n\nCatatan pengembalian (opsional):`, '');
+            if (catatan === null) return;
+            try {
+                const payload = { 
+                    status: prev,
+                    catatan_kembalikan: catatan || null,
+                    dikembalikan_at: new Date().toISOString(),
+                    dikembalikan_dari: aduan.status
+                };
+                if (typeof klienSupabase !== 'undefined' && klienSupabase) {
+                    const {error} = await klienSupabase.from('aduan').update(payload).eq('id', id);
+                    if (error) throw error;
+                } else {
+                    const local = getLocalAduan();
+                    const idx = local.findIndex(x => x.id === id);
+                    if (idx >= 0) { local[idx] = { ...local[idx], ...payload }; saveLocalAduan(local); }
+                }
+                showToast(`Aduan dikembalikan ke "${prev}"`, 'success');
+                const cfg = mapRecall[tabKey];
+                if (cfg) {
+                    await muatPilihanAduan(cfg.select, cfg.status, cfg.info);
+                    await muatDatasheetView(tabKey);
+                }
+                document.querySelectorAll('.active-header').forEach(el => el.style.display = 'none');
+                const sectionMap = {operator:'section-operator', eskalasi:'section-eskalasi', pic:'section-pic', otorisasi:'section-otorisasi', penetapan:'section-penetapan'};
+                if (sectionMap[tabKey]) resetForm(sectionMap[tabKey]);
+            } catch(e) {
+                alert('Gagal mengembalikan: ' + (e.message || e));
+            }
+        }
+
+
+        // =========================================================
+        // SuperAdmin: Manajemen Aduan Terkirim
+        // =========================================================
+        async function loadAduanSuperAdmin() {
+            const statusEl = document.getElementById('sa-aduan-status');
+            const infoEl = document.getElementById('sa-aduan-info');
+            const tbody = document.querySelector('#sa-aduan-table tbody');
+            if (!tbody) return;
+            
+            const statusFilter = statusEl ? statusEl.value : 'Terkirim';
+            if (infoEl) infoEl.textContent = 'Memuat...';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:16px;">Memuat...</td></tr>';
+            
+            let list = [];
+            try {
+                if (typeof klienSupabase !== 'undefined' && klienSupabase) {
+                    let query = klienSupabase.from('aduan').select('*').order('created_at', { ascending: false }).limit(200);
+                    if (statusFilter && statusFilter !== '__all__') {
+                        query = query.eq('status', statusFilter);
+                    }
+                    const { data, error } = await query;
+                    if (error) throw error;
+                    list = data || [];
+                } else {
+                    throw new Error('Supabase offline');
+                }
+            } catch (e) {
+                try {
+                    const local = typeof getLocalAduan === 'function' ? getLocalAduan() : [];
+                    list = statusFilter === '__all__' ? local : local.filter(a => a.status === statusFilter);
+                } catch(e2) { list = []; }
+            }
+            
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b; padding:16px;">Tidak ada aduan dengan status ini.</td></tr>';
+                if (infoEl) infoEl.textContent = '0 aduan';
+                return;
+            }
+            
+            tbody.innerHTML = list.map(a => {
+                const tgl = a.tanggal_kejadian ? new Date(a.tanggal_kejadian).toLocaleDateString('id-ID') : '-';
+                const idShort = (a.id || '').toString().substring(0,8);
+                const pelapor = (a.nama_pelapor || '-').replace(/</g,'&lt;');
+                const terlapor = (a.nama_terlapor || '-').replace(/</g,'&lt;');
+                const status = a.status || '-';
+                return `<tr>
+                    <td><code style="font-size:11px;">${idShort}</code></td>
+                    <td>${pelapor}</td>
+                    <td>${terlapor}</td>
+                    <td>${tgl}</td>
+                    <td><span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-size:11px;">${status}</span></td>
+                    <td>
+                        <button class="btn-small" style="background:#2563eb; color:#fff; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; margin-right:4px;" onclick="editAduanSuperAdmin('${a.id}')">Edit</button>
+                        <button class="btn-small" style="background:#ef4444; color:#fff; border:none; padding:4px 10px; border-radius:4px; cursor:pointer;" onclick="hapusAduanSuperAdmin('${a.id}')">Hapus</button>
+                    </td>
+                </tr>`;
+            }).join('');
+            
+            if (infoEl) infoEl.textContent = `${list.length} aduan ditemukan`;
+        }
+
+        async function editAduanSuperAdmin(id) {
+            let aduan = null;
+            try {
+                if (typeof klienSupabase !== 'undefined' && klienSupabase) {
+                    const { data } = await klienSupabase.from('aduan').select('*').eq('id', id).single();
+                    aduan = data;
+                }
+            } catch(e) {}
+            if (!aduan && typeof getLocalAduan === 'function') {
+                const local = getLocalAduan();
+                aduan = local.find(x => x.id === id);
+            }
+            if (!aduan) { alert('Aduan tidak ditemukan'); return; }
+            
+            const setVal = (elId, val) => { const el = document.getElementById(elId); if(el) el.value = val || ''; };
+            setVal('input-nama', aduan.nama_pelapor);
+            setVal('input-email', aduan.email_pelapor);
+            setVal('input-kontak', aduan.kontak);
+            setVal('input-terlapor', aduan.nama_terlapor);
+            setVal('input-jabatan', aduan.jabatan);
+            setVal('input-lokasi', aduan.lokasi_kejadian);
+            setVal('input-tanggal', aduan.tanggal_kejadian ? aduan.tanggal_kejadian.substring(0,10) : '');
+            setVal('input-deskripsi', aduan.deskripsi);
+            setVal('input-link', aduan.link_bukti);
+            const subEl = document.getElementById('input-subkategori');
+            if (subEl && aduan.sub_kategori) subEl.value = aduan.sub_kategori;
+            
+            if (typeof editingId !== 'undefined') { editingId = id; }
+            else { window.editingId = id; }
+            
+            if (typeof bukaTab === 'function') bukaTab('pelapor');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            const msg = `Aduan #${id.substring(0,8)} dimuat ke form. Silakan update, lalu klik Simpan Draft / Kirim Laporan.`;
+            if (typeof showToast === 'function') showToast(msg, 'success');
+            else alert(msg);
+        }
+
+        async function hapusAduanSuperAdmin(id) {
+            if (!confirm('Hapus aduan ini? Tindakan tidak dapat dibatalkan.')) return;
+            try {
+                if (typeof klienSupabase !== 'undefined' && klienSupabase) {
+                    const { error } = await klienSupabase.from('aduan').delete().eq('id', id);
+                    if (error) throw error;
+                } else {
+                    if (typeof getLocalAduan === 'function') {
+                        let local = getLocalAduan().filter(x => x.id !== id);
+                        localStorage.setItem('sigap_aduan', JSON.stringify(local));
+                    }
+                }
+                if (typeof showToast === 'function') showToast('Aduan dihapus', 'success');
+                loadAduanSuperAdmin();
+            } catch(e) {
+                alert('Gagal menghapus: ' + (e.message || e));
+            }
+        }
+        // --- End SuperAdmin Aduan Manager ---
+
+
+        // Auto-render Detail Aduan header saat pilih aduan
+        ['op-pilih-aduan','pic-pilih-aduan','ot-pilih-aduan','pen-pilih-aduan','esk-pilih-aduan'].forEach(id => {
+          document.getElementById(id)?.addEventListener('change', e => sinkronHeader(e.target.value));
+        });
+
+</script>
 </body>
 </html>
