@@ -8,6 +8,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        function simpanKopSurat() {
+            const input = document.getElementById('kop-input');
+            if (!input || !input.files || !input.files[0]) { alert('Pilih file kop terlebih dahulu'); return; }
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    localStorage.setItem('kopSuratData', e.target.result);
+                    alert('Kop surat berhasil disimpan dan akan tampil di preview SK');
+                } catch(err) { alert('Gagal simpan kop: ' + err.message); }
+            };
+            reader.readAsDataURL(file);
+        }
+    </script>
     
     <style>
         :root{--bg:#020617;--bg-soft:#0f172a;--card:#0f172a;--card-soft:#111827;--text:#ffffff;--muted:#cbd5e1;--primary:#60a5fa;--accent:#f97316;--danger:#ef4444;--success:#22c55e;--surface:#111827;--surface-soft:rgba(255,255,255,0.08);--input-bg:#0f172a;--input-border:rgba(203,213,225,0.45);--placeholder:rgba(203,213,225,0.95)}
@@ -338,8 +353,40 @@ input::placeholder, textarea::placeholder { opacity: 1; }
             color: #0c4a6e !important;
         }
         
+
+        /* Horizontal tabs saat sidenav collapse / mobile */
+        @media (max-width: 992px) {
+            .process-steps, .tab-nav, .nav-tabs {
+                display: flex !important;
+                overflow-x: auto !important;
+                white-space: nowrap !important;
+                gap: 4px !important;
+                padding-bottom: 8px !important;
+            }
+            .process-steps > *, .tab-nav > *, .nav-tabs > * {
+                flex: 0 0 auto !important;
+                min-width: 140px !important;
+            }
+        }
+
 </style>
-<style>.d-pelapor,.d-tgl,.d-terlapor,.d-jabatan,.d-deskripsi,.d-rekomendasi,.d-keputusan{display:none !important}</style>
+<style>.d-pelapor,.d-tgl,.d-terlapor,.d-jabatan,.d-deskripsi,.d-rekomendasi,.d-keputusan{display:none !important}
+        /* Horizontal tabs saat sidenav collapse / mobile */
+        @media (max-width: 992px) {
+            .process-steps, .tab-nav, .nav-tabs {
+                display: flex !important;
+                overflow-x: auto !important;
+                white-space: nowrap !important;
+                gap: 4px !important;
+                padding-bottom: 8px !important;
+            }
+            .process-steps > *, .tab-nav > *, .nav-tabs > * {
+                flex: 0 0 auto !important;
+                min-width: 140px !important;
+            }
+        }
+
+</style>
 </head>
 
 
@@ -653,10 +700,10 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 </div>
                 <div class="form-group"><label>To-Do List Verifikasi</label>
                     <div class="checkbox-group" style="background:var(--input-bg); border:2px solid var(--input-border);">
-                        <label class="checkbox-item" style="color:var(--text); font-weight:600; padding:8px;"><input type="checkbox" class="pic-todo" value="Pemanggilan/Menghadirkan Terlapor"> <span style="color:var(--text);">✓ Pemanggilan Terlapor</span></label>
-                        <label class="checkbox-item" style="color:var(--text); font-weight:600; padding:8px;"><input type="checkbox" class="pic-todo" value="Pemeriksaan Terlapor"> <span style="color:var(--text);">✓ Pemeriksaan Terlapor</span></label>
-                        <label class="checkbox-item" style="color:var(--text); font-weight:600; padding:8px;"><input type="checkbox" class="pic-todo" value="Sidang Etik"> <span style="color:var(--text);">✓ Sidang Etik</span></label>
-                        <label class="checkbox-item" style="color:var(--text); font-weight:600; padding:8px;"><input type="checkbox" class="pic-todo" value="Membuat Rekomendasi/Hasil"> <span style="color:var(--text);">✓ Membuat Rekomendasi Akhir</span></label>
+                        <label class="checkbox-item" style="color:var(--text); font-weight:600; padding:8px;"><input type="checkbox" class="pic-todo" value="Pemanggilan/Menghadirkan Terlapor"> <span style="color:var(--text);">Pemanggilan Terlapor</span></label>
+                        <label class="checkbox-item" style="color:var(--text); font-weight:600; padding:8px;"><input type="checkbox" class="pic-todo" value="Pemeriksaan Terlapor"> <span style="color:var(--text);">Pemeriksaan Terlapor</span></label>
+                        <label class="checkbox-item" style="color:var(--text); font-weight:600; padding:8px;"><input type="checkbox" class="pic-todo" value="Sidang Etik"> <span style="color:var(--text);">Sidang Etik</span></label>
+                        <label class="checkbox-item" style="color:var(--text); font-weight:600; padding:8px;"><input type="checkbox" class="pic-todo" value="Membuat Rekomendasi/Hasil"> <span style="color:var(--text);">Membuat Rekomendasi Akhir</span></label>
                     </div>
                 </div>
                 <div class="form-group"><label>Tanggapan Proses</label><textarea id="pic-tanggapan-proses"></textarea></div>
@@ -692,7 +739,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
                 <div id="header-ot"></div>
 
                 <div class="form-group"><label>Keputusan Penetapan *</label>
-                    <select id="ot-keputusan"><option value="Disetujui - Terbitkan SK">Disetujui - Terbitkan SK</option><option value="Dinyatakan terbukti secara sah dan meyakinkan">Dinyatakan terbukti secara sah dan meyakinkan</option><option value="tidak terbukti">tidak terbukti</option><option value="Dikembalikan untuk Direvisi">Kembalikan ke PIC</option><option value="Ditolak">Ditolak</option></select>
+                    <select id="ot-keputusan"><option value="Dinyatakan terbukti secara sah dan meyakinkan">Dinyatakan terbukti secara sah dan meyakinkan</option><option value="tidak terbukti">tidak terbukti</option><option value="Dikembalikan untuk Direvisi">Kembalikan ke PIC</option><option value="Ditolak">Ditolak</option></select>
                 </div>
                 <div class="form-group"><label>Catatan Final</label><textarea id="ot-catatan"></textarea></div>
                 <div class="form-group">
@@ -770,6 +817,7 @@ input::placeholder, textarea::placeholder { opacity: 1; }
 
                 <hr>
                 <div class="form-group"><label>Upload Scan SK Bertanda Tangan (Final)</label><input type="file" id="pen-file" accept="image/*,.pdf" onchange="validasiUkuranFile(this, 5)"><span class="file-hint">Maks. 5MB.</span></div>
+                <button class="btn-admin" id="btn-pen-preview" onclick="muatPreviewSK(document.getElementById('pen-pilih-aduan').value)" style="background:#2563eb;margin-right:8px;">🔍 Preview SK</button>
                 <button class="btn-admin" id="btn-pen-simpan" onclick="simpanPenetapan()">Terbitkan & Arsipkan SK</button>
                 <button class="btn-admin btn-small" style="margin-left:8px;" onclick="kembalikanProses('penetapan')">↩ Kembalikan ke Otorisasi</button>
             </div>
@@ -1914,8 +1962,6 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
 
         // Seed sample data for local testing (only used when Supabase unreachable)
         function seedLocalData() { /* disabled - no dummy data */ }
-        
-        
 
         function distribusiParameter() {
             Object.keys(systemParameters).forEach(key => {
@@ -1979,7 +2025,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                 const b = new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
                 downloadBlob(b, `backup_sigap_${t}.json`);
             } else if(fmt==='txt'){
-                const txt = d.map(x => `${x.id}	${x.nama_pelapor}	${x.nama_terlapor}	${x.status}	${x.tanggal_kejadian}`).join('\n');
+                const txt = d.map(x => `${x.id} ${x.nama_pelapor}       ${x.nama_terlapor}      ${x.status}     ${x.tanggal_kejadian}`).join('\n');
                 const b = new Blob([txt],{type:'text/plain'});
                 downloadBlob(b, `backup_sigap_${t}.txt`);
             } else if(fmt==='csv'){
@@ -2128,7 +2174,10 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
 
         async function sinkronHeader(aduan_id) {
             const infoBoxes = document.querySelectorAll('.active-header');
-            if(!aduan_id) { infoBoxes.forEach(el => el.style.display = 'none'); return; }
+            if(!aduan_id) { 
+                infoBoxes.forEach(el => el.style.display = 'none'); 
+                return; 
+            }
             let aduan = (typeof dataAduanGlobal !== 'undefined' ? dataAduanGlobal.find(x => x.id === aduan_id) : null);
             try {
                 if (typeof klienSupabase !== 'undefined' && klienSupabase) {
@@ -2137,10 +2186,12 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                 }
             } catch(e) {}
             if(!aduan) return;
-            const rekomendasi = aduan.rekomendasi_pic || '-';
-            const keputusan = aduan.keputusan_otorisasi || aduan.isi_keputusan || '-';
+            
+            const rekomendasi = aduan.rekomendasi_pic ||aduan.keputusan_otorisasi ||  '-';
+            const keputusan = aduan.isi_keputusan || '-';
             const tgl_lapor_str = aduan.tanggal_kejadian || aduan.created_at?.substring(0,10) || '';
             const tgl = tgl_lapor_str ? new Date(tgl_lapor_str).toLocaleDateString('id-ID') : '-';
+            
             const SLA_TARGET = 14;
             let sla_sisa = '-', sla_status = '-';
             if (tgl_lapor_str) {
@@ -2151,6 +2202,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                 sla_sisa = sisa >= 0 ? sisa + ' hari' : 'Terlambat ' + Math.abs(sisa) + ' hari';
                 sla_status = sisa >= 3 ? 'Aman' : sisa >= 0 ? 'Mendekati' : 'Overdue';
             }
+            
             const setAll = (sel, val) => document.querySelectorAll(sel).forEach(el => el.textContent = val || '-');
             setAll('.h-pelapor', aduan.nama_pelapor);
             setAll('.h-tgl', tgl);
@@ -2164,18 +2216,27 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             setAll('.h-sla', SLA_TARGET);
             setAll('.h-sla-sisa', sla_sisa);
             setAll('.h-sla-status', sla_status);
+            
             document.querySelectorAll('.h-sla-status').forEach(el => {
                 el.style.color = sla_status === 'Overdue' ? '#dc2626' : sla_status === 'Mendekati' ? '#d97706' : '#16a34a';
                 el.style.fontWeight = '600';
             });
+            
+            // Sembunyikan jejak Rekomendasi/Keputusan di header kalau sudah Selesai
             const isSelesai = (aduan.status || '').includes('Selesai');
-            document.querySelectorAll('.rk-header').forEach(el => { el.style.display = isSelesai ? 'none' : 'block'; });
+            document.querySelectorAll('.rk-header').forEach(el => {
+                el.style.display = isSelesai ? 'none' : 'block';
+            });
+            
+            // set min tanggal SK >= tanggal laporan
             const tglSkEl = document.getElementById('pen-tgl');
             if (tglSkEl && tgl_lapor_str) {
                 tglSkEl.min = tgl_lapor_str;
                 if (tglSkEl.value && tglSkEl.value < tgl_lapor_str) tglSkEl.value = '';
             }
+            
             infoBoxes.forEach(el => { el.style.display = 'block'; });
+            
             const isiKepEl = document.getElementById('pen-isi-keputusan');
             if (isiKepEl && !isiKepEl.value && keputusan !== '-') isiKepEl.value = keputusan;
             if (typeof muatPreviewSK === 'function' && document.getElementById('preview-sk-content')?.style.display !== 'none') {
@@ -2411,7 +2472,22 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
         }
 
         // ---------------- SK, PDF, RTF DOWNLOAD ----------------
-        async function generateAutoSK() { document.getElementById('pen-no-sk').value = `${String(Math.floor(Math.random()*9000)+1000).padStart(4,'0')}/KEH/RSJDAHM/${new Date().getFullYear()}`; muatPreviewSK(document.getElementById('pen-pilih-aduan').value); }
+        async function generateAutoSK() { 
+            try {
+                const tahun = new Date().getFullYear();
+                const { data, error } = await klienSupabase.from('aduan').select('no_sk').not('no_sk', 'is', null);
+                let count = 0;
+                if (!error && data) {
+                    count = data.filter(x => x.no_sk && x.no_sk.includes('/' + tahun)).length;
+                }
+                const nomorUrut = String(count + 1).padStart(4, '0');
+                document.getElementById('pen-no-sk').value = nomorUrut + '/KEH/RSJDAHM/' + tahun;
+            } catch(e) {
+                document.getElementById('pen-no-sk').value = '0001/KEH/RSJDAHM/' + new Date().getFullYear();
+            }
+            muatPreviewSK(document.getElementById('pen-pilih-aduan').value);
+        }
+        //KEH/RSJDAHM/${new Date().getFullYear()}`; muatPreviewSK(document.getElementById('pen-pilih-aduan').value); }
         async function muatPreviewSK(id) {
             if(!id) return;
             const preview = document.getElementById('preview-sk-content');
@@ -2425,12 +2501,14 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                 
                 const noSK = document.getElementById('pen-no-sk').value || '[Nomor SK]';
                 const tglSK = document.getElementById('pen-tgl').value || new Date().toISOString().split('T')[0];
-                const isiKeputusanDB = aduan.keputusan_otorisasi || aduan.isi_keputusan || '';
+                const isiKeputusanDB = aduan.isi_keputusan || '';
                 const isiKeputusanForm = document.getElementById('pen-isi-keputusan').value;
-                const isiKeputusan = isiKeputusanForm || isiKeputusanDB || '[Isi keputusan akan ditampilkan di sini]';
-                if (isiKeputusanDB && !isiKeputusanForm) {
-                    document.getElementById('pen-isi-keputusan').value = isiKeputusanDB;
-                }
+                const isiKeputusan = isiKeputusanForm || '[Isi keputusan akan ditampilkan di sini]';
+                const rekomendasiPIC = aduan.rekomendasi_pic || aduan.keputusan_otorisasi || '[Rekomendasi PIC]';
+                const halInput = document.getElementById('pen-hal-sk');
+                if (halInput && !halInput.value) { halInput.value = rekomendasiPIC; }
+                const isiInput = document.getElementById('pen-isi-keputusan');
+                if (isiInput && !isiInput.value) { isiInput.value = rekomendasiPIC; }
                 
                 const tglAduan = formatTanggalPanjang(aduan.tanggal_kejadian || aduan.created_at);
                 const tglSurat = formatTanggalPanjang(tglSK);
@@ -2438,12 +2516,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                 
                 preview.innerHTML = `
                     <div style="text-align:center;margin-bottom:30px;line-height: 1.0;">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI0MCIgY3k9IjQwIiByPSI0MCIgZmlsbD0iI2RjMjYyNiIvPjx0ZXh0IHg9IjQwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjMyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC13ZWlnaHQ9ImJvbGQiPlM8L3RleHQ+PC9zdmc+" style="width:70px;height:70px;margin-bottom:10px;">
-                        <div style="font-size:14pt;font-weight:bold;">PEMERINTAH PROVINSI KALIMANTAN TIMUR</div>
-                        <div style="font-size:16pt;font-weight:bold;margin:4px 0;">RUMAH SAKIT JIWA DAERAH</div>
-                        <div style="font-size:16pt;font-weight:bold;">ATMA HUSADA MAHAKAM</div>
-                        <div style="font-size:11pt;margin-top:6px;">Jalan Kakap No. 23 Samarinda 75115 Telp. (0541) 743364</div>
-                        <div style="border-bottom:3px double #000;margin-top:12px;"></div>
+                        ${(function(){const k=localStorage.getItem("kopSuratData");return k?`<img src="${k}" style="width:100%;max-height:140px;object-fit:contain;margin-bottom:10px;">`:`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="width:70px;height:70px;border:2px solid #16a34a;border-radius:50%;"></div><div style="width:70px;height:70px;background:#dc2626;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:32px;">S</div></div>`})()}
                     </div>
                     
                     <div style="text-align:center;margin:30px;line-height: 1.0;">
@@ -2453,7 +2526,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                         <p style="font-weight:bold;font-size:13pt;margin:8px 0;">PENETAPAN HASIL PENANGANAN ADUAN ETIK</p>
                     </div>
                     
-                    <table class="sk-table" style="margin:20px 0;line-height: 1.5;">
+                    <table class="sk-table" style="margin:30px 0;line-height: 1.5;">
                         <tr><td>Menimbang</td><td>:</td><td>
                             a.</td><td>Bahwa berdasarkan data aduan masuk pada sistem aplikasi tanggal ${tglAduan} dengan ID ${idAduan};</td></tr>
                         <tr><td></td><td> </td><td>
@@ -2480,11 +2553,11 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                                 <p>Unit Kerja : <span style="font-weight: bold;">${aduan.lokasi_kejadian || '-'}</span></p>
                             </div>    
                         <tr><td></td><td></td><td>
-                            ${aduan.keputusan_otorisasi || 'Dinyatakan terbukti secara sah dan meyakinkan / tidak terbukti'} melakukan pemenuhan unsur kategori pelanggaran pada perkara ${aduan.kategori || '-'} dengan tingkat urgensi penanganan ${aduan.urgensi || '-'}
+                            ${isiKeputusan} melakukan pemenuhan unsur kategori pelanggaran pada perkara ${aduan.kategori || '-'} dengan tingkat urgensi penanganan ${aduan.urgensi || '-'}
                             </td></tr>
                         <tr><td>KEDUA</td><td>:</td><td>
                             <span style="font-weight: bold;">Hasil Ketetapan Eksekusi/Tindak Lanjut:</span><br>
-                            <span style="font-style: italic;">kepada terlapor sebagaimana diktum KESATU - ${isiKeputusan}</span>
+                            <span style="font-style: italic;">${rekomendasiPIC}</span>
                                 </td></tr>
                         <tr><td>KETIGA</td><td>:</td><td>Keputusan ini  bersifat mutlak mengikat, diterbitkan secara resmi melalui otorisasi kelembagaan, berlaku sejak tanggal ditetapkan.
                             </td></tr>
@@ -2516,20 +2589,58 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
     // <-- INI YANG HILANG
 
            function downloadRTF(id, filename) { 
-            const content = document.getElementById(id).innerHTML;
-            if(!content) return alert("Preview SK belum termuat!");
-            const preHtml = ['<','html','>','<','head','>','<','meta charset="utf-8"','>','<','title','>','SK','<','/title','>','<','/head','>','<','body','>'].join('');
-            const postHtml = ['<','/body','>','<','/html','>'].join('');
-            const blob = new Blob(['\ufeff', preHtml + content + postHtml], { type: 'application/rtf' }); 
+            const el = document.getElementById(id);
+            if(!el || el.style.display === 'none' || !el.innerHTML.trim()) return alert("Preview SK belum termuat!");
+            // Ambil teks bersih untuk RTF, escape karakter khusus RTF
+            const text = el.innerText || '';
+            const rtfEsc = text.replace(/\\/g,'\\\\').replace(/{/g,'\\{').replace(/}/g,'\\}').replace(/\n/g,'\\par\n');
+            const rtfContent = `{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Arial;}{\\f1 Times New Roman;}}\\f0\\fs22 ${rtfEsc}}`;
+            const blob = new Blob([rtfContent], { type: 'application/rtf' }); 
             const url = URL.createObjectURL(blob); 
-            const a = document.createElement("a"); a.href = url; a.download = filename; 
+            const a = document.createElement("a"); a.href = url; a.download = filename.endsWith('.rtf') ? filename : filename + '.rtf'; 
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
 
         function downloadPDF(id, filename) { 
             const element = document.getElementById(id);
-            if(!element || element.style.display === 'none') return alert("Preview SK belum termuat!");
-            html2pdf().set({margin:0.5, filename:filename, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'in', format:'letter', orientation:'portrait'}}).from(element).save(); 
+            if(!element || element.style.display === 'none' || !element.innerHTML.trim()) return alert("Preview SK belum termuat! Klik 'Preview' dulu.");
+            // Pastikan html2pdf sudah load
+            if(typeof html2pdf === 'undefined') return alert('Library PDF belum siap, refresh halaman.');
+            const opt = {
+                margin:       [0.5, 0.5, 0.7, 0.5],
+                filename:     filename.endsWith('.pdf') ? filename : filename + '.pdf',
+                image:        { type:'jpeg', quality:0.98 },
+                html2canvas:  { scale:2, useCORS:true, scrollY:0 },
+                jsPDF:        { unit:'in', format:'a4', orientation:'portrait' },
+                pagebreak:    { mode:['avoid-all','css','legacy'] }
+            };
+            html2pdf().set(opt).from(element).save(); 
+        }
+        
+        // FITUR BARU: download SK yang sudah diterbitkan
+        async function downloadSKTerbit(id, format='pdf') {
+            try {
+                // muat data dulu, isi form, generate preview
+                const { data: aduan } = await klienSupabase.from('aduan').select('*').eq('id', id).single();
+                if(!aduan || !aduan.no_sk) return alert('SK belum diterbitkan untuk aduan ini');
+                
+                // set form sementara agar preview pakai data asli
+                document.getElementById('pen-pilih-aduan').value = id;
+                document.getElementById('pen-no-sk').value = aduan.no_sk;
+                document.getElementById('pen-tgl').value = aduan.tgl_sk || '';
+                document.getElementById('pen-isi-keputusan').value = aduan.isi_keputusan || aduan.keputusan_otorisasi || '';
+                
+                await muatPreviewSK(id);
+                
+                // tunggu render
+                setTimeout(() => {
+                    const fname = `SK_${aduan.no_sk.replace(/[\/\\]/g,'-')}_${id.substring(0,6)}`;
+                    if(format === 'rtf') downloadRTF('preview-sk-content', fname);
+                    else downloadPDF('preview-sk-content', fname);
+                }, 800);
+            } catch(e) {
+                alert('Gagal download SK: ' + e.message);
+            }
         }
         
         
@@ -2540,6 +2651,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                 if (d) data = d;
             } catch(e){}
             if (!data) return alert('Data tidak ditemukan');
+            // Rollback status satu step agar bisa diterbitkan ulang
             if (data.status === 'Selesai (SK Diterbitkan)') {
                 try {
                     await klienSupabase.from('aduan').update({ status: 'Menunggu Penerbitan SK' }).eq('id', id);
@@ -2562,6 +2674,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             const tglEl = document.getElementById('pen-tgl');
             if (tglEl && data.tanggal_kejadian) tglEl.min = data.tanggal_kejadian;
             if (typeof bukaTab === 'function') bukaTab('penetapan');
+            // refresh list agar ID muncul di pilihan
             if (typeof muatPilihanAduan === 'function') await muatPilihanAduan('pen-pilih-aduan', ['Menunggu Penerbitan SK']);
             if (sel) sel.value = id;
             if (typeof muatDatasheetView === 'function') muatDatasheetView('penetapan');
@@ -2571,23 +2684,33 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
         async function simpanPenetapan() { 
             const id = document.getElementById('pen-pilih-aduan').value;
             if(!id) return alert('Pilih aduan dulu');
-            const no_sk = document.getElementById('pen-no-sk').value;
+            const no_sk = document.getElementById('pen-no-sk').value?.trim();
             const tgl_sk = document.getElementById('pen-tgl').value;
-            const isi_keputusan = document.getElementById('pen-isi-keputusan').value;
+            const isi_keputusan = document.getElementById('pen-isi-keputusan').value?.trim();
             if(!no_sk || !tgl_sk) return alert('No SK dan Tanggal SK wajib diisi');
             let aduan = (window.dataAduanGlobal || []).find(x => x.id === id);
             const tgl_lapor = aduan?.tanggal_kejadian || '';
             if (tgl_lapor && tgl_sk < tgl_lapor) {
                 return alert('Tanggal SK tidak boleh lebih awal dari Tanggal Kejadian (' + tgl_lapor + ')');
             }
+            // PERBAIKAN: definisikan rekomendasi_pic agar tidak ReferenceError
+            const rekomendasi_pic = aduan?.rekomendasi_pic || isi_keputusan || '';
             const payload = { 
                 status: 'Selesai (SK Diterbitkan)',
                 no_sk: no_sk,
                 tgl_sk: tgl_sk,
                 isi_keputusan: isi_keputusan,
-                keputusan_otorisasi: isi_keputusan
+                keputusan_otorisasi: rekomendasi_pic,
+                updated_at: new Date().toISOString()
             };
             try {
+                // CEK DUPLIKAT NO SK
+                const { data: cek, error: cekErr } = await klienSupabase.from('aduan').select('id').eq('no_sk', no_sk).neq('id', id).limit(1);
+                if (cekErr) throw cekErr;
+                if (cek && cek.length > 0) {
+                    return alert('No SK sudah digunakan pada aduan lain. Gunakan nomor berbeda.');
+                }
+
                 const { error } = await klienSupabase.from('aduan').update(payload).eq('id', id);
                 if (error) throw error;
                 alert('SK berhasil diterbitkan!');
@@ -2598,6 +2721,7 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
                     await muatPilihanAduan('pen-pilih-aduan', ['Menunggu Penerbitan SK']);
                 }
                 if (typeof muatDatasheetView === 'function') muatDatasheetView('penetapan');
+                if (typeof muatLaporanFormal === 'function') { setTimeout(() => muatLaporanFormal(), 500); }
             } catch(err) {
                 alert('Gagal terbitkan SK: ' + (err.message || err));
             }
@@ -2610,17 +2734,19 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             
             const tbody = document.getElementById('lap-tbody'); tbody.innerHTML = '';
             try {
-                let query = klienSupabase.from('aduan').select('id, created_at, tanggal_kejadian, nama_pelapor, nama_terlapor, kategori, urgensi, status, proses_penanganan(tanggapan_akhir)').order('created_at', { ascending: false });
+                let query = klienSupabase.from('aduan').select('id, created_at, tanggal_kejadian, nama_pelapor, nama_terlapor, kategori, urgensi, status, isi_keputusan, keputusan_otorisasi, no_sk, tgl_sk, proses_penanganan(tanggapan_akhir)').order('created_at', { ascending: false });
                 if(fKat) query = query.eq('kategori', fKat);
                 if(fStatus) query = query.eq('status', fStatus);
                 const { data } = await query;
                 if(!data || data.length===0) return tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data</td></tr>';
                 const selWaktu = document.getElementById('lap-filter-waktu'); document.getElementById('lap-periode-text').innerText = selWaktu.options[selWaktu.selectedIndex].text;
                 data.forEach(d => {
-                    const rek = (d.proses_penanganan && d.proses_penanganan.length > 0) ? d.proses_penanganan[0].tanggapan_akhir : "-";
+                    // SINKRONISASI: prioritaskan hasil SK
+                    const rekPIC = (d.proses_penanganan && d.proses_penanganan.length > 0) ? d.proses_penanganan[0].tanggapan_akhir : "-";
+                    const rek = d.isi_keputusan || d.keputusan_otorisasi || rekPIC || "-";
                     const tgl = formatTanggalIndo(d.created_at);
                     const urg = d.urgensi || "-";
-                    tbody.innerHTML += `<tr><td>${tgl}</td><td style="font-size:10px;">${d.id.substring(0,8).toUpperCase()}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td>${d.kategori||'-'}<br><small>(${urg})</small></td><td><b>${d.status}</b></td><td>${rek}</td></tr>`;
+                    tbody.innerHTML += `<tr><td>${tgl}</td><td style="font-size:10px;">${d.id.substring(0,8).toUpperCase()}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td>${d.kategori||'-'}<br><small>(${urg})</small></td><td><b>${d.status}</b>${d.no_sk ? `<br><small style="color:#60a5fa">SK: ${d.no_sk}</small>` : ''}</td><td>${rek}</td></tr>`;
                 });
                 return;
             } catch (e) {
@@ -2631,10 +2757,10 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
             if(!local || local.length===0) return tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data</td></tr>';
             const selWaktu = document.getElementById('lap-filter-waktu'); document.getElementById('lap-periode-text').innerText = selWaktu.options[selWaktu.selectedIndex].text;
             local.forEach(d => {
-                const rek = d.tanggapan_akhir || '-';
+                const rek = d.isi_keputusan || d.keputusan_otorisasi || d.tanggapan_akhir || '-';
                 const tgl = formatTanggalIndo(d.created_at);
                 const urg = d.urgensi || '-';
-                tbody.innerHTML += `<tr><td>${tgl}</td><td style="font-size:10px;">${d.id.substring(0,8).toUpperCase()}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td>${d.kategori||'-'}<br><small>(${urg})</small></td><td><b>${d.status}</b></td><td>${rek}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${tgl}</td><td style="font-size:10px;">${d.id.substring(0,8).toUpperCase()}</td><td>${d.nama_pelapor}</td><td>${d.nama_terlapor}</td><td>${d.kategori||'-'}<br><small>(${urg})</small></td><td><b>${d.status}</b>${d.no_sk ? `<br><small style="color:#60a5fa">SK: ${d.no_sk}</small>` : ''}</td><td>${rek}</td></tr>`;
             });
         }
 
@@ -2864,6 +2990,38 @@ async function loadPub(){const c=document.getElementById('publikasi-list');if(!c
         ['op-pilih-aduan','pic-pilih-aduan','ot-pilih-aduan','pen-pilih-aduan','esk-pilih-aduan'].forEach(id => {
           document.getElementById(id)?.addEventListener('change', e => sinkronHeader(e.target.value));
         });
+
+
+        // Auto-render Detail Aduan header
+        ['op-pilih-aduan','pic-pilih-aduan','ot-pilih-aduan','pen-pilih-aduan','esk-pilih-aduan'].forEach(id => {
+          document.getElementById(id)?.addEventListener('change', e => sinkronHeader(e.target.value));
+        });
+
+        function distribusiParameter() {
+            Object.keys(systemParameters).forEach(key => {
+                document.querySelectorAll(`.dyn-${key}`).forEach(sel => {
+                    const firstOpt = sel.options.length > 0 && sel.options[0].value === "" ? sel.options[0].outerHTML : "";
+                    sel.innerHTML = firstOpt;
+                    systemParameters[key].forEach(val => sel.innerHTML += `<option value="${val}">${val}</option>`);
+                });
+            });
+        }
+
+
+
+        function simpanKopSurat() {
+            const input = document.getElementById('kop-input');
+            if (!input || !input.files || !input.files[0]) { alert('Pilih file kop terlebih dahulu'); return; }
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    localStorage.setItem('kopSuratData', e.target.result);
+                    alert('Kop surat berhasil disimpan dan akan tampil di preview SK');
+                } catch(err) { alert('Gagal simpan kop: ' + err.message); }
+            };
+            reader.readAsDataURL(file);
+        }
 
 </script>
 </body>
